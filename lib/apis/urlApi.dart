@@ -3,7 +3,10 @@ part of  'apis.dart';
 
 
 class UrlApi {
-  static const host = ConstApi.hostDesarrollo; //ip del servidor
+
+  static String ambiente=Host.hostProduccion;
+  static String host = Host.gethost(ambiente); //Pruebas
+
   static const _pathUrl = "appmovil/siipneMovil/index.php"; //ruta del arhivo index
 //obtener polilyne
   //http://router.project-osrm.org/route/v1/driving/-78.501620,-0.217045;-78.500491,-0.216096

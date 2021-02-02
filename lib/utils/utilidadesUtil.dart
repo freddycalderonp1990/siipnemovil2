@@ -24,6 +24,21 @@ class UtilidadesUtil {
     return getImagenResourse(title:title,imageFile:imageFile);
 
   }
+  static Future<String> getVersionCodeApp() async{
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String versionName = packageInfo.version;
+    String versionCode = packageInfo.buildNumber;
+
+    String result= versionName+' - '+versionCode;
+
+    return result;
+  }
+
+
+
+  static pantallasAbrirNuevaCerrarTodas({BuildContext context, String pantalla}){
+    Navigator.of(context).pushNamedAndRemoveUntil(pantalla, (Route<dynamic> route) => false);
+  }
 
   static Future<GaleryCameraModel> getImagenResourse ({String title,imageFile}) async{
     final tempDir = await getTemporaryDirectory();

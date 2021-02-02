@@ -17,6 +17,9 @@ class DialogosWidget {
       @required Widget widget}) {
     double radioBorder = 30.0;
 
+    widget= WillPopScope(
+        onWillPop: () async => false,
+        child:widget);
     final dialog = Dialog(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(radioBorder))),
@@ -27,6 +30,8 @@ class DialogosWidget {
         radioBorder: radioBorder,
       ),
     );
+
+
 
     showDialog(
         barrierDismissible: false,
@@ -180,6 +185,7 @@ class DialogosWidget {
     ];
 
     dialogo(context,
+
         title: title,
         botonesWidget: botonesWidget,
         widget: getDialogoMsj(message));

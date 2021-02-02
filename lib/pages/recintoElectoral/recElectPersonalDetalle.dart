@@ -69,10 +69,12 @@ class _RecElectPersonalDetalleState extends State<RecElectPersonalDetalle> {
         anchoPorce: anchoContenedor,
         child: Column(
           children: [
-            TituloTextWidget(
-              textAlign: TextAlign.center,
-              title: _RecintoProvider.getRecintoAbierto.nomRecintoElec,
-            ),
+           Container(
+             padding: EdgeInsets.all(5),
+             child:  TituloTextWidget(
+             textAlign: TextAlign.center,
+             title: _RecintoProvider.getRecintoAbierto.nomRecintoElec,
+           ),),
             _wgJefe(responsive),
             _PersonalActivo(responsive),
             _PersonalNoActivo(responsive)
@@ -142,7 +144,14 @@ class _RecElectPersonalDetalleState extends State<RecElectPersonalDetalle> {
                 itemBuilder: (context, index) {
                   PersonalRecintoElectoral personal = _ListPersonalActivo[index];
 
-                  return DisingPersonal(index: index,nombrePersonal:personal.personal ,);
+                  return DisingPersonal(index: index,nombrePersonal:personal.personal ,onTap: (){
+                    _AbandonarRecintoElectoral(
+                        usuario: _UserProvider.getUser.idGenUsuario,
+                        idDgoPerAsigOpe:
+                        personal.idDgoPerAsigOpe,
+                    nombre: personal.personal);
+
+                  },);
                 })
 
 
@@ -221,22 +230,56 @@ class _RecElectPersonalDetalleState extends State<RecElectPersonalDetalle> {
       });
     }
   }
+
+
+  _AbandonarRecintoElectoral(
+      {@required String usuario, @required String idDgoPerAsigOpe,String nombre}) async {
+    try {
+      if (peticionServer) return;
+
+      setState(() {
+        peticionServer = true;
+      });
+
+      bool res = await _recintosElectoralesApi.abandonarRecintoElectoral(
+        context: context,
+        idDgoPerAsigOpe: idDgoPerAsigOpe,
+        usuario: usuario,
+          msjDialogo: "Ha inactivado a ${nombre}, de su recinto electoral."
+      );
+
+      setState(() {
+        peticionServer = false;
+      });
+    } catch (e) {
+      setState(() {
+        peticionServer = false;
+      });
+    }
+  }
 }
 
 class DisingPersonal extends StatelessWidget {
 
   final int index;
   final String nombrePersonal;
-
-  const DisingPersonal({Key key, this.index, this.nombrePersonal}) : super(key: key);
+  final GestureTapCallback onTap;
+  const DisingPersonal({Key key, this.index, this.nombrePersonal, this.onTap}) : super(key: key);
 
 
   @override
   Widget build(BuildContext context) {
     final responsive = ResponsiveUtil(context);
 
-    return Padding(
+    return Container(
+      margin: EdgeInsets.all(2),
         padding: EdgeInsets.symmetric(horizontal: 15),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(5),
+            boxShadow: [
+              BoxShadow(color: AppConfig.colorBordecajas, blurRadius: 1)
+            ]),
         child:
         Row(
           children: <Widget>[
@@ -269,6 +312,7 @@ class DisingPersonal extends StatelessWidget {
                     )),
               ),
             ),
+         onTap!=null?   BtnIconWidget(iconData: Icons.cancel,color: Colors.red.withOpacity(0.2),colorTextoIcon: Colors.white,onTap: onTap,elevation: 2,paddinHorizontal: 0,):Container()
 
           ],
         )
@@ -276,5 +320,6 @@ class DisingPersonal extends StatelessWidget {
 
     );
   }
+
 }
 

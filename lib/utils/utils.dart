@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:get_ip/get_ip.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:math' as math;
 import 'package:latlong/latlong.dart';

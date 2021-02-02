@@ -191,8 +191,8 @@ class RecintosElectoralesApi {
             title: "Recintos Electorales",
             message: "Ya se encuentra asignado al recinto electoral \n" +
                 _resgistroPersEnRecElectoral.nomRecintoElec +
-                "\n\nJefe/Encargado\n" +
-                _resgistroPersEnRecElectoral.encargado +
+              /*  "\n\nJefe/Encargado\n" +
+                _resgistroPersEnRecElectoral.encargado +*/
                 "\n\nPara poder ser asignado a un nuevo recinto electoral abandone el recinto anterior y vuelva a intentar.");
 
         return _resgistroPersEnRecElectoral;
@@ -204,8 +204,9 @@ class RecintosElectoralesApi {
 
         if (msj == ConstApi.varTrue) {
           DialogosWidget.alert(context, onTap: () {
-            Navigator.pushReplacementNamed(
-                context, AppConfig.pantallaMenuRecintoElectoral);
+            UtilidadesUtil.pantallasAbrirNuevaCerrarTodas(context: context,pantalla: AppConfig.pantallaMenuRecintoElectoral);
+            /*Navigator.pushReplacementNamed(
+                context, AppConfig.pantallaMenuRecintoElectoral);*/
           },
               title: "Recintos Electorales",
               message: "Registro Realizado con exito!.");
@@ -378,8 +379,10 @@ class RecintosElectoralesApi {
             title: "Recintos Electorales",
             message: "Recinto Electoral eliminado con exito!. " + msj,
         onTap: (){
-          Navigator.pushReplacementNamed(
-              context, AppConfig.pantallaMenuRecintoElectoral);
+         /* Navigator.pushReplacementNamed(
+              context, AppConfig.pantallaMenuRecintoElectoral);*/
+
+          UtilidadesUtil.pantallasAbrirNuevaCerrarTodas(context: context,pantalla: AppConfig.pantallaMenuRecintoElectoral);
 
         
         });
@@ -409,6 +412,7 @@ class RecintosElectoralesApi {
     @required BuildContext context,
     @required String idDgoPerAsigOpe,
     @required String usuario,
+    String msjDialogo,
 
   }) async {
     try {
@@ -442,10 +446,12 @@ class RecintosElectoralesApi {
 
         DialogosWidget.alert(context,
             title: "Recintos Electorales",
-            message: "Usted abandono con éxito el recinto Electoral!. " ,
+            message: msj==null? "Usted abandono con éxito el recinto Electoral!. ": msjDialogo ,
             onTap: (){
-              Navigator.pushReplacementNamed(
-                  context, AppConfig.pantallaMenuRecintoElectoral);
+             /* Navigator.pushReplacementNamed(
+                  context, AppConfig.pantallaMenuRecintoElectoral);*/
+
+              UtilidadesUtil.pantallasAbrirNuevaCerrarTodas(context: context,pantalla: AppConfig.pantallaMenuRecintoElectoral);
             });
         return true;
       }
@@ -473,6 +479,7 @@ class RecintosElectoralesApi {
     @required BuildContext context,
     @required String idDgoCreaOpReci,
     @required String usuario,
+    @required String idDgoPerAsigOpe,
 
   }) async {
     try {
@@ -485,6 +492,8 @@ class RecintosElectoralesApi {
         "usuario": usuario,
         "idDgoCreaOpReci": idDgoCreaOpReci,
         "ip": ip,
+        "idDgoPerAsigOpe": idDgoPerAsigOpe,
+
       };
 
       //cUANDO SE NECESITA LOS METODOS ESPECIFICO PARA CADA MODULO SE ENVIA POR PARAMETRO EL MODULO CORRESPONDIENTE
@@ -508,8 +517,9 @@ class RecintosElectoralesApi {
             title: "Recintos Electorales",
             message: "Usted finalizó con éxito el recinto Electoral!. " ,
             onTap: (){
-              Navigator.pushReplacementNamed(
-                  context, AppConfig.pantallaMenuRecintoElectoral);
+             /* Navigator.pushReplacementNamed(
+                  context, AppConfig.pantallaMenuRecintoElectoral);*/
+              UtilidadesUtil.pantallasAbrirNuevaCerrarTodas(context: context,pantalla: AppConfig.pantallaMenuRecintoElectoral);
             });
         return true;
       }

@@ -23,6 +23,7 @@ part 'urlApi.dart';
 part 'responseApi.dart';
 part 'genDivPolitica.dart';
 part 'genPersonaApi.dart';
+part 'host.dart';
 
 
 //SISTEMA RECINTO ELECTORAL

@@ -322,8 +322,11 @@ class _RecElecAbrirState extends State<RecElecAbrir> {
             message:
                 "El Codigo para que el personal se anexe al recinto electoral es: " +
                     _abrirRecintoElectoral.idDgoCreaOpReci, onTap: () {
-          Navigator.pushReplacementNamed(
-              context, AppConfig.pantallaMenuRecintoElectoral);
+
+          UtilidadesUtil.pantallasAbrirNuevaCerrarTodas(context: context,pantalla: AppConfig.pantallaMenuRecintoElectoral);
+
+         /* Navigator.pushReplacementNamed(
+              context, AppConfig.pantallaMenuRecintoElectoral);*/
         });
       }
 

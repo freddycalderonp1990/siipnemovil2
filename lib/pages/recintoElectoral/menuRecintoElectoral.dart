@@ -103,7 +103,10 @@ class _MenuRecintoElectoralState extends State<MenuRecintoElectoral> {
   }
 
   _cerrarSession() {
-    Navigator.pushReplacementNamed(context, AppConfig.pantallaLogin);
+    //Aquí (Route <dynamic> route) => false se asegurará de que se eliminen todas las rutas antes de hacer push de la ruta .
+    Navigator.of(context).pushNamedAndRemoveUntil(AppConfig.pantallaLogin, (Route<dynamic> route) => false);
+
+    //Navigator.pushReplacementNamed(context, AppConfig.pantallaLogin);
   }
 
   _getMenu(ResponsiveUtil responsive) {
@@ -390,6 +393,7 @@ class _MenuRecintoElectoralState extends State<MenuRecintoElectoral> {
         context: context,
         idDgoCreaOpReci: idDgoCreaOpReci,
         usuario: usuario,
+        idDgoPerAsigOpe: _RecintoProvider.getRecintoAbierto.idDgoPerAsigOpe
       );
 
       setState(() {

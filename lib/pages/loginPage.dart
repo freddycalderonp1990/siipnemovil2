@@ -21,8 +21,8 @@ class _LoginPageState extends State<LoginPage> {
     UtilidadesUtil.getTheme();
 
     //cambia el color de texto de barra superios del telefono
-    controllerUser.text = 'cpfn1206762401';
-    controllerPass.text = 'freddyNCP1990';
+    /*controllerUser.text = 'cpfn1206762401';
+    controllerPass.text = 'freddyNCP1990';*/
   }
 
   _EventoLogin() async {
@@ -49,8 +49,10 @@ class _LoginPageState extends State<LoginPage> {
 
         if (int.parse(datosUser.idGenUsuario) > 0) {
           _UserProvider.setUser = datosUser;
-          Navigator.pushReplacementNamed(
-              context, AppConfig.pantallaMenuRecintoElectoral);
+
+          UtilidadesUtil.pantallasAbrirNuevaCerrarTodas(context: context,pantalla: AppConfig.pantallaMenuRecintoElectoral);
+          /*Navigator.pushReplacementNamed(
+              context, AppConfig.pantallaMenuRecintoElectoral);*/
         }
       }
     } catch (e) {
@@ -71,6 +73,7 @@ class _LoginPageState extends State<LoginPage> {
     _UserProvider = UserProvider.of(context);
 
     return WorkAreaPageWidget(
+      mostrarVersion: true,
       imgFondo: AppConfig.imgFondoLogin,
       peticionServer: peticionServer,
       title: VariablesUtil.POLICIANACIONAL,

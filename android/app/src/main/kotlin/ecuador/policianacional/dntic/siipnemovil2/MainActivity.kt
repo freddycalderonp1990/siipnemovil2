@@ -1,4 +1,4 @@
-package ecuador.policianacional.dntic.siipnemovil2
+package ecuador.policianacional.dntic.siipnemovil_2
 
 import io.flutter.embedding.android.FlutterActivity
 

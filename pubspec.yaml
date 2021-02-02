@@ -42,6 +42,7 @@ dependencies:
   permission_handler: ^5.0.1+1 #solicitar permisos al usuario
   awesome_dialog: ^1.3.0 #dialogos desing personalizados
   image_picker: ^0.6.7+21 #Imagenes
+  package_info: ^0.4.3 #obtener version code de la app
 
 dev_dependencies:
   flutter_test:

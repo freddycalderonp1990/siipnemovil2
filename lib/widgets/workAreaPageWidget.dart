@@ -11,6 +11,10 @@ class WorkAreaPageWidget extends StatefulWidget {
   final imgPerfil;
   final String imgFondo;
   final double sizeTittle;
+  final bool mostrarVersion;
+
+
+
 
   const WorkAreaPageWidget({
     this.peticionServer = false,
@@ -20,7 +24,7 @@ class WorkAreaPageWidget extends StatefulWidget {
     this.widgetBtnFinal,
     this.paddin,
     this.ubicacionBtnFinal = FloatingActionButtonLocation.centerFloat,
-    this.imgPerfil = null, this.imgFondo=AppConfig.imgFondo, this.sizeTittle,
+    this.imgPerfil = null, this.imgFondo=AppConfig.imgFondo, this.sizeTittle, this.mostrarVersion=false,
   });
 
   @override
@@ -28,11 +32,30 @@ class WorkAreaPageWidget extends StatefulWidget {
 }
 
 class _WorkAreaPageWidgetState extends State<WorkAreaPageWidget> {
+
+  String version='';
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadVersion();
+  }
+
+  _loadVersion() async{
+    String _version=await UtilidadesUtil.getVersionCodeApp();
+    setState(() {
+      version=_version;
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final responsive = ResponsiveUtil(context);
 
-    return Scaffold(
+    return
+        Scaffold(
         floatingActionButtonLocation: widget.ubicacionBtnFinal,
         floatingActionButton: widget.widgetBtnFinal,
         body: GestureDetector(
@@ -124,6 +147,7 @@ class _WorkAreaPageWidgetState extends State<WorkAreaPageWidget> {
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: widget.sizeTittle==null?responsive.anchoP(5):responsive.anchoP(widget.sizeTittle)),
                                               ):Container(),
+                                              widget.mostrarVersion ?  Text('Versión 2: '+version +' '+UrlApi.ambiente,style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black.withOpacity(0.5)),):Container()
                                             ],
                                           ),
                                         ),
@@ -132,7 +156,9 @@ class _WorkAreaPageWidgetState extends State<WorkAreaPageWidget> {
                                         children: widget.contenido != null
                                             ? widget.contenido
                                             : [Container()],
+
                                       ),
+
                                     ],
                                   ))),
                         ),

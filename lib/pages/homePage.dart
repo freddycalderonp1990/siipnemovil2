@@ -105,7 +105,9 @@ class _HomePageState extends State<HomePage> {
 
 
   _cerrarSession() {
-    Navigator.pushReplacementNamed(context, AppConfig.pantallaLogin);
+
+    UtilidadesUtil.pantallasAbrirNuevaCerrarTodas(context: context,pantalla: AppConfig.pantallaLogin);
+    /*Navigator.pushReplacementNamed(context, AppConfig.pantallaLogin);*/
   }
 
   Future _LlamarPage({String pantalla}) async {

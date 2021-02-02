@@ -32,6 +32,7 @@ class PersonalRecintoElectoral {
     this.fechaFin,
     this.personal,
     this.estadoPersonal,
+    this.idDgoPerAsigOpe
   });
 
   String cargo;
@@ -42,6 +43,7 @@ class PersonalRecintoElectoral {
   String fechaFin;
   String personal;
   String estadoPersonal;
+  String idDgoPerAsigOpe;
 
   factory PersonalRecintoElectoral.fromJson(Map<String, dynamic> json) => PersonalRecintoElectoral(
     cargo: json["cargo"] == null ? null : json["cargo"],
@@ -52,6 +54,7 @@ class PersonalRecintoElectoral {
     fechaFin: json["FechaFin"] == null ? null : json["FechaFin"],
     personal: json["personal"] == null ? null : json["personal"],
     estadoPersonal: json["estado_personal"] == null ? null : json["estado_personal"],
+    idDgoPerAsigOpe: json["idDgoPerAsigOpe"] == null ? null : json["idDgoPerAsigOpe"],
   );
 
   Map<String, dynamic> toJson() => {
