@@ -1,0 +1,21 @@
+dependencies: \
+  /Users/computadora/Desktop/Listos/siipnemovil2/ios/Runner/GeneratedPluginRegistrant.m \
+  /Users/computadora/Desktop/Listos/siipnemovil2/ios/Runner/GeneratedPluginRegistrant.h \
+  /Users/computadora/Desktop/Listos/siipnemovil2/ios/Flutter/Flutter.framework/Modules/module.modulemap \
+  /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.4.sdk/usr/include/mach-o/compact_unwind_encoding.modulemap \
+  /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.4.sdk/usr/include/mach-o/dyld.modulemap \
+  /Users/computadora/Desktop/Listos/siipnemovil2/ios/Flutter/Flutter.framework/Headers/FlutterTexture.h \
+  /Users/computadora/Desktop/Listos/siipnemovil2/ios/Flutter/Flutter.framework/Headers/FlutterPlugin.h \
+  /Users/computadora/Desktop/Listos/siipnemovil2/ios/Flutter/Flutter.framework/Headers/FlutterEngine.h \
+  /Users/computadora/Desktop/Listos/siipnemovil2/ios/Flutter/Flutter.framework/Headers/FlutterDartProject.h \
+  /Users/computadora/Desktop/Listos/siipnemovil2/ios/Flutter/Flutter.framework/Headers/FlutterBinaryMessenger.h \
+  /Users/computadora/Desktop/Listos/siipnemovil2/ios/Flutter/Flutter.framework/Headers/FlutterViewController.h \
+  /Users/computadora/Desktop/Listos/siipnemovil2/ios/Flutter/Flutter.framework/Headers/FlutterPluginAppLifeCycleDelegate.h \
+  /Users/computadora/Desktop/Listos/siipnemovil2/ios/Flutter/Flutter.framework/Headers/FlutterPlatformViews.h \
+  /Users/computadora/Desktop/Listos/siipnemovil2/ios/Flutter/Flutter.framework/Headers/FlutterHeadlessDartRunner.h \
+  /Users/computadora/Desktop/Listos/siipnemovil2/ios/Flutter/Flutter.framework/Headers/FlutterChannels.h \
+  /Users/computadora/Desktop/Listos/siipnemovil2/ios/Flutter/Flutter.framework/Headers/FlutterCallbackCache.h \
+  /Users/computadora/Desktop/Listos/siipnemovil2/ios/Flutter/Flutter.framework/Headers/FlutterCodecs.h \
+  /Users/computadora/Desktop/Listos/siipnemovil2/ios/Flutter/Flutter.framework/Headers/FlutterMacros.h \
+  /Users/computadora/Desktop/Listos/siipnemovil2/ios/Flutter/Flutter.framework/Headers/FlutterAppDelegate.h \
+  /Users/computadora/Desktop/Listos/siipnemovil2/ios/Flutter/Flutter.framework/Headers/Flutter.h

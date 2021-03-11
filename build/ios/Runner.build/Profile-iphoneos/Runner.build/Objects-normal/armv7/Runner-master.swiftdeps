@@ -1,0 +1,5 @@
+version: "Apple Swift version 5.3.2 (swiftlang-1200.0.45 clang-1200.0.32.28)"
+options: "fe5d6b474864a18c655a48b4c54c03f5"
+build_time: [1615471145, 676055000]
+inputs:
+  "/Users/computadora/Desktop/Listos/siipnemovil2/ios/Runner/AppDelegate.swift": [1599069068, 0]
