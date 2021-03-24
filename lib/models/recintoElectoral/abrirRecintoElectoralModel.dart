@@ -37,6 +37,7 @@ class AbrirRecintoElectoral {
     this.ip,
     this.apenom,
     this.sexoPerson,
+    this.crearCodigo=false
   });
 
   String idDgoCreaOpReci;
@@ -50,6 +51,7 @@ class AbrirRecintoElectoral {
   String ip;
   String apenom;
   String sexoPerson;
+  bool crearCodigo;
 
   factory AbrirRecintoElectoral.fromJson(Map<String, dynamic> json) => AbrirRecintoElectoral(
     idDgoCreaOpReci: json["idDgoCreaOpReci"] == null ? null : json["idDgoCreaOpReci"],
@@ -63,6 +65,7 @@ class AbrirRecintoElectoral {
     ip: json["ip"] == null ? null : json["ip"],
     apenom: json["apenom"] == null ? null : json["apenom"],
     sexoPerson: json["sexoPerson"] == null ? null : json["sexoPerson"],
+    crearCodigo: json["crearCodigo"] == null ? false : json["crearCodigo"],
   );
 
   Map<String, dynamic> toJson() => {

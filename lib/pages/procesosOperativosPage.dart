@@ -180,7 +180,7 @@ class _ProcesosOperativosPageState extends State<ProcesosOperativosPage> {
         idProcesoOperativo = getIdProcesosOperativos(procesoOperativo);
 
         UtilidadesUtil.pantallasAbrirNuevaCerrarTodas(
-            context: context, pantalla: AppConfig.pantallaMenuCrearCodigo);
+            context: context, pantalla: AppConfig.pantallaTipoEjes);
       }
 
       setState(() {

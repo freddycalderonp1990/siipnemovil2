@@ -9,11 +9,10 @@ class RecElecRegistrarNovedades extends StatefulWidget {
 class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
   UserProvider _UserProvider;
   RecintoAbiertoProvider _RecintoProvider;
-  ProcesoOperativoProvider _ProcesoOperativoProvider;
 
   bool peticionServer = false;
   bool cargaInicial = true;
-  bool validarForm = true;
+  bool validarForm = false;
   bool mostrarFoto = false;
 
   bool selectPadre = true;
@@ -23,6 +22,9 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
 
   DateTime selectedDate = DateTime.now();
   String fecha;
+
+  String cedula =
+      'null'; //varibale para guardar en el campo documento la cedula solo cuando se le asigne un valor diferente de null
 
   //CONFIGURACIONES
   final anchoContenedor = AppConfig.anchoContenedor;
@@ -44,9 +46,23 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
   var controllerDirigente = new TextEditingController();
   var controllerCantidad = new TextEditingController();
 
+  var controllerNombre = new TextEditingController();
+  var controllerCargo = new TextEditingController();
+  var controllerGrado = new TextEditingController();
+  var controllerMedioComunicacion = new TextEditingController();
+
+  var controllerFuncion = new TextEditingController();
+  var controllerDescripcion = new TextEditingController();
+  var controllerInstalacion = new TextEditingController();
+  var controllerDireccion = new TextEditingController();
+  var controllerUnidad = new TextEditingController();
 
   var controllerMotivo = new TextEditingController();
   var controllerNumericoPersonal = new TextEditingController();
+
+  var controllerNumerico = new TextEditingController();
+
+
 
   String observaciones = "";
 
@@ -78,13 +94,14 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
     /*controllerHora.text = "00";
     controllerMinuto.text = "00";*/
 
-    controllerHora.text = DateFormat(AppConfig.formatoSoloHora).format(selectedDate);
-    controllerMinuto.text = DateFormat(AppConfig.formatoSoloMinuto).format(selectedDate);
+    controllerHora.text =
+        DateFormat(AppConfig.formatoSoloHora).format(selectedDate);
+    controllerMinuto.text =
+        DateFormat(AppConfig.formatoSoloMinuto).format(selectedDate);
   }
 
   @override
   void dispose() {
-
     super.dispose();
   }
 
@@ -94,24 +111,20 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
     //Variable para obtener el tamaño de la pantalla
     fecha = DateFormat(AppConfig.formatoFechaHora).format(selectedDate);
 
-
     final responsive = ResponsiveUtil(context);
     sizeIcons =
         responsive.isVertical() ? responsive.altoP(3) : responsive.anchoP(5);
 
     _UserProvider = UserProvider.of(context);
     _RecintoProvider = RecintoAbiertoProvider.of(context);
-    _ProcesoOperativoProvider = ProcesoOperativoProvider.of(context);
 
     _getNovedadesPadres();
-    String imgFondo=AppConfig.imgFondoDefault;
-    if(_RecintoProvider.getRecintoAbierto.isRecinto){
-      imgFondo=AppConfig.imgFondoElecciones;
+    String imgFondo = AppConfig.imgFondoDefault;
+    if (_RecintoProvider.getRecintoAbierto.isRecinto) {
+      imgFondo = AppConfig.imgFondoElecciones;
     }
 
-
     return WorkAreaPageWidget(
-
       imgFondo: imgFondo,
       btnAtras: true,
       peticionServer: peticionServer,
@@ -132,20 +145,17 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
                 ),
               )
             : Container(),
-
         SizedBox(
           height: responsive.altoP(2),
         ),
         MyUbicacionWidget(
-
-          callback:(_) {
-
-          },),
+          callback: (_) {},
+        ),
         SizedBox(
           height: responsive.altoP(1),
         ),
         getCombos(responsive),
-        int.parse(idNovedades) > 0
+        validarForm ?? int.parse(idNovedades) > 0
             ? ContenedorDesingWidget(
                 margin: EdgeInsets.only(top: 10),
                 anchoPorce: anchoContenedor,
@@ -170,10 +180,6 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
       ],
     );
   }
-
-
-
-
 
   Widget widgetCheckBoxNovedades(ResponsiveUtil responsive) {
     return Container(
@@ -225,21 +231,22 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
       {ResponsiveUtil responsive, String title = VariablesUtil.cedula}) {
     return Form(
       key: _formKey,
-      child: Column(children: [
-        ImputTextWidget(
-          keyboardType: TextInputType.number,
-          controller: controllerCedula,
-          icono: Icon(
-            Icons.assignment_sharp,
-            color: Colors.black38,
-            size: sizeIcons,
+      child: Column(
+        children: [
+          ImputTextWidget(
+            keyboardType: TextInputType.number,
+            controller: controllerCedula,
+            icono: Icon(
+              Icons.assignment_sharp,
+              color: Colors.black38,
+              size: sizeIcons,
+            ),
+            label: title,
+            fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
+            validar: validateCedula,
           ),
-          label: title,
-          fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
-          validar: validateCedula,
-        ),
-
-      ],),
+        ],
+      ),
     );
   }
 
@@ -247,32 +254,34 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
       {ResponsiveUtil responsive, String title = VariablesUtil.cedula}) {
     return Form(
       key: _formKey,
-      child: Column(children: [
-        ImputTextWidget(
-          keyboardType: TextInputType.number,
-          controller: controllerCedula,
-          icono: Icon(
-            Icons.assignment_sharp,
-            color: Colors.black38,
-            size: sizeIcons,
+      child: Column(
+        children: [
+          ImputTextWidget(
+            keyboardType: TextInputType.number,
+            controller: controllerCedula,
+            icono: Icon(
+              Icons.assignment_sharp,
+              color: Colors.black38,
+              size: sizeIcons,
+            ),
+            label: title,
+            fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
+            validar: validateCedula,
           ),
-          label: title,
-          fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
-          validar: validateCedula,
-        ),
-        ImputTextWidget(
-          keyboardType: TextInputType.number,
-          controller: controllerTelefono,
-          icono: Icon(
-            Icons.phone_android,
-            color: Colors.black38,
-            size: sizeIcons,
-          ),
-          label: "Teléfono",
-          fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
-          validar: validateTelefono,
-        )
-      ],),
+          ImputTextWidget(
+            keyboardType: TextInputType.number,
+            controller: controllerTelefono,
+            icono: Icon(
+              Icons.phone_android,
+              color: Colors.black38,
+              size: sizeIcons,
+            ),
+            label: "Teléfono",
+            fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
+            validar: validateTelefono,
+          )
+        ],
+      ),
     );
   }
 
@@ -531,6 +540,250 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
     );
   }
 
+  Widget wgTxtDesplazamientosAutoridades(responsive) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          ImputTextWidget(
+            keyboardType: TextInputType.text,
+            controller: controllerNombre,
+            icono: Icon(
+              Icons.assignment_sharp,
+              color: Colors.black38,
+              size: sizeIcons,
+            ),
+            label: "Nombre",
+            fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
+            validar: validateNombre,
+          ),
+          ImputTextWidget(
+            keyboardType: TextInputType.text,
+            controller: controllerCargo,
+            icono: Icon(
+              Icons.category,
+              color: Colors.black38,
+              size: sizeIcons,
+            ),
+            label: "Cargo/Función",
+            fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
+            validar: validateCargo,
+          ),
+          ImputTextWidget(
+            keyboardType: TextInputType.text,
+            controller: controllerGrado,
+            icono: Icon(
+              Icons.assignment_sharp,
+              color: Colors.black38,
+              size: sizeIcons,
+            ),
+            label: "Grado (Opcional)",
+            fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget wgTxtApoyoMediosComunicacion(responsive) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          ImputTextWidget(
+            keyboardType: TextInputType.text,
+            controller: controllerNombre,
+            icono: Icon(
+              Icons.assignment_sharp,
+              color: Colors.black38,
+              size: sizeIcons,
+            ),
+            label: "Nombre",
+            fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
+            validar: validateNombre,
+          ),
+          ImputTextWidget(
+            keyboardType: TextInputType.text,
+            controller: controllerMedioComunicacion,
+            icono: Icon(
+              Icons.category,
+              color: Colors.black38,
+              size: sizeIcons,
+            ),
+            label: "Medio de Comunicación",
+            fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
+            validar: validateMedioComunicacion,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget wgTxtSeguridadPersonasImportantes(responsive) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          ImputTextWidget(
+            keyboardType: TextInputType.text,
+            controller: controllerFuncion,
+            icono: Icon(
+              Icons.assignment_sharp,
+              color: Colors.black38,
+              size: sizeIcons,
+            ),
+            label: "Función",
+            fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
+            validar: validateFuncion,
+          ),
+          ImputTextWidget(
+            keyboardType: TextInputType.text,
+            controller: controllerNombre,
+            icono: Icon(
+              Icons.assignment_sharp,
+              color: Colors.black38,
+              size: sizeIcons,
+            ),
+            label: "Nombres",
+            fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
+            validar: validateNombre,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget wgTxtSeguridadInstalaciones(responsive) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          ImputTextWidget(
+            keyboardType: TextInputType.text,
+            controller: controllerInstalacion,
+            icono: Icon(
+              Icons.assignment_sharp,
+              color: Colors.black38,
+              size: sizeIcons,
+            ),
+            label: "Nombre Instalación",
+            fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
+            validar: validateInstalacion,
+          ),
+          ImputTextWidget(
+            keyboardType: TextInputType.text,
+            controller: controllerDescripcion,
+            icono: Icon(
+              Icons.assignment_sharp,
+              color: Colors.black38,
+              size: sizeIcons,
+            ),
+            label: "Descripción",
+            fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
+            validar: validateDescripcion,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget wgTxtExplosivos(responsive) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          ImputTextWidget(
+            keyboardType: TextInputType.text,
+            controller: controllerDireccion,
+            icono: Icon(
+              Icons.assignment_sharp,
+              color: Colors.black38,
+              size: sizeIcons,
+            ),
+            label: "Dirección",
+            fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
+            validar: validateDireccion,
+          ),
+          ImputTextWidget(
+            keyboardType: TextInputType.text,
+            controller: controllerDescripcion,
+            icono: Icon(
+              Icons.assignment_sharp,
+              color: Colors.black38,
+              size: sizeIcons,
+            ),
+            label: "Descripción",
+            fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
+            validar: validateDescripcion,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget wgTxtApoyoUnidadesPoliciales(responsive) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          ImputTextWidget(
+            keyboardType: TextInputType.text,
+            controller: controllerUnidad,
+            icono: Icon(
+              Icons.assignment_sharp,
+              color: Colors.black38,
+              size: sizeIcons,
+            ),
+            label: "Unidad",
+            fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
+            validar: validateUnidad,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget wgTxtHora(ResponsiveUtil responsive){
+    return Form(
+      key: _formKey,
+      child:  Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            height: responsive.altoP(1),
+          ),
+          getComboHora(responsive),
+          getComboMinuto(responsive)
+        ],
+      ),
+    );
+  }
+
+  Widget wgTxtNumerico(responsive) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          ImputTextWidget(
+            keyboardType: TextInputType.number,
+            controller: controllerNumerico,
+            icono: Icon(
+              Icons.assignment_sharp,
+              color: Colors.black38,
+              size: sizeIcons,
+            ),
+            label: "Numérico",
+            fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
+            validar: validateNumerico,
+          ),
+
+        ],
+      ),
+    );
+  }
+
+
   getNovedad(int valueRadio) {
     if (valueRadio == 1) {
       existeNovedades = true;
@@ -560,8 +813,6 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
     return null;
   }
 
-
-
   String validateNumBoleta(String value) {
     if (value.length < 5) {
       return VariablesUtil.ingreseBoleta;
@@ -571,15 +822,12 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
   }
 
   String validateNumPersonal(String value) {
-
-    if (value.length==0 || int.parse( value) < 1) {
+    if (value.length == 0 || int.parse(value) < 1) {
       return "Ingrese el Númerico del Personal";
     }
 
     return null;
   }
-
-
 
   String validateNumCitacion(String value) {
     if (value.length < 3) {
@@ -613,6 +861,80 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
     return null;
   }
 
+  String validateNombre(String value) {
+    if (value.length < 3) {
+      return "Ingrese el Nombre";
+    }
+
+    return null;
+  }
+
+  String validateCargo(String value) {
+    if (value.length < 3) {
+      return "Ingrese el Cargo";
+    }
+
+    return null;
+  }
+
+  String validateMedioComunicacion(String value) {
+    if (value.length < 3) {
+      return "Ingrese el nombre del Medio de Comunicación";
+    }
+
+    return null;
+  }
+
+  String validateFuncion(String value) {
+    if (value.length < 3) {
+      return "Ingrese la función";
+    }
+
+    return null;
+  }
+
+  String validateDescripcion(String value) {
+    if (value.length < 3) {
+      return "Ingrese la Descripción";
+    }
+
+    return null;
+  }
+
+  String validateInstalacion(String value) {
+    if (value.length < 3) {
+      return "Ingrese la Instalación";
+    }
+
+    return null;
+  }
+
+  String validateDireccion(String value) {
+    if (value.length < 3) {
+      return "Ingrese la Dirección";
+    }
+
+    return null;
+  }
+
+  String validateUnidad(String value) {
+    if (value.length < 3) {
+      return "Ingrese la Unidad";
+    }
+
+    return null;
+  }
+
+  String validateNumerico(String value) {
+    if (value.length == 0 || int.parse(value) == 0) {
+      return "Ingrese el Numérico";
+    }
+
+    return null;
+  }
+
+
+
   Widget getComboNovedades() {
     return existeNovedades
         ? Container(
@@ -645,11 +967,10 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
   }
 
   _EventoRegistrarNovedadesElectorales() async {
-    bool isValid=true;
-    if(validarForm){
+    bool isValid = true;
+    if (validarForm) {
       isValid = _formKey.currentState.validate();
     }
-
 
     print("isValid");
     print(isValid);
@@ -662,6 +983,7 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
         } else {
           bool insertImg = await guardarImgRecElectNovedades(
               galeryCameraModel: mGaleryCameraModel);
+          print('Ingreso con imagen');
 
           if (insertImg) {
             await _RegistrarNovedades(
@@ -670,11 +992,11 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
                 idDgoPerAsigOpe:
                     _RecintoProvider.getRecintoAbierto.idDgoPerAsigOpe,
                 idDgoNovedadesElect: idNovedades,
-              imagen:mGaleryCameraModel.nombreImg
-            );
+                imagen: mGaleryCameraModel.nombreImg);
           }
         }
       } else {
+        print('no foto');
         await _RegistrarNovedades(
             usuario: _UserProvider.getUser.idGenUsuario,
             observacion: getObservacion(),
@@ -706,32 +1028,28 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
   Widget wgCajasTexto(String novedadesPadres, ResponsiveUtil responsive) {
     Widget wg = Container();
     if (novedadesPadres != null) {
+      mostrarFoto = false;
+      validarForm = false;
       switch (novedadesPadres.trim().toUpperCase()) {
         case "NOVEDADES":
-          mostrarFoto = true;
-          // wg = wgTxtCedula(responsive);
-
           break;
         case "DELITOS":
-          mostrarFoto = false;
-          validarForm=true;
+          validarForm = true;
           wg = wgTxtCedula(responsive: responsive);
           break;
         case "DETENIDOS":
-          mostrarFoto = false;
-          validarForm=true;
+          validarForm = true;
           wg = wgTxtCedulaBoleta(responsive);
           break;
         case "CITACIONES":
-          mostrarFoto = false;
-          validarForm=true;
+          validarForm = true;
           wg = wgTxtCedulaCitacion(responsive);
           break;
 
         case "UMO":
-          mostrarFoto = true;
+          //mostrarFoto = true;
 
-         // wg = wgTxtCedulaCitacion(responsive);
+          //wg = wgTxtCedulaCitacion(responsive);
           break;
 
         default:
@@ -747,44 +1065,37 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
     Widget wg = Container();
     print("suiii");
     print(idDgoNovedadesElect);
+    validarForm = false;
+    mostrarFoto = false;
     switch (idDgoNovedadesElect) {
       case 17:
         //1. RECINTOS ELECTORALES INSTALADOS
         wg = Container();
-        validarForm = false;
+
         break;
       case 18:
         //2. RECINTOS ELECTORALES NO INSTALADOS
         wg = Container();
-        validarForm = false;
+
         break;
       case 19:
         //3. RECINTO ELECTORAL INSTALADO CON RETARDO POR DIFERENTES CAUSAS
-        validarForm = false;
-        wg = Container(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: responsive.altoP(1),
-              ),
-              getComboHora(responsive),
-              getComboMinuto(responsive)
-            ],
-          ),
-        );
+
+        wg = wgTxtHora(responsive);
+        validarForm = true;
 
         break;
       case 20:
         //4. RECINTOS ELECTORALES SUSPENDIDO POR DIFERENTES CAUSAS
         wg = wgTxtMotivo(responsive);
-        validarForm=true;
+        validarForm = true;
+        mostrarFoto = true;
         break;
       case 21:
         //5. AGRESIONES A SERVIDORES POLICIALES
         wg = wgTxtCedula(responsive: responsive, title: VariablesUtil.cedulaSP);
-        validarForm=true;
+        validarForm = true;
+        mostrarFoto = true;
         break;
       case 22:
         //6. PRESENCIA DE MANIFESTANTES / CONCENTRACIONES / MARCHAS
@@ -820,11 +1131,13 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
             )
           ],
         );
-        validarForm=true;
+        validarForm = true;
+        mostrarFoto = true;
         break;
       case 23:
         //7. QUEMA DE URNAS / PAPELETAS
-        validarForm=true;
+        validarForm = true;
+        mostrarFoto = true;
         wg = Column(
           children: [
             wgTxtNumeroQuemaUrnas(responsive),
@@ -860,7 +1173,8 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
         break;
       case 28:
         //8. TOMA DE RECINTOS / DELEGACIONES / BODEGAS / INSTALACIONES DEL CNE
-        validarForm=true;
+        validarForm = true;
+        mostrarFoto = true;
         wg = Column(
           children: [
             wgTxtNumeroTomaRecintos(responsive),
@@ -897,74 +1211,175 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
       case 29:
         //9. PRESENCIA DE VENTAS AMBULANTES
         wg = Container();
-        validarForm = false;
+        mostrarFoto = true;
+
         break;
       case 30:
         //10. ATENCIÓN MÉDICA POR DIFERENTES CAUSAS
-        validarForm=true;
+        validarForm = true;
+        mostrarFoto = true;
         wg = wgTxtCedulaTelefono(responsive: responsive);
         break;
       case 31:
         //11. SERVIDORES POLICIALES INFECTADOS (SOSPECHA/POSITIVO)
-        wg = wgTxtCedulaTelefono(responsive: responsive, title: VariablesUtil.cedulaSP);
-        validarForm=true;
+
+        validarForm = true;
+        wg = wgTxtCedulaTelefono(
+            responsive: responsive, title: VariablesUtil.cedulaSP);
+
         break;
 
-      default:
+      case 32:
+      //NUMÉRICO DE ACÉMILAS
+        wg = wgTxtNumerico(responsive);
+        validarForm = true;
+        break;
 
-        wg = Container();
-    }
-
-    return wg;
-  }
-
-
-  Widget wgCajasTextoHumo(
-      int idDgoNovedadesElect, ResponsiveUtil responsive) {
-    Widget wg = Container();
-
-    switch (idDgoNovedadesElect) {
+      /*********************** UMO ***************************************/
       case 33:
-      //1. NUMERICO DE PERSONAL
+        //1. NUMERICO DE PERSONAL
         wg = wgTxtNumericoPersonal(responsive);
+        validarForm = true;
         validarForm = true;
         break;
       case 34:
-      //2. PLANTONES
+        //2. PLANTONES
         wg = wgorganizacionDirigenteCantidad(responsive);
+        validarForm = true;
         validarForm = true;
         break;
       case 35:
-      //3. MARCHAS
+        //3. MARCHAS
         wg = wgorganizacionDirigenteCantidad(responsive);
+        validarForm = true;
         validarForm = true;
         break;
 
-
       case 36:
-      //4. CIERRE DE VIAS
+        //4. CIERRE DE VIAS
         wg = wgorganizacionDirigenteCantidad(responsive);
+        validarForm = true;
         validarForm = true;
         break;
 
       case 37:
-      //5. TOMA DE ENTIDADES
+        //5. TOMA DE ENTIDADES
         wg = wgorganizacionDirigenteCantidad(responsive);
+        validarForm = true;
         validarForm = true;
         break;
 
+      /************************AEREOPOLCIAL*************************************/
+      case 45:
+        //1. DESPLAZAMIENTO DE AUTORIDADES
+        wg = wgTxtDesplazamientosAutoridades(responsive);
+        validarForm = true;
+
+        break;
+      case 46:
+        //2. DESPLAZAMIENTO DE SERVIDORES PÚBLICOS
+        wg = wgTxtDesplazamientosAutoridades(responsive);
+        validarForm = true;
+
+        break;
+
+      case 47:
+        //3. APOYO AÉREO A MEDIOS DE COMUNICACIÓN
+        wg = wgTxtApoyoMediosComunicacion(responsive);
+        validarForm = true;
+
+        break;
+
+      /************************GOE - GIR*************************************/
+      case 41:
+        //1. SEGURIDAD DE PERSONAS IMPORTANTES
+        wg = wgTxtSeguridadPersonasImportantes(responsive);
+        validarForm = true;
+
+        break;
+      case 42:
+        //2. SEGURIDAD DE INSTALACIONES
+        wg = wgTxtSeguridadInstalaciones(responsive);
+        validarForm = true;
+        mostrarFoto = true;
+
+        break;
+
+      case 43:
+        //3. REGISTRO DE EXPLOSIVOS
+        wg = wgTxtExplosivos(responsive);
+        validarForm = true;
+        mostrarFoto = true;
+
+        break;
+
+      case 44:
+        //4. APOYO A UNIDADES POLICIALES
+        wg = wgTxtApoyoUnidadesPoliciales(responsive);
+        validarForm = true;
+
+        break;
+
+      /************************CARCK - UMO - UER*************************************/
+      case 49:
+        //AGLOMERACIONES
+        wg = wgTxtNumerico(responsive);
+        validarForm = true;
+
+        break;
+      case 50:
+        //NUMÉRICO DE ACÉMILAS
+        wg = wgTxtNumerico(responsive);
+        validarForm = true;
+
+
+        break;
+
+      case 51:
+        //NUMÉRICO DE CANES
+        wg = wgTxtNumerico(responsive);
+        validarForm = true;
+
+
+        break;
+
+      case 52:
+        //PERSONAL ESTÁTICO
+        wg = wgTxtNumerico(responsive);
+        validarForm = true;
+        break;
+      case 53:
+        //PERSONAL MÓVIL
+        wg = wgTxtNumerico(responsive);
+        validarForm = true;
+
+        break;
+
+      case 54:
+      //INICIA SERVICIO
+        wg = wgTxtHora(responsive);
+        validarForm = true;
+        break;
+      case 55:
+      //FINALIZA SERVICIO
+        wg = wgTxtHora(responsive);
+        validarForm = true;
+
+        break;
 
       default:
+        print('idDgoNovedadesElect');
 
+        validarForm = false;
+        mostrarFoto = false;
         wg = Container();
     }
 
     return wg;
   }
 
-
-  Widget wgorganizacionDirigenteCantidad(ResponsiveUtil responsive){
-    return   Column(
+  Widget wgorganizacionDirigenteCantidad(ResponsiveUtil responsive) {
+    return Column(
       children: [
         wgTxtNumeroManifestantes(responsive),
         SizedBox(
@@ -996,34 +1411,39 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
         )
       ],
     );
-
   }
+
   String getObservacion() {
     String observacion = "";
+    ObservacionModel observacionModel =
+        ObservacionModel(idDgoNovedadesElect: idNovedades);
+    cedula = 'null';
     if (novedadesPadres != null) {
       switch (novedadesPadres.trim().toUpperCase()) {
         case "NOVEDADES":
-         // observacion = '{"cedula": "${controllerCedula.text}"}';
-        observacion=getObservacionNovedades();
+          // observacion = '{"cedula": "${controllerCedula.text}"}';
+          cedula = 'null';
+          observacionModel = getObservacionNovedades();
           break;
         case "DELITOS":
-          mostrarFoto=false;
-          observacion = '{"cedula": "${controllerCedula.text}"}';
+          cedula = controllerCedula.text;
+          observacionModel = ObservacionModel(
+              idDgoNovedadesElect: idNovedades, cedula: controllerCedula.text);
           break;
         case "DETENIDOS":
-          mostrarFoto=false;
-          observacion =
-              '{"cedula": "${controllerCedula.text}", "numBoleta": "${controllerNumBoleta.text}"}';
+          cedula = controllerCedula.text;
+          observacionModel = ObservacionModel(
+              idDgoNovedadesElect: idNovedades,
+              cedula: controllerCedula.text,
+              numBoleta: controllerNumBoleta.text);
           break;
         case "CITACIONES":
-          mostrarFoto=false;
-          observacion =
-              '{"cedula": "${controllerCedula.text}", "numCitacion": "${controllerNumCitacion.text}"}';
+          cedula = controllerCedula.text;
+          observacionModel = ObservacionModel(
+              idDgoNovedadesElect: idNovedades,
+              cedula: controllerCedula.text,
+              numCitacion: controllerNumCitacion.text);
           break;
-
-        case "UMO":
-          print("ingresaa");
-        observacion=getObservacionUmo();
 
           break;
 
@@ -1031,116 +1451,277 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
           observacion = "";
       }
     }
-    return observacion;
+    return observacionModelToJson2(observacionModel);
   }
 
-  String getObservacionNovedades() {
-    String observacion = "";
-    if (mostrarFoto) {
-      switch (int.parse(idNovedades)) {
-        case 17:
-            break;
-        case 18:
-          break;
-        case 19:
+  ObservacionModel getObservacionNovedades() {
+    ObservacionModel observacionModel =
+        ObservacionModel(idDgoNovedadesElect: idNovedades);
+
+    switch (int.parse(idNovedades)) {
+      case 17:
+        break;
+      case 18:
+        break;
+      case 19:
         //3. RECINTO ELECTORAL INSTALADO CON RETARDO POR DIFERENTES CAUSAS
+        observacionModel = ObservacionModel(
+            idDgoNovedadesElect: idNovedades,
+            hora: "${controllerHora.text}:${controllerMinuto.text}");
 
-          observacion = '{"hora": "${controllerHora.text}:${controllerMinuto.text}"}';
-
-          break;
-        case 20:
+        break;
+      case 20:
         //4. RECINTOS ELECTORALES SUSPENDIDO POR DIFERENTES CAUSAS
-          observacion = '{"motivo": "${controllerMotivo.text}"}';
-          validarForm=true;
-          break;
-        case 21:
+
+        observacionModel = ObservacionModel(
+            idDgoNovedadesElect: idNovedades, motivo: controllerMotivo.text);
+
+        break;
+      case 21:
         //5. AGRESIONES A SERVIDORES POLICIALES
-          observacion = '{"cedula": "${controllerCedula.text}"}';
-          validarForm=true;
-          break;
-        case 22:
+
+        observacionModel = ObservacionModel(
+            idDgoNovedadesElect: idNovedades, cedula: controllerCedula.text);
+
+        break;
+      case 22:
         //6. PRESENCIA DE MANIFESTANTES / CONCENTRACIONES / MARCHAS
-          observacion =  '{"organizacion": "${controllerOrganizacion.text}", "dirigente": "${controllerDirigente.text}" , "cantidad": "${controllerCantidad.text}"}';
-          break;
-        case 23:
+
+        observacionModel = ObservacionModel(
+            idDgoNovedadesElect: idNovedades,
+            organizacion: controllerOrganizacion.text,
+            dirigente: controllerDirigente.text,
+            cantidad: controllerCantidad.text);
+        break;
+      case 23:
         //7. QUEMA DE URNAS / PAPELETAS
-          observacion =  '{"organizacion": "${controllerOrganizacion.text}", "dirigente": "${controllerDirigente.text}" , "cantidad": "${controllerCantidad.text}"}';
-          break;
-        case 28:
+
+        observacionModel = ObservacionModel(
+            idDgoNovedadesElect: idNovedades,
+            organizacion: controllerOrganizacion.text,
+            dirigente: controllerDirigente.text,
+            cantidad: controllerCantidad.text);
+
+        break;
+      case 28:
         //8. TOMA DE RECINTOS / DELEGACIONES / BODEGAS / INSTALACIONES DEL CNE
-          observacion =  '{"organizacion": "${controllerOrganizacion.text}", "dirigente": "${controllerDirigente.text}" , "cantidad": "${controllerCantidad.text}"}';
-          break;
-        case 29:
+
+        observacionModel = ObservacionModel(
+            idDgoNovedadesElect: idNovedades,
+            organizacion: controllerOrganizacion.text,
+            dirigente: controllerDirigente.text,
+            cantidad: controllerCantidad.text);
+
+        break;
+      case 29:
         //9. PRESENCIA DE VENTAS AMBULANTES
 
-          break;
-        case 30:
+        break;
+      case 30:
         //10. ATENCIÓN MÉDICA POR DIFERENTES CAUSAS
 
-          observacion = '{"cedula": "${controllerCedula.text}", "telefono": "${controllerTelefono.text}"}';
-          break;
-        case 31:
+        observacionModel = ObservacionModel(
+          idDgoNovedadesElect: idNovedades,
+          cedula: controllerCedula.text,
+          telefono: controllerTelefono.text,
+        );
+        break;
+      case 31:
         //11. SERVIDORES POLICIALES INFECTADOS (SOSPECHA/POSITIVO)
-          observacion = '{"cedula": "${controllerCedula.text}"}';
 
-          break;
+        observacionModel = ObservacionModel(
+          idDgoNovedadesElect: idNovedades,
+          cedula: controllerCedula.text,
+        );
 
-        default:
+        break;
 
-          observacion = "";
-      }
+      case 32:
 
 
-    }
-    return observacion;
-  }
+        observacionModel = ObservacionModel(
+          idDgoNovedadesElect: idNovedades,
+          numerico: controllerNumerico.text,
+        );
 
-  String getObservacionUmo() {
-    String observacion = "";
-    if (mostrarFoto) {
-      switch (int.parse(idNovedades)) {
-        case 33:
+        break;
+
+      /******************************** UMO ******************************************/
+      case 33:
         //1. NUMERICO DE PERSONAL
-          observacion = '{"cantidad": "${controllerNumericoPersonal.text}"}';
-          print("aqui");
-          validarForm = true;
-          break;
-        case 34:
+
+        observacionModel = ObservacionModel(
+          idDgoNovedadesElect: idNovedades,
+          cantidad: controllerNumericoPersonal.text,
+        );
+
+        break;
+      case 34:
         //2. PLANTONES
-          observacion =  '{"organizacion": "${controllerOrganizacion.text}", "dirigente": "${controllerDirigente.text}" , "cantidad": "${controllerCantidad.text}"}';
-          validarForm = true;
-          break;
-        case 35:
+
+        observacionModel = ObservacionModel(
+            idDgoNovedadesElect: idNovedades,
+            organizacion: controllerOrganizacion.text,
+            dirigente: controllerDirigente.text,
+            cantidad: controllerCantidad.text);
+
+        break;
+      case 35:
         //3. MARCHAS
-          observacion =  '{"organizacion": "${controllerOrganizacion.text}", "dirigente": "${controllerDirigente.text}" , "cantidad": "${controllerCantidad.text}"}';
-          validarForm = true;
-          break;
+        observacionModel = ObservacionModel(
+            idDgoNovedadesElect: idNovedades,
+            organizacion: controllerOrganizacion.text,
+            dirigente: controllerDirigente.text,
+            cantidad: controllerCantidad.text);
 
+        break;
 
-        case 36:
+      case 36:
         //4. CIERRE DE VIAS
-          observacion =  '{"organizacion": "${controllerOrganizacion.text}", "dirigente": "${controllerDirigente.text}" , "cantidad": "${controllerCantidad.text}"}';
-          validarForm = true;
-          break;
+        observacionModel = ObservacionModel(
+            idDgoNovedadesElect: idNovedades,
+            organizacion: controllerOrganizacion.text,
+            dirigente: controllerDirigente.text,
+            cantidad: controllerCantidad.text);
 
-        case 37:
+        break;
+
+      case 37:
         //5. TOMA DE ENTIDADES
-          observacion =  '{"organizacion": "${controllerOrganizacion.text}", "dirigente": "${controllerDirigente.text}" , "cantidad": "${controllerCantidad.text}"}';
-          validarForm = true;
-          break;
+        observacionModel = ObservacionModel(
+            idDgoNovedadesElect: idNovedades,
+            organizacion: controllerOrganizacion.text,
+            dirigente: controllerDirigente.text,
+            cantidad: controllerCantidad.text);
 
-        default:
+        break;
 
-          observacion = "";
-      }
+      /******************************** AEROPOLICIAL ******************************************/
+      case 45:
+        //1. DESPLAZAMIENTO DE AUTORIDADES
+
+        observacionModel = ObservacionModel(
+            idDgoNovedadesElect: idNovedades,
+            nombre: controllerNombre.text,
+            cargo: controllerCargo.text,
+            grado: controllerGrado.text);
+
+        break;
+      case 46:
+        //2. DESPLAZAMIENTO DE SERVIDORES PÚBLICOS
+
+        observacionModel = ObservacionModel(
+            idDgoNovedadesElect: idNovedades,
+            nombre: controllerNombre.text,
+            cargo: controllerCargo.text,
+            grado: controllerGrado.text);
+
+        break;
+      case 47:
+        //3. APOYO AÉREO A MEDIOS DE COMUNICACIÓN
+
+        observacionModel = ObservacionModel(
+          idDgoNovedadesElect: idNovedades,
+          nombre: controllerNombre.text,
+          medioComunicacion: controllerMedioComunicacion.text,
+        );
+
+        break;
+
+      case 48:
+        //4. TRASLADO DE RECURSOS LOGÍSTICOS
+
+        break;
+
+      /******************************** GOE - GIR ******************************************/
+
+      case 41:
+        //1. SEGURIDAD DE PERSONAS IMPORTANTES
+
+        observacionModel = ObservacionModel(
+          idDgoNovedadesElect: idNovedades,
+          funcion: controllerFuncion.text,
+          nombre: controllerNombre.text,
+        );
+
+        break;
+      case 42:
+        //2. SEGURIDAD DE INSTALACIONES
+
+        observacionModel = ObservacionModel(
+          idDgoNovedadesElect: idNovedades,
+          instalacion: controllerInstalacion.text,
+          descripcion: controllerDescripcion.text,
+        );
+
+        break;
+      case 43:
+        //3. REGISTRO DE EXPLOSIVOS
+
+        observacionModel = ObservacionModel(
+          idDgoNovedadesElect: idNovedades,
+          direccion: controllerDireccion.text,
+          descripcion: controllerDescripcion.text,
+        );
+
+        break;
+
+      case 44:
+        //4. APOYO A UNIDADES POLICIALES
+
+        observacionModel = ObservacionModel(
+          idDgoNovedadesElect: idNovedades,
+          unidad: controllerUnidad.text,
+        );
+        break;
 
 
+    /******************************** UMO - CRACK- UER ******************************************/
+
+      case 49:
+        observacionModel = ObservacionModel(
+          idDgoNovedadesElect: idNovedades,
+          numerico: controllerNumerico.text,
+        );
+        break;
+
+      case 50:
+        observacionModel = ObservacionModel(
+          idDgoNovedadesElect: idNovedades,
+          numerico: controllerNumerico.text,
+        );
+        break;
+      case 51:
+        observacionModel = ObservacionModel(
+          idDgoNovedadesElect: idNovedades,
+          numerico: controllerNumerico.text,
+        );
+        break;
+      case 52:
+        observacionModel = ObservacionModel(
+          idDgoNovedadesElect: idNovedades,
+          numerico: controllerNumerico.text,
+        );
+        break;
+      case 54:
+        observacionModel = ObservacionModel(
+          idDgoNovedadesElect: idNovedades,
+            hora: "${controllerHora.text}:${controllerMinuto.text}");
+
+        break;
+
+      case 55:
+        observacionModel = ObservacionModel(
+          idDgoNovedadesElect: idNovedades,
+          hora: "${controllerHora.text}:${controllerMinuto.text}");
+
+        break;
+
+      default:
     }
-    return observacion;
+
+    return observacionModel;
   }
-
-
-
 
   Widget getComboHora(ResponsiveUtil responsive) {
     List<String> datos = new List();
@@ -1207,7 +1788,7 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
               complete: (dato) {
                 selectPadre = true;
                 setState(() {
-                  wgCajaTextosHijas=Container();
+                  wgCajaTextosHijas = Container();
                   novedadesPadres = dato;
 
                   novedadesHijas = null;
@@ -1243,8 +1824,7 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
         ? Container(
             padding: EdgeInsets.symmetric(horizontal: paddingContenido),
             child: ComboConBusqueda(
-              selectValue:
-                  selectPadre ?novedadesHijas: "",
+              selectValue: selectPadre ? novedadesHijas : "",
               title: VariablesUtil.novedad,
               searchHint: 'Seleccione la ' + VariablesUtil.novedad,
               datos: datos,
@@ -1258,12 +1838,8 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
                         getIdNovedades(novedadesHijas, _listNovedadesHijas)
                             .toString();
 
-                    if(novedadesPadres=="NOVEDADES") {
+                    if (novedadesPadres == "NOVEDADES") {
                       wgCajaTextosHijas = wgCajasTextoNovedades(
-                          int.parse(idNovedades), responsive);
-                    }
-                    else if(novedadesPadres=="UMO"){
-                      wgCajaTextosHijas = wgCajasTextoHumo(
                           int.parse(idNovedades), responsive);
                     }
 
@@ -1290,10 +1866,9 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
       peticionServer = true;
     });
 
-
-
-    _listNovedadesPadres =
-        await _novedadesElectoralesApi.getNovedadesPadres(context: context,idDgoTipoEje:_RecintoProvider.getRecintoAbierto.idDgoTipoEje);
+    _listNovedadesPadres = await _novedadesElectoralesApi.getNovedadesPadres(
+        context: context,
+        idDgoTipoEje: _RecintoProvider.getRecintoAbierto.idDgoTipoEje);
 
     if (_listNovedadesHijas.length > 0) {
       novedadesHijas = _listNovedadesHijas[0].descripcion;
@@ -1436,20 +2011,21 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
       peticionServer = true;
     });
     _listNovedadesHijas = await _novedadesElectoralesApi.getNovedadesHijas(
-        context: context, idNovedadesPadre: idNovedadPadre.toString(),idDgoTipoEje: _RecintoProvider.getRecintoAbierto.idDgoTipoEje);
+        context: context,
+        idNovedadesPadre: idNovedadPadre.toString(),
+        idDgoTipoEje: _RecintoProvider.getRecintoAbierto.idDgoTipoEje);
 
     setState(() {
       peticionServer = false;
     });
   }
 
-  _RegistrarNovedades({
-    @required String idDgoNovedadesElect,
-    @required String idDgoPerAsigOpe,
-    @required String observacion,
-    @required String usuario,
-    String imagen="null"
-  }) async {
+  _RegistrarNovedades(
+      {@required String idDgoNovedadesElect,
+      @required String idDgoPerAsigOpe,
+      @required String observacion,
+      @required String usuario,
+      String imagen = "null"}) async {
     if (idDgoPerAsigOpe == 0) return;
 
     if (peticionServer) return;
@@ -1457,12 +2033,10 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
       peticionServer = true;
     });
 
-
     String latitud =
-    _UserProvider.getUser.ubicacionSeleccionada.latitude.toString();
+        _UserProvider.getUser.ubicacionSeleccionada.latitude.toString();
     String longitud =
-    _UserProvider.getUser.ubicacionSeleccionada.longitude.toString();
-
+        _UserProvider.getUser.ubicacionSeleccionada.longitude.toString();
 
     await _novedadesElectoralesApi.registrarNovedadesElectorales(
         context: context,
@@ -1470,10 +2044,11 @@ class _RecElecRegistrarNovedadesState extends State<RecElecRegistrarNovedades> {
         usuario: usuario,
         idDgoNovedadesElect: idDgoNovedadesElect,
         observacion: observacion,
-        imagen:imagen,
-      latitud: latitud,
-      longitud: longitud
-    );
+        imagen: imagen,
+        latitud: latitud,
+        longitud: longitud,
+        cedula: cedula,
+        idDgoProcElec: _RecintoProvider.getRecintoAbierto.idDgoProcElec);
 
     setState(() {
       peticionServer = false;

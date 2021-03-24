@@ -27,11 +27,11 @@ class _LoginPageState extends State<LoginPage> {
     UtilidadesUtil.getTheme();
 
     //cambia el color de texto de barra superios del telefono
-    /* controllerUser.text = 'cpfn1206762401';
-    controllerPass.text = '1234567';*/
+    /*controllerUser.text = 'cpfn1206762401';
+    controllerPass.text = 'freddyNCP1990';*/
 
     if (!prefs.getAppInicial()) {
-      print("aquii");
+
       wgLoginUserPass = true;
       wgOcultarLoginUserPass = true;
     }

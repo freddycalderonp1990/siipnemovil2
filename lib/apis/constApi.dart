@@ -44,6 +44,7 @@ class ConstApi {
 
   static const String ConsultarProcesosOperativos = "689a384a92f51e89f6916f146c3cbb25";
   static const String ConsultarUnidadesPoliciales = "bbc1a27d5d33236b1ae4100a33b5f2e9";
+  static const String ConsultarAllUnidadesPoliciales              = "47c685145e473f183cfcb4cf342b1773";
   static const String ConsultarTiposEjesPorIdPadre = "0934eca05bce3f4f96999f3fa15ec6aa";
   static const String ConsultarTipoEjeOtros        = "b2745abdf4ec9cae769d9730a4e9db6f";
   static const String ConsultarTipoEjesActivosEnProcesoOperativos = "1e5ce7ad42482403d3dc5b3eba80e97b";

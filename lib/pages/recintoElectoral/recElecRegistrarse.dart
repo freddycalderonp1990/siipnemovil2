@@ -10,6 +10,11 @@ class _RecElecRegistrarseState extends State<RecElecRegistrarse> {
   RecintoAbiertoProvider _RecintoProvider;
   bool peticionServer = false;
 
+  bool cargaInicial = true;
+  List<RecintosElectoral> _recintosElectorales = new List();
+  String  recintoElectoral;
+  int idRecintoElectoral = 0;
+
   //CONFIGURACIONES
   final anchoContenedor = AppConfig.anchoContenedor;
   final anchoContenedorHijos = AppConfig.anchoContenedorHijos;
@@ -67,7 +72,7 @@ btnAtras: true,
         MyUbicacionWidget(
 
           callback:(_) {
-
+            _getAllUnidadesPoliciales();
           },),
         SizedBox(
           height: responsive.altoP(separcion),
@@ -77,6 +82,10 @@ btnAtras: true,
           height: responsive.altoP(separcion),
         ),
         wgDatosRecinto(),
+        SizedBox(
+          height: responsive.altoP(0.5),
+        ),
+        getCombos(),
         SizedBox(
           height: responsive.altoP(3),
         ),
@@ -182,7 +191,7 @@ btnAtras: true,
   }
 
   Widget btnRegistrarse(ResponsiveUtil responsive) {
-    return _datosRecintoElectoralClass.nomRecintoElec != ""
+    return idRecintoElectoral != 0
         ? Container(
             width: responsive.anchoP(anchoContenedor),
             child: BotonesWidget(
@@ -274,7 +283,8 @@ btnAtras: true,
           latitud: latitud,
           longitud: longitud,
           idDgoTipoEje:_datosRecintoElectoralClass.idDgoTipoEje ,
-          idDgoReciElect: _datosRecintoElectoralClass.idDgoReciElect);
+          idDgoReciElect: _datosRecintoElectoralClass.idDgoReciElect,
+          idRecintoElectoral:idRecintoElectoral.toString());
 
       setState(() {
         peticionServer = false;
@@ -283,6 +293,107 @@ btnAtras: true,
       print("un error ${e.toString()}");
       setState(() {
         peticionServer = false;
+      });
+    }
+  }
+
+
+
+  Widget getCombos() {
+
+    return _datosRecintoElectoralClass.nomRecintoElec != ""?  getComboInstalacionesUnidadesPoliciales():Container();
+  }
+
+
+
+
+  List<String> getDatosInstalaciones(List<RecintosElectoral> _recintosElectorales) {
+    List<String> datos = new List();
+
+    print('getDatosInstalaciones');
+    for (int i = 0; i < _recintosElectorales.length; i++) {
+      //datos.add(_recintosElectorales[i].nomRecintoElec + "\n(Distancia " +_recintosElectorales[i].distance+"m)");
+      datos.add(_recintosElectorales[i].nomRecintoElec);
+    }
+    print('datos ${datos.length}');
+    return datos;
+  }
+
+  int getIdInstalaciones(String nomRecintoElec) {
+    int id = 0;
+    for (int i = 0; i < _recintosElectorales.length; i++) {
+      if (_recintosElectorales[i].nomRecintoElec == nomRecintoElec) {
+        id = int.parse(_recintosElectorales[i].idDgoReciElect);
+        return id;
+      }
+    }
+    return id;
+  }
+
+  Widget getComboInstalacionesUnidadesPoliciales() {
+    List<String> datos = getDatosInstalaciones(_recintosElectorales);
+
+    return ContenedorDesingWidget(
+        anchoPorce: anchoContenedor,
+        child: Container(
+            padding: EdgeInsets.symmetric(vertical: paddingContenido),
+            child: Container(
+                padding: EdgeInsets.symmetric(horizontal: paddingContenido),
+                child:Column(children: [
+                  TituloTextWidget(title: "Seleccione la Unidad a la que pertenece el Servidor Policial ",textAlign: TextAlign.center,),
+                  ComboConBusqueda(
+                    title: VariablesUtil.UnidadPolicial,
+                    searchHint: 'Seleccione la ' + VariablesUtil.UnidadPolicial,
+                    datos: datos,
+                    complete: (dato) {
+                      setState(() {
+                        recintoElectoral = dato;
+                        idRecintoElectoral =
+                            getIdInstalaciones(recintoElectoral);
+                      });
+                    },
+                  ),
+
+                ],))));
+  }
+
+  _getAllUnidadesPoliciales( ) async {
+    try {
+
+
+      if (!cargaInicial) return;
+
+
+
+      setState(() {
+        peticionServer = true;
+      });
+
+
+
+      _recintosElectorales =
+      await _recintosElectoralesApi.getAllUnidadesPoliciales(
+        context: context,
+        usuario: _UserProvider.getUser.idGenUsuario,
+      );
+
+      print("_recintosElectorales ${_recintosElectorales.length}");
+
+
+
+      setState(() {
+        peticionServer = false;
+        cargaInicial=false;
+
+      });
+    } catch (e) {
+      print("un error");
+      print(e.toString());
+      setState(() {
+        peticionServer = false;
+        cargaInicial=false;
+
+
       });
     }
   }

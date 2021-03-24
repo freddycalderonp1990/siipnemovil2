@@ -11,12 +11,14 @@ class BiometricUtil {
       //Para obtener una lista de datos biométricos inscritos, llame a getAvailableBiometrics:
       List<BiometricType> availableBiometrics =
           await auth.getAvailableBiometrics();
+    print('es android ${Platform.isAndroid}');
 
       if (Platform.isAndroid || Platform.isIOS) {
         if (availableBiometrics.contains(BiometricType.face)) {
           // Face ID.
           print('Face ID');
-        } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
+        }
+        if (availableBiometrics.contains(BiometricType.fingerprint)) {
           accesoBiometrico = true;
         }
       }
@@ -47,7 +49,9 @@ class BiometricUtil {
         if (availableBiometrics.contains(BiometricType.face)) {
           // Face ID.
           print('Face ID');
-        } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
+        }
+
+        if (availableBiometrics.contains(BiometricType.fingerprint)) {
           // Touch ID.
           print('Touch ID');
 

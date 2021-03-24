@@ -464,10 +464,13 @@ class DesingDialogo extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: responsive.altoP(3)),
-                Row(
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[widget],
-                ),
+                ),),
+
                 SizedBox(height: responsive.anchoP(3)),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

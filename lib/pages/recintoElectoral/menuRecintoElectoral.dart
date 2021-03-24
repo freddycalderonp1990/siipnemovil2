@@ -56,11 +56,17 @@ class _MenuRecintoElectoralState extends State<MenuRecintoElectoral> {
           : "MENÚ SISTEMA RECINTO ELECTORAL",
       imgPerfil: _UserProvider.getUser.foto,
       contenido: <Widget>[
+        MyUbicacionWidget(
+mostraUbicacion: false,
+          callback:(_) {
+
+          },),
         Container(
           padding: EdgeInsets.all(5),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+
               Container(
                   decoration: BoxDecoration(
                       borderRadius:
@@ -81,13 +87,15 @@ class _MenuRecintoElectoralState extends State<MenuRecintoElectoral> {
               SizedBox(
                 height: responsive.altoP(2),
               ),
-              wgMenu
+
+              wgMenu,
             ],
           ),
         ),
         SizedBox(
           height: responsive.altoP(1),
         ),
+
         Container(
           width: responsive.anchoP(30),
           child: BtnIconWidget(
@@ -154,7 +162,11 @@ class _MenuRecintoElectoralState extends State<MenuRecintoElectoral> {
               DialogosWidget.alertSiNo(context,
                   title: "Eliminar Recinto Electoral",
                   message:
-                      "¿Esta seguro que desea eliminar el Recinto Electoral.?",
+
+
+                  "Si abrió por error el Recinto Electoral se recomienda eliminarlo.  "
+                      "\n\nRecuerde todo será registrado para verificar el correcto uso del aplicativo."
+                      "\n\n¿Esta seguro que desea eliminar el Recinto Electoral.?",
                   onTap: () {
                 Navigator.of(context).pop();
                 _EliminarRecintoElectoral(
@@ -207,6 +219,22 @@ class _MenuRecintoElectoralState extends State<MenuRecintoElectoral> {
   _wgCodigoRecinto(ResponsiveUtil responsive) {
     return Column(
       children: [
+        Container(
+            decoration: BoxDecoration(
+                borderRadius:
+                BorderRadius.circular(AppConfig.radioBordecajas),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.white12.withOpacity(0.5), blurRadius: 10)
+                ]),
+            child: Text(
+              _RecintoProvider.getRecintoAbierto.descProcElecc,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: responsive.anchoP(3.5)),
+            )),
         Container(
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(AppConfig.radioBordecajas),
@@ -301,15 +329,16 @@ class _MenuRecintoElectoralState extends State<MenuRecintoElectoral> {
   _AbandonarRecintoElectoral(
       {@required String usuario, @required String idDgoPerAsigOpe}) async {
     try {
-      if (peticionServer) return;
+      print('abannnn1');
 
       setState(() {
         peticionServer = true;
       });
-      String latitud =
+      String latitud = await
       _UserProvider.getUser.ubicacionSeleccionada.latitude.toString();
-      String longitud =
+      String longitud =await
       _UserProvider.getUser.ubicacionSeleccionada.longitude.toString();
+      print('abannnn');
 
       bool res = await _recintosElectoralesApi.abandonarRecintoElectoral(
         context: context,
@@ -323,6 +352,7 @@ class _MenuRecintoElectoralState extends State<MenuRecintoElectoral> {
         peticionServer = false;
       });
     } catch (e) {
+      print(e.toString());
       setState(() {
         peticionServer = false;
       });
@@ -352,11 +382,14 @@ class _MenuRecintoElectoralState extends State<MenuRecintoElectoral> {
         peticionServer = true;
       });
 
+
+
       bool res = await _recintosElectoralesApi.finalizarRecintoElectoral(
         context: context,
         idDgoCreaOpReci: idDgoCreaOpReci,
         usuario: usuario,
-        idDgoPerAsigOpe: _RecintoProvider.getRecintoAbierto.idDgoPerAsigOpe
+        idDgoPerAsigOpe: _RecintoProvider.getRecintoAbierto.idDgoPerAsigOpe,
+          idDgoTipoEje:  _RecintoProvider.getRecintoAbierto.idDgoTipoEje
       );
 
       setState(() {

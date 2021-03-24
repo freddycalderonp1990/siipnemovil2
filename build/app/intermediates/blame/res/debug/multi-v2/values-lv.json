@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\Users\\Calderon\\Desktop\\Listos\\siipnemovil2\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-lv\\values-lv.xml",
+            "outputFile": "C:\\Users\\Calderon\\StudioProjects\\Listos con Ios\\siipnemovil2\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-lv\\values-lv.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Calderon\\.gradle\\caches\\transforms-2\\files-2.1\\5ac9ad6f13ea0190a3570ea7a43d9f59\\play-services-base-17.0.0\\res\\values-lv\\values.xml",

@@ -26,3 +26,4 @@ part 'recintoElectoral/resgistroPersEnRecElectoralModel.dart';
 part 'recintoElectoral/novedadesElectoralesModel.dart';
 part 'recintoElectoral/personalRecintoElectoralModel.dart';
 part 'recintoElectoral/novedadesElectoralesDetalleModel.dart';
+part 'recintoElectoral/observacionModel.dart';

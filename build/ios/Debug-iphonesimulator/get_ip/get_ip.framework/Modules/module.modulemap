@@ -1,0 +1,11 @@
+framework module get_ip {
+  umbrella header "get_ip-umbrella.h"
+
+  export *
+  module * { export * }
+}
+
+module get_ip.Swift {
+    header "get_ip-Swift.h"
+    requires objc
+}

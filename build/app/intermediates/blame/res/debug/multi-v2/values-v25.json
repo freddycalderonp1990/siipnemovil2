@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\Users\\Calderon\\Desktop\\Listos\\siipnemovil2\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v25\\values-v25.xml",
+            "outputFile": "C:\\Users\\Calderon\\StudioProjects\\Listos con Ios\\siipnemovil2\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v25\\values-v25.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Calderon\\.gradle\\caches\\transforms-2\\files-2.1\\933d661a419bf7a83fd1cf166912a299\\appcompat-1.1.0-rc01\\res\\values-v25\\values-v25.xml",

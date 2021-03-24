@@ -56,6 +56,11 @@ class _MenuUnidadesPolicialesOtrosPageState extends State<MenuUnidadesPoliciales
           : "MENÚ UNIDADES POLICIALES - OTROS",
       imgPerfil: _UserProvider.getUser.foto,
       contenido: <Widget>[
+        MyUbicacionWidget(
+          mostraUbicacion: false,
+          callback:(_) {
+
+          },),
         Container(
           padding: EdgeInsets.all(5),
           child: Column(
@@ -154,7 +159,9 @@ class _MenuUnidadesPolicialesOtrosPageState extends State<MenuUnidadesPoliciales
               DialogosWidget.alertSiNo(context,
                   title: VariablesUtil.EliminarOperativo,
                   message:
-                  "¿Esta seguro que desea eliminar el Operativo.?",
+                  "Si abrió por error el Operativo se recomienda eliminarlo.  "
+                      "\n\nRecuerde todo será registrado para verificar el correcto uso del aplicativo."
+                      "\n\n¿Esta seguro que desea eliminar el Operativo.?",
                   onTap: () {
                     Navigator.of(context).pop();
                     _EliminarRecintoElectoral(
@@ -207,6 +214,25 @@ class _MenuUnidadesPolicialesOtrosPageState extends State<MenuUnidadesPoliciales
   _wgCodigoRecinto(ResponsiveUtil responsive) {
     return Column(
       children: [
+
+        Container(
+            decoration: BoxDecoration(
+                borderRadius:
+                BorderRadius.circular(AppConfig.radioBordecajas),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.white60.withOpacity(0.3),
+                      blurRadius: 10)
+                ]),
+            child: Text(
+              _RecintoProvider.getRecintoAbierto.descProcElecc,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: responsive.anchoP(3.5)),
+            )),
+
         Container(
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(AppConfig.radioBordecajas),
@@ -364,7 +390,8 @@ class _MenuUnidadesPolicialesOtrosPageState extends State<MenuUnidadesPoliciales
           usuario: usuario,
           idDgoPerAsigOpe: _RecintoProvider.getRecintoAbierto.idDgoPerAsigOpe,
           title: 'OPERATIVO',
-          msj1: 'Usted finalizó con éxito el Operativo!.'
+          msj1: 'Usted finalizó con éxito el Operativo!.',
+          idDgoTipoEje:  _RecintoProvider.getRecintoAbierto.idDgoTipoEje
       );
 
       setState(() {

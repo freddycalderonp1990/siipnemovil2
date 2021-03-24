@@ -1,17 +1,24 @@
 part of '../pages.dart';
 
 class CrearCodigoUnidadPolicialPage extends StatefulWidget {
-
   final int idDgoTipoEje;
 
-  const CrearCodigoUnidadPolicialPage({Key key, this.idDgoTipoEje}) : super(key: key);
+  const CrearCodigoUnidadPolicialPage({Key key, this.idDgoTipoEje})
+      : super(key: key);
+
   @override
-  _CrearCodigoUnidadPolicialPageState createState() => _CrearCodigoUnidadPolicialPageState();
+  _CrearCodigoUnidadPolicialPageState createState() =>
+      _CrearCodigoUnidadPolicialPageState();
 }
 
-class _CrearCodigoUnidadPolicialPageState extends State<CrearCodigoUnidadPolicialPage> {
+class _CrearCodigoUnidadPolicialPageState
+    extends State<CrearCodigoUnidadPolicialPage> {
   UserProvider _UserProvider;
   ProcesoOperativoProvider _ProcesoOperativoProvider;
+
+  double sizeIcons;
+  var controllerTelefono = new TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   bool peticionServer = false;
   bool cargarRecintosElectorales = false, cargaInicial = true;
@@ -24,7 +31,7 @@ class _CrearCodigoUnidadPolicialPageState extends State<CrearCodigoUnidadPolicia
   List<RecintosElectoral> _recintosElectorales = new List();
   AbrirRecintoElectoral _abrirRecintoElectoral = new AbrirRecintoElectoral();
 
-  String  recintoElectoral;
+  String recintoElectoral;
   int idRecintoElectoral = 0;
   String textoDistancia;
 
@@ -40,7 +47,6 @@ class _CrearCodigoUnidadPolicialPageState extends State<CrearCodigoUnidadPolicia
 
   @override
   void dispose() {
-
     super.dispose();
   }
 
@@ -54,17 +60,19 @@ class _CrearCodigoUnidadPolicialPageState extends State<CrearCodigoUnidadPolicia
     _UserProvider = UserProvider.of(context);
     _ProcesoOperativoProvider = ProcesoOperativoProvider.of(context);
 
-    return WorkAreaPageWidget(
+    sizeIcons =
+        responsive.isVertical() ? responsive.altoP(3) : responsive.anchoP(5);
 
+    return WorkAreaPageWidget(
       btnAtras: true,
       peticionServer: _recintosElectorales.length > 0 ? peticionServer : true,
       title: "GENERAR CÓDIGO",
       contenido: [
         MyUbicacionWidget(
-
-          callback:(_) {
+          callback: (_) {
             getRecintosElectoralesInstalaciones();
-          },),
+          },
+        ),
         SizedBox(
           height: responsive.altoP(1),
         ),
@@ -76,7 +84,6 @@ class _CrearCodigoUnidadPolicialPageState extends State<CrearCodigoUnidadPolicia
       ],
     );
   }
-
 
   Widget getComboInstalacionesUnidadesPoliciales() {
     List<String> datos = getDatosInstalaciones(_recintosElectorales);
@@ -94,8 +101,7 @@ class _CrearCodigoUnidadPolicialPageState extends State<CrearCodigoUnidadPolicia
                   complete: (dato) {
                     setState(() {
                       recintoElectoral = dato;
-                      idRecintoElectoral =
-                          getIdInstalaciones(recintoElectoral);
+                      idRecintoElectoral = getIdInstalaciones(recintoElectoral);
                     });
                   },
                 ))));
@@ -103,26 +109,76 @@ class _CrearCodigoUnidadPolicialPageState extends State<CrearCodigoUnidadPolicia
 
   Widget btnAbrir(ResponsiveUtil responsive) {
     return Container(
-      width: responsive.anchoP(anchoContenedor),
-      child: BotonesWidget(
-          iconData: Icons.open_in_browser_outlined,
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          title: VariablesUtil.ABRIR,
-          onPressed: () {
-            DialogosWidget.alertSiNo(context,
-                title: "Abrir Operativo",
-                message:
-                "Usted es la persona encargada o jefe designada a este Operativo",
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _AbrirRecintoElectoral(_UserProvider.getUser.idGenUsuario,
-                      idRecintoElectoral.toString());
-                });
-          }),
+        width: responsive.anchoP(anchoContenedor),
+        child: Column(
+          children: [
+            ContenedorDesingWidget(
+                margin: EdgeInsets.symmetric(vertical: 10),
+                anchoPorce: anchoContenedor,
+                child: Column(
+                  children: [
+                    wgTxtTelefono(responsive),
+                    SizedBox(
+                      height: responsive.altoP(1.5),
+                    )
+                  ],
+                )),
+            SizedBox(
+              height: responsive.altoP(1.5),
+            ),
+            BotonesWidget(
+                iconData: Icons.open_in_browser_outlined,
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                title: VariablesUtil.ABRIR,
+                onPressed: () {
+                  DialogosWidget.alertSiNo(context,
+                      title: "Abrir Operativo",
+                      message:
+                          "Usted es la persona encargada o jefe designada a este Operativo, "
+                          "\n \nRecuerde crear el código si se encuentra de servicio en el operativo, para prevenir el mal uso todo será registrado."
+                          "\n \nUtilice la aplicación con responsabilidad.",
+                      onTap: () {
+                    Navigator.of(context).pop();
+                    _AbrirRecintoElectoral(_UserProvider.getUser.idGenUsuario,
+                        idRecintoElectoral.toString());
+                  });
+                }),
+          ],
+        ));
+  }
+
+  Widget wgTxtTelefono(responsive) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          ImputTextWidget(
+            keyboardType: TextInputType.number,
+            controller: controllerTelefono,
+            icono: Icon(
+              Icons.phone_android,
+              color: Colors.black38,
+              size: sizeIcons,
+            ),
+            label: "Teléfono",
+            fonSize: responsive.anchoP(AppConfig.tamTextoTitulo),
+            validar: validateTelefono,
+          )
+        ],
+      ),
     );
   }
 
-  List<String> getDatosInstalaciones(List<RecintosElectoral> _recintosElectorales) {
+  String validateTelefono(String value) {
+    if (value.length < 8) {
+      return "Ingrese el número de Teléfono";
+    }
+
+    return null;
+  }
+
+  List<String> getDatosInstalaciones(
+      List<RecintosElectoral> _recintosElectorales) {
     List<String> datos = new List();
     for (int i = 0; i < _recintosElectorales.length; i++) {
       //datos.add(_recintosElectorales[i].nomRecintoElec + "\n(Distancia " +_recintosElectorales[i].distance+"m)");
@@ -145,9 +201,9 @@ class _CrearCodigoUnidadPolicialPageState extends State<CrearCodigoUnidadPolicia
   getRecintosElectoralesInstalaciones() async {
     try {
       String latitud =
-      _UserProvider.getUser.ubicacionSeleccionada.latitude.toString();
+          _UserProvider.getUser.ubicacionSeleccionada.latitude.toString();
       String longitud =
-      _UserProvider.getUser.ubicacionSeleccionada.longitude.toString();
+          _UserProvider.getUser.ubicacionSeleccionada.longitude.toString();
 
       if (!cargaInicial) return;
 
@@ -164,16 +220,14 @@ class _CrearCodigoUnidadPolicialPageState extends State<CrearCodigoUnidadPolicia
       String idDgoTipoEje = widget.idDgoTipoEje.toString();
 
       _recintosElectorales =
-      await _recintosElectoralesApi.getRecintosElectoralesCercanos(
-        title: VariablesUtil.UNIDADESPOLICIALES,
-          msj1: "No existen Unidades Policiales Cercanas",
-          context: context,
-          latitud: latitud,
-          longitud: longitud,
-          idDgoProcElec: idDgoProcElec,
-          idDgoTipoEje: idDgoTipoEje);
-
-
+          await _recintosElectoralesApi.getRecintosElectoralesCercanos(
+              title: VariablesUtil.UNIDADESPOLICIALES,
+              msj1: "No existen Unidades Policiales Cercanas",
+              context: context,
+              latitud: latitud,
+              longitud: longitud,
+              idDgoProcElec: idDgoProcElec,
+              idDgoTipoEje: idDgoTipoEje);
 
       setState(() {
         peticionServer = false;
@@ -183,14 +237,14 @@ class _CrearCodigoUnidadPolicialPageState extends State<CrearCodigoUnidadPolicia
       setState(() {
         peticionServer = false;
         cargaInicial = false;
-
       });
     }
   }
 
   _AbrirRecintoElectoral(String usuario, String idRecintoElectoral) async {
     try {
-      print("hola");
+      bool isValid = _formKey.currentState.validate();
+      if (!isValid) return;
       if (peticionServer) return;
 
       setState(() {
@@ -198,21 +252,24 @@ class _CrearCodigoUnidadPolicialPageState extends State<CrearCodigoUnidadPolicia
       });
 
       String latitud =
-      _UserProvider.getUser.ubicacionSeleccionada.latitude.toString();
+          _UserProvider.getUser.ubicacionSeleccionada.latitude.toString();
       String longitud =
-      _UserProvider.getUser.ubicacionSeleccionada.longitude.toString();
+          _UserProvider.getUser.ubicacionSeleccionada.longitude.toString();
 
-      String idDgoProcElec= _ProcesoOperativoProvider.getProcesosOperativo.idDgoProcElec;
+      String idDgoProcElec =
+          _ProcesoOperativoProvider.getProcesosOperativo.idDgoProcElec;
 
       _abrirRecintoElectoral =
-      await _recintosElectoralesApi.abrirRecintoElectoral(
-          context: context,
-          idDgoReciElect: idRecintoElectoral,
-          idGenPersona: _UserProvider.getUser.idGenPersona,
-          usuario: usuario,
-          latitud: latitud,
-          longitud: longitud,
-          idDgoProcElec: idDgoProcElec);
+          await _recintosElectoralesApi.abrirRecintoElectoral(
+              context: context,
+              idDgoReciElect: idRecintoElectoral,
+              idGenPersona: _UserProvider.getUser.idGenPersona,
+              usuario: usuario,
+              latitud: latitud,
+              longitud: longitud,
+              idDgoProcElec: idDgoProcElec,
+              idDgoReciUnidadPolicial: idRecintoElectoral,
+              telefono: controllerTelefono.text);
 
       if (_abrirRecintoElectoral.estado == "A") {
         DialogosWidget.alert(context,
@@ -227,15 +284,15 @@ class _CrearCodigoUnidadPolicialPageState extends State<CrearCodigoUnidadPolicia
         DialogosWidget.alert(context,
             title: "CODIGO",
             message:
-            "El Codigo para que el personal se anexe al recinto electoral es: " +
-                _abrirRecintoElectoral.idDgoCreaOpReci, onTap: () {
-              UtilidadesUtil.pantallasAbrirNuevaCerrarTodas(
-                  context: context,
-                  pantalla: AppConfig.pantallaVerificarOperativoRecintoAbierto);
+                "El Codigo para que el personal se anexe al recinto electoral es: " +
+                    _abrirRecintoElectoral.idDgoCreaOpReci, onTap: () {
+          UtilidadesUtil.pantallasAbrirNuevaCerrarTodas(
+              context: context,
+              pantalla: AppConfig.pantallaVerificarOperativoRecintoAbierto);
 
-              /* Navigator.pushReplacementNamed(
+          /* Navigator.pushReplacementNamed(
               context, AppConfig.pantallaMenuRecintoElectoral);*/
-            });
+        });
       }
 
       setState(() {

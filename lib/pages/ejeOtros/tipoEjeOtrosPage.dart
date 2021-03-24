@@ -10,13 +10,15 @@ class _TipoEjeOtrosPageState extends State<TipoEjeOtrosPage> {
   UserProvider _UserProvider;
   ProcesoOperativoProvider _ProcesoOperativoProvider;
   bool cargaInicial = true;
-  bool existeDataHija = false;
+
+
+  bool selectPadre = true;
 
   TiposEjesApi _TiposEjesApi = new TiposEjesApi();
-  List<UnidadesPoliciale> listTipoEjeOtros = new List();
-  List<UnidadesPoliciale> listTipoEjeOtrosHijas = new List();
-  String tipoEjePadre, tipoEjeHija;
-  int idTipoEjeEnviar = 0, idtipoEjePadre = 0, idtipoEjeHija = 0;
+  List<UnidadesPoliciale> _listUnidadesPolicialesPadres = new List();
+  List<UnidadesPoliciale> _listUnidadesPolicialesHijas = new List();
+  String unidadPolicialPadre, unidadPolicialHija;
+  int idUnidadPolicialPadre = 0, idUnidadPolicialHija = 0;
 
   //CONFIGURACIONES
   final anchoContenedor = AppConfig.anchoContenedor;
@@ -29,8 +31,7 @@ class _TipoEjeOtrosPageState extends State<TipoEjeOtrosPage> {
     super.initState();
     context.bloc<MiUbicacionBloc>().iniciarSeguimiento();
 
-    listTipoEjeOtros = new List();
-    listTipoEjeOtrosHijas = new List();
+
     UtilidadesUtil.getTheme();
   }
 
@@ -67,17 +68,13 @@ class _TipoEjeOtrosPageState extends State<TipoEjeOtrosPage> {
               ),
               MyUbicacionWidget(
                 callback: (_) {
-                  _getTipoEjePadre();
+                  _getUnidadesPoliciales();
                 },
               ),
               SizedBox(
                 height: responsive.altoP(1),
               ),
-              getComboTipoEjePadres(),
-              SizedBox(
-                height: responsive.altoP(1),
-              ),
-              getComboTipoEjeHijas(),
+              getCombos(responsive),
               SizedBox(
                 height: responsive.altoP(4),
               ),
@@ -99,116 +96,131 @@ class _TipoEjeOtrosPageState extends State<TipoEjeOtrosPage> {
 
     //Navigator.pushReplacementNamed(context, AppConfig.pantallaLogin);
   }
-
-  List<String> getDatosTipoEje(List<UnidadesPoliciale> lista) {
+  List<String> getDatosUnidadesPoliciales(
+      List<UnidadesPoliciale> listUnidadesPoliciale) {
     List<String> datos = new List();
-    if (lista != null) {
-      for (int i = 0; i < lista.length; i++) {
-        datos.add(lista[i].descripcion);
-      }
+    for (int i = 0; i < listUnidadesPoliciale.length; i++) {
+      datos.add(listUnidadesPoliciale[i].descripcion);
     }
     return datos;
   }
 
-  int getIdTipoEje(String descripcion, List<UnidadesPoliciale> lista) {
+  int getIdUnidadPolicial(String descripcion, List<UnidadesPoliciale> lista) {
     int id = 0;
-    if (lista != null) {
-      for (int i = 0; i < lista.length; i++) {
-        if (lista[i].descripcion == descripcion) {
-          id = int.parse(lista[i].idDgoTipoEje);
+    for (int i = 0; i < lista.length; i++) {
+      if (lista[i].descripcion == descripcion) {
+        id = int.parse(lista[i].idDgoTipoEje);
 
-          return id;
-        }
+        return id;
       }
     }
     return id;
   }
 
-  Widget getComboTipoEjePadres() {
-    List<String> datos = getDatosTipoEje(listTipoEjeOtros);
-
+  Widget getCombos(ResponsiveUtil responsive) {
     return ContenedorDesingWidget(
         anchoPorce: anchoContenedor,
         child: Container(
-            padding: EdgeInsets.symmetric(vertical: paddingContenido),
-            child: Container(
-                padding: EdgeInsets.symmetric(horizontal: paddingContenido),
-                child: ComboConBusqueda(
-                  title: "OTROS",
-                  searchHint: 'Seleccione una ',
-                  datos: datos,
-                  complete: (dato) {
-                    setState(() {
-                      if (dato == null) {
-                        tipoEjePadre = '';
-                        idtipoEjePadre = 0;
-                        tipoEjeHija = '';
-                        idtipoEjeHija = 0;
-                        existeDataHija = false;
-                        listTipoEjeOtrosHijas=new List();
-                      } else {
-                        tipoEjePadre = dato;
-
-                        idtipoEjePadre =
-                            getIdTipoEje(tipoEjePadre, listTipoEjeOtros);
-
-                        if (listTipoEjeOtrosHijas != null) {
-                          if (listTipoEjeOtrosHijas.length > 0) {
-                            tipoEjeHija = listTipoEjeOtrosHijas[0].descripcion;
-                            idtipoEjeHija = int.parse(
-                                listTipoEjeOtrosHijas[0].idDgoTipoEje);
-                          }
-                        }
-
-                        if (idtipoEjePadre > 0) {
-                          print("idtipoEjePadre ${idtipoEjePadre}");
-                          _getTipoEjePadreNivel1(idtipoEjePadre);
-                        }
-                      }
-                    });
-                  },
-                ))));
+          padding: EdgeInsets.symmetric(vertical: paddingContenido),
+          child: Column(
+            children: [
+              getComboNovedadesPadres(responsive),
+              unidadPolicialPadre != null
+                  ? getComboNovedadesHijos(responsive)
+                  : Container(),
+            ],
+          ),
+        ));
   }
 
-  Widget getComboTipoEjeHijas() {
-    print("getComboTipoEjePadresHIjas");
-    List<String> datos = getDatosTipoEje(listTipoEjeOtrosHijas);
+  Widget getComboNovedadesPadres(ResponsiveUtil responsive) {
+    List<String> datos = getDatosUnidadesPoliciales(_listUnidadesPolicialesPadres);
 
-    if (datos.length > 0) {
-      existeDataHija = true;
-    } else {
-      existeDataHija = false;
-    }
+    return _listUnidadesPolicialesPadres.length > 0
+        ? Container(
+        padding: EdgeInsets.symmetric(horizontal: paddingContenido),
+        child: ComboConBusqueda(
+          title: "Otros",
+          searchHint: "Seleccione Una",
+          datos: datos,
+          complete: (dato) {
+            selectPadre = true;
+            setState(() {
 
-    return existeDataHija
-        ? ContenedorDesingWidget(
-            anchoPorce: anchoContenedor,
-            child: Container(
-                padding: EdgeInsets.symmetric(vertical: paddingContenido),
-                child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: paddingContenido),
-                    child: ComboConBusqueda(
-                      selectValue: idtipoEjePadre > 0 ? tipoEjeHija : "",
-                      title: "OTROS",
-                      searchHint: 'Seleccione una',
-                      datos: datos,
-                      complete: (dato) {
-                        setState(() {
-                          tipoEjeHija = dato;
-                          idtipoEjeHija =
-                              getIdTipoEje(tipoEjeHija, listTipoEjeOtrosHijas);
-                        });
-                      },
-                    ))))
-        : Container();
+              unidadPolicialPadre = dato;
+
+              unidadPolicialHija = null;
+              idUnidadPolicialHija = 0;
+
+              if (unidadPolicialPadre != null) {
+
+                if (_listUnidadesPolicialesHijas.length > 0) {
+                  unidadPolicialHija = _listUnidadesPolicialesHijas[0].descripcion;
+
+                  idUnidadPolicialHija = 0;
+                  idUnidadPolicialHija = int.parse( _listUnidadesPolicialesHijas[0].idDgoTipoEje);
+                }
+
+                int idNovedadPadre =
+                getIdUnidadPolicial(unidadPolicialPadre, _listUnidadesPolicialesPadres);
+                _getUnidadesPolicialesHijasNivel1(idNovedadPadre);
+              }
+            });
+          },
+        ))
+        : Container(
+      child: DetalleTextWidget(
+        detalle: "No exiten Unidades Policiales",
+      ),
+    );
   }
 
-  _getTipoEjePadre() async {
+
+  Widget getComboNovedadesHijos(ResponsiveUtil responsive) {
+    List<String> datos = getDatosUnidadesPoliciales(_listUnidadesPolicialesHijas);
+
+    Widget wg = _listUnidadesPolicialesHijas.length > 0
+        ? Container(
+        padding: EdgeInsets.symmetric(horizontal: paddingContenido),
+        child: ComboConBusqueda(
+          selectValue:
+          selectPadre ?unidadPolicialHija: "",
+          title: "Otros",
+          searchHint: "Seleccione Una",
+          datos: datos,
+          complete: (dato) {
+            selectPadre = false;
+            setState(() {
+              unidadPolicialHija = dato;
+              idUnidadPolicialHija = 0;
+              if (unidadPolicialHija != null) {
+                idUnidadPolicialHija =
+                    getIdUnidadPolicial(unidadPolicialHija, _listUnidadesPolicialesHijas)                       ;
+
+
+
+              }
+            });
+          },
+        ))
+        : Container(
+      child: DetalleTextWidget(
+        detalle: "No exiten Unidades Policiales 1",
+      ),
+    );
+
+    return wg;
+  }
+
+
+
+
+  _getUnidadesPoliciales() async {
     try {
       String latitud =
-          _UserProvider.getUser.ubicacionSeleccionada.latitude.toString();
+      _UserProvider.getUser.ubicacionSeleccionada.latitude.toString();
       String longitud =
-          _UserProvider.getUser.ubicacionSeleccionada.longitude.toString();
+      _UserProvider.getUser.ubicacionSeleccionada.longitude.toString();
 
       if (!cargaInicial) return;
 
@@ -218,7 +230,7 @@ class _TipoEjeOtrosPageState extends State<TipoEjeOtrosPage> {
         peticionServer = true;
       });
 
-      listTipoEjeOtros = await _TiposEjesApi.getTipoEjeOtros(
+      _listUnidadesPolicialesPadres = await _TiposEjesApi.getTipoEjeOtros(
           context: context, usuario: _UserProvider.getUser.idGenUsuario);
 
       setState(() {
@@ -228,16 +240,17 @@ class _TipoEjeOtrosPageState extends State<TipoEjeOtrosPage> {
     } catch (e) {
       setState(() {
         peticionServer = false;
+        cargaInicial = false;
       });
     }
   }
 
-  _getTipoEjePadreNivel1(int idtipoEjePadre) async {
+  _getUnidadesPolicialesHijasNivel1(int idtipoEjePadre) async {
     try {
       String latitud =
-          _UserProvider.getUser.ubicacionSeleccionada.latitude.toString();
+      _UserProvider.getUser.ubicacionSeleccionada.latitude.toString();
       String longitud =
-          _UserProvider.getUser.ubicacionSeleccionada.longitude.toString();
+      _UserProvider.getUser.ubicacionSeleccionada.longitude.toString();
 
       if (peticionServer) return;
 
@@ -247,11 +260,13 @@ class _TipoEjeOtrosPageState extends State<TipoEjeOtrosPage> {
 
       print("consulto");
 
-      listTipoEjeOtrosHijas = await _TiposEjesApi.getTipoEjePorIdPadre(
+      _listUnidadesPolicialesHijas = await _TiposEjesApi.getTipoEjePorIdPadre(
           context: context,
           mostrarMsj: false,
           usuario: _UserProvider.getUser.idGenUsuario,
           idDgoTipoEje: idtipoEjePadre.toString());
+
+      idUnidadPolicialHija =int.parse(  _listUnidadesPolicialesHijas[0].idDgoTipoEje);
 
       setState(() {
         peticionServer = false;
@@ -259,12 +274,14 @@ class _TipoEjeOtrosPageState extends State<TipoEjeOtrosPage> {
     } catch (e) {
       setState(() {
         peticionServer = false;
+        cargaInicial = false;
       });
     }
   }
 
   Widget btnContinuar(ResponsiveUtil responsive) {
-    Widget wg = Container(
+    return idUnidadPolicialHija > 0
+        ? Container(
       width: responsive.anchoP(anchoContenedor),
       child: BotonesWidget(
           iconData: Icons.navigate_next,
@@ -272,32 +289,14 @@ class _TipoEjeOtrosPageState extends State<TipoEjeOtrosPage> {
           title: VariablesUtil.CONTINUAR,
           onPressed: () {
 
+
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        VerificarGpsPage(pantalla: CrearCodigoOtrosPage(idDgoTipoEje: idTipoEjeEnviar,))));
+                        VerificarGpsPage(pantalla: CrearCodigoOtrosPage(idDgoTipoEje: idUnidadPolicialHija,))));
           }),
-    );
-
-    if (idtipoEjeHija > 0) {
-      idTipoEjeEnviar = idtipoEjeHija;
-    } else if (idtipoEjePadre > 0) {
-      idTipoEjeEnviar = idtipoEjePadre;
-    } else {
-      wg = Container();
-    }
-
-    if (existeDataHija) {
-      if (idtipoEjeHija == 0) {
-        wg = Container();
-      }
-    }
-
-    if (idtipoEjePadre == 0) {
-      wg = Container();
-    }
-
-    return wg;
+    )
+        : Container();
   }
 }

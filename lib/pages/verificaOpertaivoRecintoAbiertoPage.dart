@@ -75,6 +75,8 @@ class _VerificaOpertaivoRecintoAbiertoPageState
 
         _RecintoProvider.setRecinto(new RecintosElectoralesAbiertos());
 
+
+
         UtilidadesUtil.pantallasAbrirNuevaCerrarTodas(
             context: context, pantalla: AppConfig.pantallaMenuCrearCodigo);
       } else {
@@ -85,7 +87,10 @@ class _VerificaOpertaivoRecintoAbiertoPageState
 
         idDgoReciElect = _RecintosElectoralesAbiertos.idDgoReciElect;
 
+
+
         _RecintoProvider.setRecinto(_RecintosElectoralesAbiertos);
+        print('Set datos Recinto ${_RecintoProvider.getRecintoAbierto.idDgoReciElect}');
 
         //Hay Abierto Verifico si es Recinto
 

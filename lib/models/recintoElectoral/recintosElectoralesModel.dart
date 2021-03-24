@@ -26,29 +26,29 @@ class RecintosElectoralsModel {
 
 class RecintosElectoral {
   RecintosElectoral({
-    this.numElectores,
-    this.numJuntMascu,
-    this.numJuntFeme,
-    this.idDgoReciElect,
-    this.idGenGeoSenplades,
-    this.idGenDivPolitica,
-    this.codRecintoElec,
-    this.nomRecintoElec,
-    this.direcRecintoElec,
-    this.latitud,
-    this.longitud,
-    this.usuario,
-    this.fecha,
-    this.ip,
-    this.distance,
+    this.numElectores='0',
+    this.numJuntMascu='0',
+    this.numJuntFeme='0',
+    this.idDgoReciElect='0',
+    this.idGenGeoSenplades='0',
+    this.idGenDivPolitica='0',
+    this.codRecintoElec='',
+    this.nomRecintoElec='',
+    this.direcRecintoElec='',
+    this.latitud='',
+    this.longitud='',
+    this.usuario='',
+    this.fecha='',
+    this.ip='',
+    this.distance='0',
   });
 
   String numElectores;
   String numJuntMascu;
   String numJuntFeme;
   String idDgoReciElect;
-  dynamic idGenGeoSenplades;
-  dynamic idGenDivPolitica;
+  String idGenGeoSenplades;
+  String idGenDivPolitica;
   String codRecintoElec;
   String nomRecintoElec;
   String direcRecintoElec;
@@ -59,23 +59,36 @@ class RecintosElectoral {
   String ip;
   String distance;
 
-  factory RecintosElectoral.fromJson(Map<String, dynamic> json) => RecintosElectoral(
-    numElectores: json["numElectores"] == null ? null : json["numElectores"],
-    numJuntMascu: json["numJuntMascu"] == null ? null : json["numJuntMascu"],
-    numJuntFeme: json["numJuntFeme"] == null ? null : json["numJuntFeme"],
-    idDgoReciElect: json["idDgoReciElect"] == null ? null : json["idDgoReciElect"],
-    idGenGeoSenplades: json["idGenGeoSenplades"],
-    idGenDivPolitica: json["idGenDivPolitica"],
-    codRecintoElec: json["codRecintoElec"] == null ? null : json["codRecintoElec"],
-    nomRecintoElec: json["nomRecintoElec"] == null ? null : json["nomRecintoElec"]+"\nDistancia:"+json["distance"]+"m",
-    direcRecintoElec: json["direcRecintoElec"] == null ? null : json["direcRecintoElec"],
-    latitud: json["latitud"] == null ? null : json["latitud"],
-    longitud: json["longitud"] == null ? null : json["longitud"],
-    usuario: json["usuario"] == null ? null : json["usuario"],
-    fecha: json["fecha"] == null ? null : json["fecha"],
-    ip: json["ip"] == null ? null : json["ip"],
-    distance: json["distance"] == null ? null : json["distance"],
-  );
+  factory RecintosElectoral.fromJson(Map<String, dynamic> json) {
+    String nomRecinto=json["nomRecintoElec"] == null ? null : json["nomRecintoElec"];
+
+    String dist=json["distance"] == null ? '' :"\nDistancia:"+json["distance"]+"m";
+
+    nomRecinto=nomRecinto+dist;
+
+
+
+
+
+    return RecintosElectoral(
+      numElectores: json["numElectores"] == null ? null : json["numElectores"],
+      numJuntMascu: json["numJuntMascu"] == null ? null : json["numJuntMascu"],
+      numJuntFeme: json["numJuntFeme"] == null ? null : json["numJuntFeme"],
+      idDgoReciElect: json["idDgoReciElect"] == null ? null : json["idDgoReciElect"],
+      idGenGeoSenplades: json["idGenGeoSenplades"],
+      idGenDivPolitica: json["idGenDivPolitica"],
+      codRecintoElec: json["codRecintoElec"] == null ? null : json["codRecintoElec"],
+      nomRecintoElec: nomRecinto,
+      direcRecintoElec: json["direcRecintoElec"] == null ? null : json["direcRecintoElec"],
+      latitud: json["latitud"] == null ? null : json["latitud"],
+      longitud: json["longitud"] == null ? null : json["longitud"],
+      usuario: json["usuario"] == null ? null : json["usuario"],
+      fecha: json["fecha"] == null ? null : json["fecha"],
+      ip: json["ip"] == null ? null : json["ip"],
+      distance: json["distance"] == null ? null : json["distance"],
+    );
+
+  }
 
   Map<String, dynamic> toJson() => {
     "numElectores": numElectores == null ? null : numElectores,

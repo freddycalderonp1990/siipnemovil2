@@ -8,7 +8,13 @@ class RecElecAddPersonal extends StatefulWidget {
 class _RecElecAddPersonalState extends State<RecElecAddPersonal> {
   UserProvider _UserProvider;
   RecintoAbiertoProvider _RecintoProvider;
+
   bool peticionServer = false;
+  bool cargaInicial = true;
+
+  List<RecintosElectoral> _recintosUnidadesPoliciales = new List();
+  String recintoUnidadesPoliciales;
+  int idRecintoUnidadPolicial = 0;
 
   //CONFIGURACIONES
   final anchoContenedor = AppConfig.anchoContenedor;
@@ -37,7 +43,6 @@ class _RecElecAddPersonalState extends State<RecElecAddPersonal> {
 
   @override
   void dispose() {
-
     super.dispose();
   }
 
@@ -50,14 +55,13 @@ class _RecElecAddPersonalState extends State<RecElecAddPersonal> {
     _RecintoProvider = RecintoAbiertoProvider.of(context);
     final separcion = 0.5;
 
-    String imgFondo=AppConfig.imgFondoDefault;
-    if(_RecintoProvider.getRecintoAbierto.isRecinto){
-      imgFondo=AppConfig.imgFondoElecciones;
+    String imgFondo = AppConfig.imgFondoDefault;
+    if (_RecintoProvider.getRecintoAbierto.isRecinto) {
+      imgFondo = AppConfig.imgFondoElecciones;
+
     }
 
-
     return WorkAreaPageWidget(
-
       imgFondo: imgFondo,
       btnAtras: true,
       peticionServer: peticionServer,
@@ -82,10 +86,10 @@ class _RecElecAddPersonalState extends State<RecElecAddPersonal> {
           height: responsive.anchoP(1),
         ),
         MyUbicacionWidget(
-
-          callback:(_) {
-
-          },),
+          callback: (_) {
+            _getAllUnidadesPoliciales();
+          },
+        ),
         SizedBox(
           height: responsive.altoP(separcion),
         ),
@@ -95,14 +99,16 @@ class _RecElecAddPersonalState extends State<RecElecAddPersonal> {
         ),
         wgDatosPersona(),
         SizedBox(
+          height: responsive.altoP(0.5),
+        ),
+        getCombos(responsive),
+        SizedBox(
           height: responsive.altoP(3),
         ),
         btnAsignar(responsive),
       ],
     );
   }
-
-
 
   Widget wgConsultaIdGenPersonaPorDocumento() {
     final responsive = ResponsiveUtil(context);
@@ -194,7 +200,7 @@ class _RecElecAddPersonalState extends State<RecElecAddPersonal> {
   }
 
   Widget btnAsignar(ResponsiveUtil responsive) {
-    return _datosPers.idGenPersona != "0"
+    return idRecintoUnidadPolicial != 0
         ? Container(
             width: responsive.anchoP(anchoContenedor),
             child: BotonesWidget(
@@ -248,7 +254,7 @@ class _RecElecAddPersonalState extends State<RecElecAddPersonal> {
 
       print("_datosPers.apenom");
 
-      print(_datosPers.apenom);
+      print(_datosPers.idGenPersona);
 
       setState(() {
         peticionServer = false;
@@ -284,8 +290,9 @@ class _RecElecAddPersonalState extends State<RecElecAddPersonal> {
           idGenPersona: idGenPersona,
           latitud: latitud,
           longitud: longitud,
-          idDgoTipoEje:_RecintoProvider.getRecintoAbierto.idDgoTipoEje ,
-          idDgoReciElect: _RecintoProvider.getRecintoAbierto.idDgoReciElect);
+          idDgoTipoEje: _RecintoProvider.getRecintoAbierto.idDgoTipoEje,
+          idDgoReciElect: _RecintoProvider.getRecintoAbierto.idDgoReciElect,
+          idRecintoElectoral: idRecintoUnidadPolicial.toString());
 
       setState(() {
         peticionServer = false;
@@ -294,6 +301,99 @@ class _RecElecAddPersonalState extends State<RecElecAddPersonal> {
       print("un error ${e.toString()}");
       setState(() {
         peticionServer = false;
+      });
+    }
+  }
+
+  Widget getCombos(ResponsiveUtil responsive) {
+    return _datosPers.idGenPersona != "0"
+        ? getComboInstalacionesUnidadesPoliciales()
+        : Container();
+  }
+
+  List<String> getDatosInstalaciones(
+      List<RecintosElectoral> _recintosUnidadesPoliciales) {
+    List<String> datos = new List();
+
+    print('getDatosInstalaciones');
+    for (int i = 0; i < _recintosUnidadesPoliciales.length; i++) {
+      //datos.add(_recintosElectorales[i].nomRecintoElec + "\n(Distancia " +_recintosElectorales[i].distance+"m)");
+      datos.add(_recintosUnidadesPoliciales[i].nomRecintoElec);
+    }
+    print('datos ${datos.length}');
+    return datos;
+  }
+
+  int getIdInstalaciones(String nomRecintoElec) {
+    int id = 0;
+    for (int i = 0; i < _recintosUnidadesPoliciales.length; i++) {
+      if (_recintosUnidadesPoliciales[i].nomRecintoElec == nomRecintoElec) {
+        id = int.parse(_recintosUnidadesPoliciales[i].idDgoReciElect);
+        return id;
+      }
+    }
+    return id;
+  }
+
+  Widget getComboInstalacionesUnidadesPoliciales() {
+    List<String> datos = getDatosInstalaciones(_recintosUnidadesPoliciales);
+
+    return ContenedorDesingWidget(
+        anchoPorce: anchoContenedor,
+        child: Container(
+            padding: EdgeInsets.symmetric(vertical: paddingContenido),
+            child: Container(
+                padding: EdgeInsets.symmetric(horizontal: paddingContenido),
+                child: Column(
+                  children: [
+                    TituloTextWidget(
+                      title:
+                          "Seleccione la Unidad a la que pertenece el Servidor Policial ",
+                      textAlign: TextAlign.center,
+                    ),
+                    ComboConBusqueda(
+                      title: VariablesUtil.UnidadPolicial,
+                      searchHint:
+                          'Seleccione la ' + VariablesUtil.UnidadPolicial,
+                      datos: datos,
+                      complete: (dato) {
+                        setState(() {
+                          recintoUnidadesPoliciales = dato;
+                          idRecintoUnidadPolicial =
+                              getIdInstalaciones(recintoUnidadesPoliciales);
+                        });
+                      },
+                    ),
+                  ],
+                ))));
+  }
+
+  _getAllUnidadesPoliciales() async {
+    try {
+      if (!cargaInicial) return;
+
+      setState(() {
+        peticionServer = true;
+      });
+
+      _recintosUnidadesPoliciales =
+          await _recintosElectoralesApi.getAllUnidadesPoliciales(
+        context: context,
+        usuario: _UserProvider.getUser.idGenUsuario,
+      );
+
+      print("_recintosElectorales ${_recintosUnidadesPoliciales.length}");
+
+      setState(() {
+        peticionServer = false;
+        cargaInicial = false;
+      });
+    } catch (e) {
+      print("un error");
+      print(e.toString());
+      setState(() {
+        peticionServer = false;
+        cargaInicial = false;
       });
     }
   }

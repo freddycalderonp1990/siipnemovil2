@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\Users\\Calderon\\Desktop\\Listos\\siipnemovil2\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values\\values.xml",
+            "outputFile": "C:\\Users\\Calderon\\StudioProjects\\Listos con Ios\\siipnemovil2\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values\\values.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Calderon\\.gradle\\caches\\transforms-2\\files-2.1\\e99120cdf85e287031178cdc91eb2340\\appcompat-resources-1.1.0-rc01\\res\\values\\values.xml",
@@ -23,7 +23,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\Calderon\\Desktop\\Listos\\siipnemovil2\\build\\local_auth\\intermediates\\packaged_res\\debug\\values\\values.xml",
+                    "source": "C:\\Users\\Calderon\\StudioProjects\\Listos con Ios\\siipnemovil2\\build\\local_auth\\intermediates\\packaged_res\\debug\\values\\values.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10",
                         "startColumns": "4,4,4,4,4,4,4,4,4",
@@ -39,25 +39,6 @@
                         "endLines": "20,45,48,77,84,163,181,182,334",
                         "endColumns": "44,43,44,47,47,45,45,47,10",
                         "endOffsets": "1334,3236,3416,5267,5722,11080,12451,12499,23233"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\Calderon\\Desktop\\Listos\\siipnemovil2\\android\\app\\src\\main\\res\\values\\styles.xml",
-                    "from": {
-                        "startLines": "3,14",
-                        "startColumns": "4,4",
-                        "startOffsets": "176,830",
-                        "endLines": "7,16",
-                        "endColumns": "12,12",
-                        "endOffsets": "472,996"
-                    },
-                    "to": {
-                        "startLines": "1415,1420",
-                        "startColumns": "4,4",
-                        "startOffsets": "92959,93256",
-                        "endLines": "1419,1422",
-                        "endColumns": "12,12",
-                        "endOffsets": "93251,93420"
                     }
                 },
                 {
@@ -115,6 +96,25 @@
                         "endLines": "19,173,296,315,316,317,318,319,320,321,322,323,324,1414,1759",
                         "endColumns": "55,52,88,75,59,88,98,107,96,87,99,69,88,12,12",
                         "endOffsets": "1289,11794,19432,21841,21901,21990,22089,22197,22294,22382,22482,22552,22641,92954,119521"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Calderon\\StudioProjects\\Listos con Ios\\siipnemovil2\\android\\app\\src\\main\\res\\values\\styles.xml",
+                    "from": {
+                        "startLines": "3,14",
+                        "startColumns": "4,4",
+                        "startOffsets": "176,830",
+                        "endLines": "7,16",
+                        "endColumns": "12,12",
+                        "endOffsets": "472,996"
+                    },
+                    "to": {
+                        "startLines": "1415,1420",
+                        "startColumns": "4,4",
+                        "startOffsets": "92959,93256",
+                        "endLines": "1419,1422",
+                        "endColumns": "12,12",
+                        "endOffsets": "93251,93420"
                     }
                 },
                 {

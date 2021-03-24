@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\Users\\Calderon\\Desktop\\Listos\\siipnemovil2\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-el\\values-el.xml",
+            "outputFile": "C:\\Users\\Calderon\\StudioProjects\\Listos con Ios\\siipnemovil2\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-el\\values-el.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Calderon\\.gradle\\caches\\transforms-2\\files-2.1\\6e874f2e39d966ce051e4a933b1f935d\\jetified-play-services-basement-17.0.0\\res\\values-el\\values.xml",

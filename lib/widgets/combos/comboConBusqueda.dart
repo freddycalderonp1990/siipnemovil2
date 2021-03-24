@@ -62,6 +62,7 @@ class _ComboConBusquedaState extends State<ComboConBusqueda> {
             ),
             Expanded(
               child: SearchableDropdown.single(
+
                 value: widget.selectValue,
                 clearIcon: Icon(
                   Icons.clear,

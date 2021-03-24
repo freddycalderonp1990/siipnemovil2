@@ -1,0 +1,4 @@
+#Wed Mar 24 14:25:12 COT 2021
+base.0=C\:\\Users\\Calderon\\StudioProjects\\Listos con Ios\\siipnemovil2\\build\\app\\intermediates\\transforms\\r8\\release\\0\\classes.dex
+path.0=classes.dex
+renamed.0=classes.dex

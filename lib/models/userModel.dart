@@ -29,9 +29,11 @@ class Usuario {
       this.documento,
       this.sexo,
       this.foto,
-        this.fotoString,
+      this.fotoString,
       this.ubicacionSeleccionada,
-      this.actualizarApp = false});
+      this.actualizarApp = false,
+      this.session = false,
+      this.motivo});
 
   String idGenUsuario;
   String idGenPersona;
@@ -43,6 +45,8 @@ class Usuario {
   String fotoString;
   LatLng ubicacionSeleccionada;
   bool actualizarApp;
+  bool session;
+  String motivo;
 
   factory Usuario.fromJson(Map<String, dynamic> json) {
     String img = json["foto"];
@@ -62,10 +66,12 @@ class Usuario {
             json["nombreUsuario"] == null ? "null" : json["nombreUsuario"],
         apenom: json["apenom"] == null ? "null" : json["apenom"],
         documento: json["documento"] == null ? "null" : json["documento"],
-        fotoString: json["foto"] == null ?null : json["foto"],
+        fotoString: json["foto"] == null ? null : json["foto"],
         actualizarApp:
             json["actualizarApp"] == null ? false : json["actualizarApp"],
         sexo: json["sexoPerson"] == null ? "null" : json["sexoPerson"],
+        session: json["session"] == null ? false : json["session"],
+        motivo: json["motivo"] == null ? "vacio" : json["motivo"],
         foto: imgDecode);
   }
 }

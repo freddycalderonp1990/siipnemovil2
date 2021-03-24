@@ -60,9 +60,26 @@ bool isAndroid= UtilidadesUtil.plataformaIsAndroid();
         List<Usuario> usuarioList = userModelFromJson(datos).usuario;
         Usuario user = new Usuario();
         if (usuarioList.length > 0) {
+
+
           prefs.setContadorFallido(0);
           user = usuarioList[0];
-        } else {}
+          print(user.motivo);
+
+          if(!user.session){
+
+            DialogosWidget.alert(context,
+                title: "Usuario",
+                message:
+                user.motivo);
+
+            user = new Usuario();
+          }
+
+
+
+        }
+
 
         return user;
       } else {

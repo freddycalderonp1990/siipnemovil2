@@ -260,7 +260,7 @@ class _TipoEjeUnidadesPolicialesPageState
           usuario: _UserProvider.getUser.idGenUsuario,
           idDgoTipoEje: idUnidadPolicialPadre.toString());
 
-
+      idUnidadPolicialHija =int.parse(  _listUnidadesPolicialesHijas[0].idDgoTipoEje);
 
       setState(() {
         peticionServer = false;

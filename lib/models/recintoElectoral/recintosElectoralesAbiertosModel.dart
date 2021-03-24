@@ -28,6 +28,7 @@ class RecintosElectoralesAbiertosModel {
 class RecintosElectoralesAbiertos {
   RecintosElectoralesAbiertos({
     this.idDgoCreaOpReci,
+    this.descProcElecc,
     this.idDgoPerAsigOpe,
     this.idDgoProcElec,
     this.codigoRecinto,
@@ -43,6 +44,7 @@ this.isRecinto=false,
   });
 
   String idDgoCreaOpReci;
+  String descProcElecc;
   String idDgoPerAsigOpe;
   //Se agrega para capturar el proceso u operativo seleccionado
   String idDgoProcElec;
@@ -59,7 +61,10 @@ this.isRecinto=false,
   //Se agrega esta variable para al macenar el tipo de eje seleccionado
   String idDgoTipoEje;
 
+
   factory RecintosElectoralesAbiertos.fromJson(Map<String, dynamic> json) => RecintosElectoralesAbiertos(
+    idDgoProcElec: json["idDgoProcElec"] == null ? null : json["idDgoProcElec"],
+    descProcElecc: json["descProcElecc"] == null ? null : json["descProcElecc"],
     idDgoTipoEje: json["idDgoTipoEje"] == null ? null : json["idDgoTipoEje"],
     idDgoCreaOpReci: json["idDgoCreaOpReci"] == null ? null : json["idDgoCreaOpReci"],
     idDgoPerAsigOpe: json["idDgoPerAsigOpe"] == null ? null : json["idDgoPerAsigOpe"],

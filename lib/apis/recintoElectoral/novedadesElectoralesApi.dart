@@ -143,6 +143,8 @@ class NovedadesElectoralesApi {
     @required String usuario,
     @required String latitud,
     @required String longitud,
+    @required String cedula='null',
+    String idDgoProcElec,
      String imagen="No Imagen",
   }) async {
     try {
@@ -160,6 +162,8 @@ class NovedadesElectoralesApi {
         "imagen":imagen,
         "latitud":latitud,
         "longitud":longitud,
+        "cedula":cedula,
+        "idDgoProcElec":idDgoProcElec
       };
 
       //cUANDO SE NECESITA LOS METODOS ESPECIFICO PARA CADA MODULO SE ENVIA POR PARAMETRO EL MODULO CORRESPONDIENTE
@@ -183,12 +187,25 @@ class NovedadesElectoralesApi {
             message: "Registro de Novedad con Exito");
         return true;
       } else {
-        DialogosWidget.alert(context, onTap: () {
-          Navigator.of(context).pop();
-        },
-            title: "NOVEDADES",
-            message:
-                "Error al Registrar la Novedad. Vuelva a intentar o contacte con el administrador del sistema.");
+        if(msj==ConstApi.varExiste){
+
+          DialogosWidget.alert(context, onTap: () {
+            Navigator.of(context).pop();
+          },
+              title: "NOVEDADES",
+              message:
+              "Ya existe una novedad registrada con este documento");
+        }
+        else{
+
+          DialogosWidget.alert(context, onTap: () {
+            Navigator.of(context).pop();
+          },
+              title: "NOVEDADES",
+              message:
+              "Error al Registrar la Novedad. Vuelva a intentar o contacte con el administrador del sistema.");
+        }
+
         return false;
       }
     } catch (e) {

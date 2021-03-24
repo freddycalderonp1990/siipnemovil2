@@ -4,7 +4,7 @@ class MyUbicacionWidget extends StatefulWidget {
 
   final FrameCallback callback;
   final bool mostraUbicacion;
-  const MyUbicacionWidget({Key key, this.callback, this.mostraUbicacion=true}) : super(key: key);
+  const MyUbicacionWidget({Key key, this.callback, this.mostraUbicacion=false}) : super(key: key);
   @override
   _MyUbicacionWidgetState createState() => _MyUbicacionWidgetState();
 }
