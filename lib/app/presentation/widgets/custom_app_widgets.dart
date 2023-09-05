@@ -1,0 +1,35 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:get/get.dart';
+import '../../../../../app_siipne_movil/core/values/siipne_colors.dart';
+
+import '../../../app/core/utils/responsiveUtil.dart';
+import '../../../app/core/utils/utilidadesUtil.dart';
+import '../../../app_siipne_movil/core/siipne_config.dart';
+import '../../../app_siipne_movil/core/values/siipne_images.dart';
+import '../../../app_siipne_movil/presentation/widgets/customWidgets.dart';
+import '../../core/app_config.dart';
+import '../../core/utils/photo_helper.dart';
+import '../../core/values/app_colors.dart';
+import '../../core/values/app_images.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
+part 'btn_menu_img_widget.dart';
+part 'work_area_page_app_widget.dart';
+part 'btn_atras_widget.dart';
+part 'cargando_widget.dart';
+part 'icon_detalle_widget.dart';
+part 'detalle_text_widget.dart';
+part 'only_icon_widget.dart';
+part 'contenedor_desing_widget.dart';
+part 'imput_text_widget.dart';
+part 'combos/combo_con_busqueda.dart';
+part 'combos/combo_con_busqueda2.dart';
+part 'titulo_text_widget.dart';
+part 'titulo_detalle_text_widget.dart';
+part 'titulo_detalle_text_double_column_widget.dart';
+part 'icon_title_detalle_widget.dart';
+part 'botones_widget.dart';
+part 'dialogos_desing_widget.dart';
+part 'btn_icon_app_widget.dart';

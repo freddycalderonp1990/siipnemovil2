@@ -1,0 +1,194 @@
+name: siipnemovil_2
+description: A new Flutter project. -flutter 3.13.1
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 2.0.0+10
+
+environment:
+  sdk: '>=3.1.0 <4.0.0'
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.2
+
+
+
+
+
+  # Necesarios para clean architecture
+  get: ^4.6.5 #manejador de estados
+  google_fonts: ^5.1.0
+  equatable: ^2.0.5 #Permite realizar una comparacion de los objetos de manera mas profunda (Permite hacer testing)
+  http: ^1.1.0 # Conectar con proveedor - Apis
+  path_provider: ^2.0.8 #Obtiene el directorio actual del app instalado
+
+
+
+
+  shared_preferences: ^2.0.7 #Preferencias de usuario (Persistencias de Datos Locales)
+  package_info_plus: ^4.0.2 #obtener version code de la app
+
+  local_auth: ^2.1.6 # Acceso Biometrico
+  #Android: se debe agregar al AndroidManifest   <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
+  #MainActivity.kt
+  #import io.flutter.embedding.android.FlutterActivity
+  #import androidx.annotation.NonNull;
+  #import io.flutter.embedding.android.FlutterFragmentActivity
+  #import io.flutter.embedding.engine.FlutterEngine
+  #import io.flutter.plugins.GeneratedPluginRegistrant
+  #
+  #class MainActivity: FlutterFragmentActivity() {
+  #    override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
+  #        GeneratedPluginRegistrant.registerWith(flutterEngine);
+  #    }
+  #}
+
+  #Ios: Info.plist  = <key>NSFaceIDUsageDescription</key>
+  #<string>Why is my app authenticating using face id?</string>
+
+
+  url_launcher: ^6.0.17 # Abrir Urls
+  intl: ^0.18.0 #Conversion de idiomas, enteros, fechas
+  awesome_dialog: ^3.1.0 #Dialogos (NO PERMITE ACTUALIZAR)
+  #advance_pdf_viewer: ^2.0.0 # visualizador de pdfs
+  #flutter_pdfview: ^1.2.1
+  cached_network_image: ^3.2.0 #Muestra imagenes desde internet y las guarda en cache
+  #dropdown_search: ^2.0.1 #combo-lista con busqueda (NO ACTUALIZAR HA CAMBIADO SUS FUNCIONES)
+  dropdown_search: ^5.0.6
+
+  network_info_plus: ^4.0.1 #Obtener ip del celular (se deben asiganr permisos para IOS)
+  expandable: ^5.0.1 #Expandibles
+
+  connectivity_plus: ^4.0.1 # Verifica a que tipo de red esta conectado
+  #device_information: ^0.0.4 #Obtener el IMEI, modelo .. (no incluye la programacion del permiso READ_PHONE_STATE)(Seactualiza por device_info_plus )
+  share_plus: ^7.0.2 #para comparir x wts
+  permission_handler: ^10.4.3 # Solicita Permisos del dispositivo al usuario (Ubicacion,Galeria.....)
+
+  syncfusion_flutter_charts: ^22.2.7 #Mostrar graficos
+  syncfusion_flutter_pdf: ^22.1.39 #Crear PDFS
+
+
+
+
+
+
+
+  #GPS - MAPAS
+  geolocator: ^10.0.0 #ubicacion Gps, del dispositivo #error en la actualizacion 8.0.1 No named parameter with the name 'desiredAccuracy'.
+  flutter_map: ^5.0.0 #para trabajar con LatLng, y mostrar mapas
+
+
+
+  flutter_svg: ^2.0.7 #Mostrar imagenes SVG
+  audioplayers: ^5.1.0 #Rreproducir Sonidos
+
+  graphview: ^1.2.0 #Grafos
+  syncfusion_flutter_gauges: ^22.2.11 #Diseño de clave digital
+
+
+  #device_information: ^0.0.4 #Obtener el IMEI, modelo .. (no incluye la programacion del permiso READ_PHONE_STATE)
+  device_info_plus: ^9.0.3 #Informacion del cell,Version Sistema Operatvivo
+
+  flutter_speed_dial: ^7.0.0 #Botones flotantes, utilizado para el menu (Cerrar sesion y mas)
+  image_picker: ^1.0.2 #Obtener img de la camara o galeria
+  vibration: ^1.8.1 #vibracion device
+
+
+  flutter_pdfview: ^1.3.1 # visualizador de PDFS
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/icon.png"
+  adaptive_icon_background: "assets/icon/icon.png"
+
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^2.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/img/
+    - assets/icon/
+    - assets/icon/siipne_movil/
+    - assets/icon/elecciones/
+    - assets/svg/
+    - assets/audio/alerta.mp3
+
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/assets-and-images/#resolution-aware
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/assets-and-images/#from-packages
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  fonts:
+    - family: Sans
+      fonts:
+        - asset: assets/fonts/OpenSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/OpenSans-Light.ttf
+          weight: 300
+        - asset: assets/fonts/OpenSans-Semibold.ttf
+          weight: 600
+        - asset: assets/fonts/OpenSans-Semibold.ttf
+          weight: 400
+    #         style: italic
+    - family: Raleway
+      fonts:
+        - asset: assets/fonts/Raleway-Bold.ttf
+          weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/custom-fonts/#from-packages
