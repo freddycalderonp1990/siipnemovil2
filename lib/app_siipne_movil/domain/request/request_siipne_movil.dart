@@ -1,0 +1,1 @@
+part 'get_permisos_modulos_request.dart';

@@ -12,6 +12,10 @@ class AppImages{
   static const imgloginPoliciaEcuador= _rutaImg + "policia_ecuador.png";
 
   static const escudopolicia = _rutaImg + "escudo_policia.png";
+  static const escudopoliciaPlomo = _rutaImg + "img_btn_plomo_escudo.png";
+
+
+
   static const cabecera = _rutaImg + "cabecera.png";
   static const splash = _rutaImg + "splash.png";
   static const ic_beneficios1 = _rutaImg + "ic_beneficios.png";

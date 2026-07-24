@@ -95,7 +95,7 @@ Al seleccionar la opción "ACEPTO", declaro que he leído, comprendido y acepto 
       return;
     }
 
-    Get.toNamed(AppRoutes.MENU_APP);
+    Get.toNamed(SiipneMovilRoutes.MENU_APP);
 
     // Guardar aceptación
     // Navegar al menú principal

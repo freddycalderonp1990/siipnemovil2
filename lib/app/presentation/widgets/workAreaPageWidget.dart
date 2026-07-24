@@ -137,6 +137,7 @@ class _WorkAreaPageWidgetState extends State<WorkAreaPageWidget> {
             )
             : widget.contenido;
 
+
     return widget.title != null
         ? Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -146,7 +147,7 @@ class _WorkAreaPageWidgetState extends State<WorkAreaPageWidget> {
               colorTexto: Colors.white,
               colorSombra: Colors.black,
               title: widget.title!,
-              size: responsive.diagonalP(AppConfig.tamTextoTitulo + 0.4),
+              size: responsive.diagonalP(AppConfig.tamTextoTitulo +0.2),
             ),
             Flexible(child: wgContenido),
           ],

@@ -49,7 +49,7 @@ class LocalNotification {
     );
 
     await _notificationsPlugin.initialize(
-      initSettings,
+      settings:  initSettings,
       onDidReceiveNotificationResponse: (
           NotificationResponse response,
           ) {
@@ -194,11 +194,12 @@ class LocalNotification {
     
 
     await _notificationsPlugin.show(
-      id,
-      notification.title,
-      notification.body,
-      notificationDetails,
-      payload: notificationModelToJson(notification),
+
+      notificationDetails: notificationDetails,
+      payload: notificationModelToJson(notification), id: id,
+      title: notification.title,
+      body: notification.body,
+
     );
 
 

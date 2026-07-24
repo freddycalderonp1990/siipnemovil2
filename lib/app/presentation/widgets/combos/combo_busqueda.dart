@@ -69,7 +69,7 @@ class _ComboBusquedaState<T> extends State<ComboBusqueda<T>> {
         //lo paso en falkse xq ya esta diseñado xq no encontraba formada de captuyra el evento de limpiar
         // lo que fue seleccionado
       ),
-      popupProps: PopupPropsMultiSelection.dialog(
+      popupProps: PopupProps.dialog(
         showSelectedItems: true,
         disableFilter: false,
         itemBuilder: (context, item, isSelected, l) =>
@@ -97,7 +97,8 @@ class _ComboBusquedaState<T> extends State<ComboBusqueda<T>> {
       dropdownBuilder: (context, selectedItem) =>
           _customDropDownExample(context, selectedItem),
       items: (filter, infiniteScrollProps) => widget.datos,
-      onChanged: (value) {
+
+      onSelected: (value) {
         print("cambiaa");
         if (widget.complete != null) {
           widget.complete!(value);

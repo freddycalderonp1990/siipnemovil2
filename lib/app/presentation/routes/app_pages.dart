@@ -2,6 +2,7 @@ import 'package:app_mi_upc/app_mi_upc.dart';
 import 'package:flutter/animation.dart';
 import 'package:get/get.dart';
 
+import '../../../app_siipne_movil/presentation/routes/siipne_movil_pages.dart';
 import '../../../feactures/user/presentation/routes/user_pages.dart';
 import '../modules/bindings.dart';
 import '../modules/pages.dart';
@@ -73,7 +74,7 @@ class AppPages {
    _pages.addAll(UserPages.pages);
     _pages.addAll(MiUpc.getPages);
 
-   // _pages.addAll(AppPagesConfigApps.pages);
+    _pages.addAll(SiipneMovilPages.pages);
     return _pages;
   }
 }

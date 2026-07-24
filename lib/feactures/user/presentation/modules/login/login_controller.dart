@@ -8,7 +8,7 @@ class LoginController extends GetxController {
   final AuthUseCase authUseCase = Get.find();
   final GetDataUserUseCase getDataUserUseCase = Get.find();
 
-  final user = UserEntities.empty().obs;
+  final  user = UserEntities.empty().obs;
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   GlobalKey<FormState> formKey2 = GlobalKey<FormState>();
   GlobalKey<FormState> formKeyPinCode = GlobalKey<FormState>();

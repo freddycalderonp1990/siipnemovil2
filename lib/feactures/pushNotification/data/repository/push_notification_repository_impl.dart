@@ -1,11 +1,6 @@
 
 
 
-
-import '../../domain/entities/user.dart';
-import '../../domain/mappers/mappers.dart';
-
-
 import '../../domain/repository/push_notification_repository.dart';
 import '../../domain/request/request_push_notification.dart';
 import '../data_sources/push_notification_remote_data_source.dart';

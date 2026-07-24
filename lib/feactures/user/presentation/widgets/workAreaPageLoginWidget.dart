@@ -126,7 +126,7 @@ class _WorkAreaPageLoginWidgetState extends State<WorkAreaPageLoginWidget> {
                     SizedBox(
                       height: responsive.diagonalP(12),
                       width: responsive.diagonalP(12),
-                      child: Image.asset(AppImages.escudopolicia),
+                      child: Image.asset(AppImages.escudopoliciaPlomo),
                     ),
 
                     SizedBox(

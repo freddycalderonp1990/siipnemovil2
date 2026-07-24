@@ -5,7 +5,7 @@ enum ShowTutorial { Login, ClaveDigital, Finish }
 
 enum ActionTutorial { onSkip, onClickOverlay, onClickTargetWithTapPosition , onClickTarget,onFinish}
 
-enum NamApps { Elecciones, Censo, todas }
+enum NamApps { Elecciones, Censo, todas, SiipneMovil }
 
 
 extension NamAppsExtension on NamApps {
