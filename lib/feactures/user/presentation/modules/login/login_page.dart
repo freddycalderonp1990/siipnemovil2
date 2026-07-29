@@ -10,8 +10,8 @@ class LoginPage extends GetView<LoginController> {
         onPressedBtnHome: () {
           controller.setAppPageSelect(PageAppsSelect.Bienvenida);
         },
-        title: "POLICÍA NACIONAL DEL ECUADOR",
-        mostrarVersion: true,
+
+
         peticionServer: controller.peticionServerState,
 
         contenido: contenido(),

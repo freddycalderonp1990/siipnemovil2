@@ -3,7 +3,7 @@ part of '../../pages.dart';
 class InicioRapidoPage extends GetView<InicioRapidoController> {
   @override
   Widget build(BuildContext context) {
-/*
+    /*
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<NotificationsBloc>().requestPermission(
         appName: NamApps.todas,
@@ -13,19 +13,21 @@ class InicioRapidoPage extends GetView<InicioRapidoController> {
     */
 
     final responsive = ResponsiveUtil();
-    // TODO: verifique
 
-    Widget wg = Obx(
-      () => WorkAreaLoginPageWidget(
-        title: "POLICÍA NACIONAL DEL ECUADOR",
-        imgPerfil: controller.user.value.foto,
-        mostrarVersion: true,
-        imgFondo: AppImages.imgFondoDefault,
-        peticionServer: controller.peticionServerState,
-        sizeTittle: 7,
-        contenido: <Widget>[getContenido(responsive)],
-      ),
-    );
+    Widget wg = Obx(()=>WorkAreaPageLoginWidget(
+      imgFondo: AppImages.imgFondoLogin,
+      imgPerfil: controller.user.value.foto,
+      mostrarBtnHome: controller.mostrarBtnHome.value,
+
+      onPressedBtnHome: () {
+        // controller.setAppPageSelect(PageAppsSelect.Bienvenida);
+      },
+
+
+      peticionServer: controller.peticionServerState,
+
+      contenido: getContenido(responsive),
+    ));
 
     return GetBuilder<LoginController>(builder: (_c) => wg);
   }
@@ -36,7 +38,7 @@ class InicioRapidoPage extends GetView<InicioRapidoController> {
         children: [
           Obx(
             () => DesingTextNameUser(
-              sizeText: responsive.diagonalP(AppConfig.tamTextoTitulo),
+              sizeText: responsive.diagonalP(AppConfig.tamTextoTitulo - 0.4),
               sexo: controller.user.value.sexo,
               text: controller.user.value.nombres,
             ),
@@ -44,7 +46,7 @@ class InicioRapidoPage extends GetView<InicioRapidoController> {
 
           SizedBox(height: responsive.altoP(2)),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: responsive.anchoP(15)),
+            padding: EdgeInsets.symmetric(horizontal: responsive.anchoP(10)),
 
             child: Column(
               children: [
@@ -60,14 +62,12 @@ class InicioRapidoPage extends GetView<InicioRapidoController> {
   }
 
   Widget wgHuella() {
-    Widget wg = BtnMenuWidget(
-      img: AppImages.icon_huella,
-      title: "Huella/Face ID",
-      horizontal: false,
-      onTap: () => controller.loginConBiometrico(),
-      colorFondo: AppColors.colorIcons,
+    Widget wg = DesignBtnLoginRapidoWidget(
+      icon: Icons.fingerprint_rounded,
 
-      colorTexto: Colors.white,
+      titulo: "Huella / Face ID",
+      descripcion: "Ingresar con biometría",
+      onTap: () => controller.loginConBiometrico(),
     );
 
     return wg;
@@ -81,6 +81,14 @@ class InicioRapidoPage extends GetView<InicioRapidoController> {
       onTap: () => controller.ingresoConOtroUsuario(),
       colorFondo: AppColors.colorIcons,
       colorTexto: Colors.white,
+    );
+
+    wg = DesignBtnLoginRapidoWidget(
+      icon: Icons.lock_person_rounded,
+
+      titulo: "Usuario y contraseña",
+      descripcion: "Ingresar de forma tradicional",
+      onTap: () => controller.ingresoConOtroUsuario(),
     );
 
     return wg;

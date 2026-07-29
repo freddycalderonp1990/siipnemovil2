@@ -31,8 +31,8 @@ import '../widgets/user_custom_widgets.dart';
 
 import 'controllers.dart';
 import '../../presentation/modules/login/local_widgets/wgLogin.dart';
-import 'login/widgets/login_form_widget.dart';
-import 'login/widgets/login_header_widget.dart';
+import 'login/widgets/desing_btn_login_rapido_widget.dart';
+
 
 
 

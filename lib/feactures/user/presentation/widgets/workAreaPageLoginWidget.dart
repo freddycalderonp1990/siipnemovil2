@@ -2,174 +2,164 @@ part of 'user_custom_widgets.dart';
 
 class WorkAreaPageLoginWidget extends StatefulWidget {
   final RxBool peticionServer;
-
   final Widget contenido;
 
-  final String title;
-  final imgPerfil;
-  final imgFondo;
+  final dynamic imgPerfil;
+  final dynamic imgFondo;
 
-  final bool mostrarVersion;
+
   final bool mostrarBtnHome;
   final VoidCallback? onPressedBtnHome;
 
   const WorkAreaPageLoginWidget({
+    super.key,
     required this.peticionServer,
     required this.contenido,
-    this.imgPerfil = null,
+    this.imgPerfil,
     this.imgFondo,
-    this.mostrarVersion = false,
-    this.title = '',
+
     this.mostrarBtnHome = false,
     this.onPressedBtnHome,
   });
 
   @override
-  _WorkAreaPageLoginWidgetState createState() =>
+  State<WorkAreaPageLoginWidget> createState() =>
       _WorkAreaPageLoginWidgetState();
 }
 
 class _WorkAreaPageLoginWidgetState extends State<WorkAreaPageLoginWidget> {
   String version = '';
 
+  final ResponsiveUtil responsive = ResponsiveUtil();
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _loadVersion();
   }
 
   Future<void> _loadVersion() async {
-    final String _version = await DeviceInfoApp.getVersionCodeNameApp;
+    version = await DeviceInfoApp.getVersionCodeNameApp;
 
-    if (!mounted) return;
-
-    setState(() {
-      version = _version;
-    });
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        statusBarColor: AppColors.colorPrimary, // color sólido
-        statusBarIconBrightness: Brightness.light, // íconos claros
+      const SystemUiOverlayStyle(
+        statusBarColor: AppColors.colorPrimary,
+        statusBarIconBrightness: Brightness.light,
       ),
     );
-    return OrientationBuilder(
-      builder: (context, orientation) {
-        print("orientation ${orientation}");
 
-        //orientation == Orientation.portrait
-        return getDersingPage();
-      },
-    );
-  }
-
-  Widget getDersingPage(){
-    final responsive = ResponsiveUtil();
     return Scaffold(
-
       body: Material(
         color: Colors.white,
-        child:  Stack(children: [
-          // Header
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SizedBox(
-              height: responsive.diagonalP(10),
-              child: Image.asset(
-                AppImages.imgLoginHeader,
-                fit: BoxFit.fill,
-              ),
+        child: Stack(
+          children: [
+            _buildHeader(),
+
+            _buildLogin(),
+
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: MediaQuery.of(context).padding.bottom,
+              child: getVersion(),
             ),
-          ),
-        // Contenido
-        Positioned(
-          top: responsive.diagonalP(10),
-          left: 0,
-          right: 0,
-          bottom: 60, // espacio para el footer
-          child:
-            SingleChildScrollView(
-             // keyboardDismissBehavior:
-            //  ScrollViewKeyboardDismissBehavior.onDrag,
-              child: ConstrainedBox(
 
-                constraints: BoxConstraints(
+            getBtnHome(),
 
-                  minHeight: responsive.altoP(80),
-                ),
-                child: Column(
-                  children: [
-                    // Header
-
-
-                    // Logo
-                    SizedBox(
-                      height: responsive.diagonalP(8),
-                      width: responsive.ancho,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: responsive.anchoP(5),
-                        ),
-                        child: Image.asset(AppImages.imgSiipneMovil),
-                      ),
-                    ),
-
-                    SizedBox(height: responsive.altoP(4)),
-
-                    SizedBox(
-                      height: responsive.diagonalP(12),
-                      width: responsive.diagonalP(12),
-                      child: Image.asset(AppImages.escudopoliciaPlomo),
-                    ),
-
-                    SizedBox(
-                      width: responsive.diagonalP(12),
-                      child: Image.asset(AppImages.imgloginPoliciaEcuador),
-                    ),
-
-                    /// FORMULARIO
-                    widget.contenido,
-
-                    const SizedBox(height: 20),
-
-
-                    SizedBox(height: responsive.altoP(4)),
-
-
-
-                  ],
-                ),
-              ),
-            ),
+            Obx(() => CargandoWidget(mostrar: widget.peticionServer.value)),
+          ],
         ),
-          // Footer
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0+MediaQuery.of(context).padding.bottom,
-            child: getVersion(),
-          ),
-          Obx(() => CargandoWidget(mostrar: widget.peticionServer.value)),
-          ],),
-        ),
-
+      ),
     );
   }
 
+  Widget _buildHeader() {
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      child: SizedBox(
+        height: responsive.diagonalP(40),
+        child: Image.asset(AppImages.imgLoginHeader, fit: BoxFit.fill),
+      ),
+    );
+  }
 
+  Widget _buildLogin() {
+    return Positioned(
+      top: responsive.diagonalP(10),
+      left: 0,
+      right: 0,
+      bottom: 60,
+      child: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: responsive.altoP(80)),
+          child: Column(
+            children: [
+              _buildLogo(),
+
+              SizedBox(height: responsive.altoP(4)),
+
+              _buildPerfil(),
+
+              _buildLogoPolicia(),
+
+              widget.contenido,
+
+              const SizedBox(height: 20),
+
+              SizedBox(height: responsive.altoP(4)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogo() {
+    return SizedBox(
+      height: responsive.diagonalP(8),
+      width: responsive.ancho,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: responsive.anchoP(5)),
+        child: Image.asset(AppImages.imgSiipneMovil),
+      ),
+    );
+  }
+
+  Widget _buildPerfil() {
+    return SizedBox(
+      height: responsive.diagonalP(12),
+      width: responsive.diagonalP(12),
+      child: widget.imgPerfil == null
+          ? Image.asset(AppImages.imgIconApp)
+          : ImgPerfilRedonda(
+              size: responsive.diagonalP(AppConfig.tamIcons),
+              img: widget.imgPerfil,
+            ),
+    );
+  }
+
+  Widget _buildLogoPolicia() {
+    return SizedBox(
+      width: responsive.diagonalP(12),
+      child: Image.asset(AppImages.imgloginPoliciaEcuador),
+    );
+  }
 
   Widget getBtnHome() {
-    final responsive = ResponsiveUtil();
+    if (!widget.mostrarBtnHome) {
+      return const SizedBox.shrink();
+    }
 
-
-    Widget wg= Positioned(
+    return Positioned(
       top: responsive.altoP(5),
       right: 10,
       child: BtnIconWidget(
@@ -182,93 +172,75 @@ class _WorkAreaPageLoginWidgetState extends State<WorkAreaPageLoginWidget> {
         titulo: "Home",
       ),
     );
-
-   return widget.mostrarBtnHome ? wg : Container();
-  }
-
-  Widget getImgFondo() {
-    final responsive = ResponsiveUtil();
-    return Container(
-      height: responsive.alto,
-      width: responsive.ancho,
-      child: Image.asset(
-        widget.imgFondo == null ? AppImages.imgFondoDefault : widget.imgFondo,
-        fit: BoxFit.fill,
-      ),
-    );
-  }
-
-  Widget getTitle() {
-    final responsive = ResponsiveUtil();
-
-    return widget.title != ''
-        ? TextSombrasWidget(
-            colorTexto: Colors.white,
-            colorSombra: Colors.black,
-            title: widget.title,
-            size: responsive.diagonalP(AppConfig.tamTextoTitulo + 1),
-          )
-        : Container();
   }
 
   Widget getVersion() {
-    if (!widget.mostrarVersion) {
-      return const SizedBox.shrink();
-    }
 
-    if (!widget.mostrarVersion) return const SizedBox.shrink();
 
-    final bool keyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+    final keyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
 
     if (keyboardVisible) {
       return const SizedBox.shrink();
     }
 
-
-    final responsive = ResponsiveUtil();
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          margin: EdgeInsets.symmetric(
-            horizontal: responsive.anchoP(10),
-          ),
-          height: 1,
-          color: AppColors.colorPlomo_40,
-        ),
-        const SizedBox(height: 10),
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.lock_outline,
-              size: 18,
-              color: Color(0xFF8E8E93),
+            Expanded(
+              child: Container(height: 1, color: const Color(0xFFE5E5E5)),
             ),
-            const SizedBox(width: 6),
-            Text(
-              version,
-              style: const TextStyle(
-                fontSize: 15,
-                color: Color(0xFF8E8E93),
-                fontWeight: FontWeight.w500,
+            const SizedBox(width: 14),
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0xFFE5E5E5)),
               ),
+              child: const Icon(
+                Icons.gpp_good_outlined,
+                size: 22,
+                color: Color(0xFF9E9E9E),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Container(height: 1, color: const Color(0xFFE5E5E5)),
             ),
           ],
         ),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF0F5FF),
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.gpp_good_rounded,
+                size: 18,
+                color: Color(0xFF0D4C9C),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                version,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Color(0xFF0D4C9C),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
       ],
     );
-  }
-
-  Widget getImgPerfil() {
-    final responsive = ResponsiveUtil();
-
-    return widget.imgPerfil == null
-        ? Container()
-        : ImgPerfilRedonda(
-            size: responsive.diagonalP(AppConfig.tamIcons),
-            img: widget.imgPerfil,
-          );
   }
 }

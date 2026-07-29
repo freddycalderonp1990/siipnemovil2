@@ -5,6 +5,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 
 import 'package:share_plus/share_plus.dart';
@@ -112,7 +113,13 @@ class UtilidadesUtil {
   }
 
   static bool get plataformaIsIos {
+    bool activarIos = bool.tryParse(
+      dotenv.env['ACTIVAR_IOS'] ?? 'false',
+    ) ?? false;
 
+    if(activarIos){
+      return true;
+    }
     return GetPlatform.isIOS;
   }
 
