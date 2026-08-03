@@ -2,7 +2,7 @@ part of '../controllers.dart';
 
 class MenuSiipneMovilController extends GetxController {
   final loginController = Get.find<LoginController>();
-  final ModulosUseCase modulosUseCase = Get.find();
+  final SiipneMovilUseCase siipneMovilUseCase = Get.find();
 
   RxList<DataModulo> listModulos = <DataModulo>[].obs;
 
@@ -68,9 +68,9 @@ class MenuSiipneMovilController extends GetxController {
         GetPermisosModulosRequest request = GetPermisosModulosRequest(
           idGenUsuario: user.idGenUsuario,
           idGenPersona: user.idGenPersona,
-          showAll: true,
+
         );
-        listModulos.value = await modulosUseCase(request: request);
+        listModulos.value = await siipneMovilUseCase.getModulos(request: request);
         // Espera a que el ListView se dibuje
         verificarIndicadorScroll();
         if (listModulos.length == 0) {
@@ -82,7 +82,7 @@ class MenuSiipneMovilController extends GetxController {
     peticionServerState(false);
   }
 
-  cerrarSession() {
-    // Get.toNamed(AppRoutes.SPLASH_APP);
-  }
+      goToNextPage(DataModulo modulo){
+        Get.toNamed(SiipneMovilRoutes.TIPOS_OPERATIVOS,arguments:{"modulo": modulo}  );
+      }
 }

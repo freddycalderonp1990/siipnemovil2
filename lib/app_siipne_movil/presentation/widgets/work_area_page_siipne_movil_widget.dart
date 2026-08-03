@@ -9,6 +9,7 @@ class WorkAreaPageSiipneMovilWidget extends StatelessWidget {
   final imgPerfil;
   final imgFondo;
   final bool mostrarBtnAtras;
+  final bool showBtnNotificacione;
 
   const WorkAreaPageSiipneMovilWidget({
     required this.peticionServer,
@@ -19,12 +20,13 @@ class WorkAreaPageSiipneMovilWidget extends StatelessWidget {
     this.mostrarBtnAtras = false,
     this.onPressBtnAtras,
     this.showGps = false,
+    this.showBtnNotificacione=false
   });
 
   @override
   Widget build(BuildContext context) {
     return WorkAreaPageWidget(
-      showBtnNotificacione: true,
+      showBtnNotificacione: showBtnNotificacione,
       namApps: NamApps.SiipneMovil,//se estable el name para que el mensaje del Gps cambie con base a la app
       peticionServer: peticionServer,
       contenido: contenido,

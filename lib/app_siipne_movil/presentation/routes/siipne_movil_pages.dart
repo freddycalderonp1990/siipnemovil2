@@ -14,11 +14,21 @@ class SiipneMovilPages {
   // ruta: lib/app/presentation/routes/app_pages.dart
   static final List<GetPage> pages = [
 
-
     AppPages.getPageConfig(
         name: SiipneMovilRoutes.MENU_APP,
         page: () => MenuSiipneMovilPage(),
         binding: MenuSiipneMovilBinding()),
+
+
+    AppPages.getPageConfig(
+        name: SiipneMovilRoutes.TIPOS_OPERATIVOS,
+        page: () => TipoOperativoPage(),
+        binding:TipoOperativoBinding()),
+
+    AppPages.getPageConfig(
+        name: SiipneMovilRoutes.OPERATIVOS_SERVICIO_URBANO,
+        page: () => OpServicioUrbanoPage(),
+        binding: OpServicioUrbanoBinding()),
 
 
 

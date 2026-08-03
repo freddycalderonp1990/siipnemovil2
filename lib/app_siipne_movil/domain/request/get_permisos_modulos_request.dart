@@ -2,9 +2,9 @@ part of 'request_siipne_movil.dart';
 class GetPermisosModulosRequest {
   final int idGenPersona;
   final int idGenUsuario;
-  final bool showAll;
 
-  GetPermisosModulosRequest({required this.idGenPersona, required this.idGenUsuario, required this.showAll});
+
+  GetPermisosModulosRequest({required this.idGenPersona, required this.idGenUsuario, });
 
 
   /// Método para convertir el objeto a JSON
@@ -12,7 +12,7 @@ class GetPermisosModulosRequest {
     return {
       "idGenPersona":idGenPersona,
       "idGenUsuario":idGenUsuario,
-      "showAll": showAll
+      "showAll": false
     };
 
 

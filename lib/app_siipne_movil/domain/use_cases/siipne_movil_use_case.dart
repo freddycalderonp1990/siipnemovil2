@@ -1,15 +1,21 @@
-
-
 import '../../data/models/models_siipne_movil.dart';
 import '../repository/repository_siipne_movil.dart';
 import '../request/request_siipne_movil.dart';
 
-class ModulosUseCase {
+class SiipneMovilUseCase {
   final SiipneMovilRepository repository;
 
-  ModulosUseCase({required this.repository});
+  SiipneMovilUseCase({required this.repository});
 
-  Future<List<DataModulo>> call({required GetPermisosModulosRequest request}) {
+  Future<List<DataModulo>> getModulos({
+    required GetPermisosModulosRequest request,
+  }) {
     return repository.getPermisosModulos(request: request);
+  }
+
+  Future<List<DataTipoOperativo>> getTipoOperativos({
+    required GetTipoOperativosRequest request,
+  }) {
+    return repository.getTipoOperativos(request: request);
   }
 }

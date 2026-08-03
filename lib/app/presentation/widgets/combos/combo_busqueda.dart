@@ -78,13 +78,21 @@ class _ComboBusquedaState<T> extends State<ComboBusqueda<T>> {
         searchFieldProps: getBusquedaPopup(),
         dialogProps: DialogProps(
           backgroundColor: Colors.white,
-          barrierDismissible: true, // Permite cerrar tocando fuera
+
+          barrierDismissible: true,
+          barrierLabel: 'Cerrar diálogo',
+
           insetPadding: EdgeInsets.symmetric(
-              horizontal: 20, vertical: 20), // Márgenes del diálogo
-          actionsAlignment:
-              MainAxisAlignment.end, // Alinea la acción a la derecha
+            horizontal: 20,
+            vertical: 20,
+          ),
+
+          actionsAlignment: MainAxisAlignment.end,
+
           actionsPadding: EdgeInsets.only(
-              top: 10, right: 10), // Posiciona el botón arriba a la derecha
+            top: 10,
+            right: 10,
+          ),
         ),
       ),
       itemAsString: (item) {

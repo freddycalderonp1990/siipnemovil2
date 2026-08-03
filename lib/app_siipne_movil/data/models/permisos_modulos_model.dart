@@ -48,6 +48,14 @@ class DataModulo {
     required this.idGenTipoTipificacionEcu,
   });
 
+  factory DataModulo.empty() => DataModulo(
+    idGenModulo: 0,
+    descripcion: "",
+    detalle: "",
+    idHdrTipoServicio: 0,
+    idGenTipoTipificacionEcu: 0,
+  );
+
   factory DataModulo.fromJson(Map<String, dynamic> json) => DataModulo(
     idGenModulo: ParseModel.parseToInt(json["idGenModulo"]),
     descripcion: ParseModel.parseToString(json["descripcion"]),

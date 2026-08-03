@@ -136,6 +136,7 @@ flutter:
     - assets/img/
     - assets/icon/
     - assets/siipne_movil/icon/
+    - assets/siipne_movil/op_servicio_urbano/
     - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see

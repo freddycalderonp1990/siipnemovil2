@@ -43,3 +43,8 @@ exista en genModulo y el usuario tenga los permisos correspondientes en SIIPNE 3
 
 De esta forma, la incorporación de nuevos módulos y operativos se realizará mediante configuración en la base de datos, evitando modificaciones en el 
 código fuente y facilitando el mantenimiento y escalabilidad de la aplicación.
+
+
+
+
+

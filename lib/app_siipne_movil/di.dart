@@ -16,7 +16,7 @@ class DependencyInjectionSiipneMovil extends Bindings{
   static ini(){
 
     // Use cases
-    Get.lazyPut<ModulosUseCase>(()=>ModulosUseCase(repository: Get.find()),fenix: true);
+    Get.lazyPut<SiipneMovilUseCase>(()=>SiipneMovilUseCase(repository: Get.find()),fenix: true);
 
 
 

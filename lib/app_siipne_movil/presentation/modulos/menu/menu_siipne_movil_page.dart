@@ -44,7 +44,7 @@ class MenuSiipneMovilPage extends GetView<MenuSiipneMovilController> {
                   bottom: 18,
                   left: 0,
                   right: 0,
-                  child: _IndicadorScroll(),
+                  child: IndicadorScroll(),
                 )
               : const SizedBox(),
         ),
@@ -70,7 +70,9 @@ class MenuSiipneMovilPage extends GetView<MenuSiipneMovilController> {
               img: AppSiipneMovilImages.ic_operativos_su,
               title: modulo.descripcion,
               descripcion: modulo.detalle,
-              onTap: () {},
+              onTap: () {
+                controller.goToNextPage(modulo);
+              },
             ),
           );
         },
@@ -78,62 +80,5 @@ class MenuSiipneMovilPage extends GetView<MenuSiipneMovilController> {
     );
 
     return wg;
-  }
-}
-
-class _IndicadorScroll extends StatefulWidget {
-  @override
-  State<_IndicadorScroll> createState() => _IndicadorScrollState();
-}
-
-class _IndicadorScrollState extends State<_IndicadorScroll>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 700),
-    )..repeat(reverse: true);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (_, child) {
-        return Transform.translate(
-          offset: Offset(0, _controller.value * 10),
-          child: child,
-        );
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: const [
-          Icon(
-            Icons.keyboard_double_arrow_down_rounded,
-            size: 42,
-            color: Color(0xFF164987),
-          ),
-
-          Text(
-            "Desliza",
-            style: TextStyle(
-              color: Color(0xFF164987),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 }
