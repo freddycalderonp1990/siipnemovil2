@@ -297,6 +297,7 @@ class TipoOperativoController extends GetxController {
     if (rutaSeleccionada.isNotEmpty) {
       selectTipoOperativo.value = rutaSeleccionada.last;
     } else {
+
       selectTipoOperativo.value = DataTipoOperativo.empty();
     }
 

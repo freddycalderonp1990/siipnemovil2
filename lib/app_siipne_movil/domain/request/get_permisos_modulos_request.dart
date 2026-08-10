@@ -12,7 +12,7 @@ class GetPermisosModulosRequest {
     return {
       "idGenPersona":idGenPersona,
       "idGenUsuario":idGenUsuario,
-      "showAll": false
+      "showAll": true
     };
 
 

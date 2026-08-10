@@ -105,6 +105,7 @@ class TipoOperativoPage extends GetView<TipoOperativoController> {
               bottom: 5,
             ),
             child: ComboBusqueda(
+              icon: Icons.local_police_outlined  ,
               datos: datos,
 
               selectValue:
