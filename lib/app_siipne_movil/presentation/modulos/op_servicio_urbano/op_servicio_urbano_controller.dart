@@ -78,7 +78,6 @@ class OpServicioUrbanoController extends GetxController {
     if (arguments != null && arguments.containsKey('dataCreateOp')) {
       try {
         dataCreateOp.value = arguments['dataCreateOp'] as DataCreateOp;
-
        // await getTipoOperativos();
       } catch (e) {
         print('Error getDataToPage: $e');
@@ -117,6 +116,49 @@ class OpServicioUrbanoController extends GetxController {
     super.onClose();
   }
 
+
+  Future<void> consultarPersonaPorDocumento() async {
+    peticionServerState(true);
+
+    await ExceptionDialogos.manejarErroresShowDialogo(
+      showMsjNodata: false,
+          () async {
+
+            final locationBloc = BlocProvider.of<LocationBloc>(Get.context!);
+            LatLng pos = await locationBloc.getCurrentPosition();
+
+            String ip = await DeviceInfoApp.getIp;
+
+            ConsultarPersonaRequest request = ConsultarPersonaRequest(
+                idOperativo: dataCreateOp.value.idHdrEvento,
+                documento: '',
+                latitud: pos.latitude,
+                longitud: pos.longitude,
+                ip: ip, idGenUsuario: user.idGenUsuario,
+                idVariableResultado: 56
+
+        );
+
+            dataPersona.clear();
+            peticionServerState(true);
+            tieneOrdenCaptura(false);
+
+            OpePersonaModelData data =   await siipneMovilUseCase.consultarPersona(
+          request: request,
+        );
+
+
+
+
+
+
+
+
+      },
+    );
+
+    peticionServerState(false);
+  }
 
 
   cerrarSession() {
