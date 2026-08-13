@@ -43,7 +43,7 @@ class TipoOperativoPage extends GetView<TipoOperativoController> {
     return Obx(()=>controller.showContinuar.value?BtnIconWidget(
       icon: Icons.exit_to_app,
       titulo: "CONTINUAR",
-      onPressed: () =>controller.gotToNextPage(),
+      onPressed: () =>controller.crearOperativo(),
     ):Container());
   }
 
@@ -105,6 +105,7 @@ class TipoOperativoPage extends GetView<TipoOperativoController> {
               bottom: 5,
             ),
             child: ComboBusqueda(
+              icon: Icons.local_police_outlined  ,
               datos: datos,
 
               selectValue:

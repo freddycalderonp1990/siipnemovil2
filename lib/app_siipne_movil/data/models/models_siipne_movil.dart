@@ -11,6 +11,7 @@ import 'package:api_provider/core/utils/parse_model.dart';
 
 part 'permisos_modulos_model.dart';
 part 'tipo_operativo_model.dart';
+part 'create_operativo_model.dart';
 
 
 part 'operativos_su/ope_persona_model.dart';

@@ -8,4 +8,11 @@ abstract class SiipneMovilRepository {
   Future<List<DataTipoOperativo>> getTipoOperativos({
     required GetTipoOperativosRequest request,
   });
+
+  Future<DataCreateOp> crearOperativo({
+    required CreateOperativoRequest request,
+  });
+
+
+
 }

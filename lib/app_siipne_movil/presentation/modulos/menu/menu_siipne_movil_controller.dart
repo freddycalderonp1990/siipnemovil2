@@ -11,26 +11,14 @@ class MenuSiipneMovilController extends GetxController {
   RxBool peticionServerState = false.obs;
 
   final ScrollController scrollController = ScrollController();
-  final mostrarIndicador = true.obs;
+  final mostrarIndicador = false.obs;
 
   @override
   void onInit() async {
 
     user = loginController.user.value;
 
-    scrollController.addListener(() {
-      if (!scrollController.hasClients) return;
-
-      final maxScroll = scrollController.position.maxScrollExtent;
-
-      if (maxScroll <= 0) {
-        mostrarIndicador.value = false;
-        return;
-      }
-
-      // Solo mostrar cuando está arriba
-      mostrarIndicador.value = scrollController.offset <= 5;
-    });
+    scrollController.addListener(actualizarIndicadorScroll);
 
     await getModulosPermitidos();
 
@@ -44,6 +32,27 @@ class MenuSiipneMovilController extends GetxController {
       mostrarIndicador.value =
           scrollController.position.maxScrollExtent > 0;
     });
+  }
+
+  void actualizarIndicadorScroll() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!scrollController.hasClients) {
+        mostrarIndicador.value = false;
+        return;
+      }
+
+      final position = scrollController.position;
+
+      // ¿Realmente existe contenido para hacer scroll?
+      final puedeHacerScroll = position.maxScrollExtent > 0;
+
+      // Mostrar únicamente si existe scroll y todavía no llegó al final
+      mostrarIndicador.value =
+          puedeHacerScroll &&
+              position.pixels < position.maxScrollExtent - 5;
+    });
+
+
   }
 
   @override
@@ -72,10 +81,12 @@ class MenuSiipneMovilController extends GetxController {
         );
         listModulos.value = await siipneMovilUseCase.getModulos(request: request);
         // Espera a que el ListView se dibuje
-        verificarIndicadorScroll();
+      //  verificarIndicadorScroll();
         if (listModulos.length == 0) {
           print("Sin permisos cerrar");
         }
+
+        actualizarIndicadorScroll();
       },
     );
 

@@ -1,8 +1,6 @@
 part of '../custom_app_widgets.dart';
 
 class ComboBusqueda<T> extends StatefulWidget {
-
-
   final String title;
   final ValueChanged<T?>? complete;
   final List<T> datos;
@@ -16,8 +14,10 @@ class ComboBusqueda<T> extends StatefulWidget {
   final String? textSeleccioneUndato;
 
   final String? Function(T?)? validator;
-  final String Function(T)?
-      displayField; // Callback para determinar qué mostrar
+
+  /// Determina el texto que se mostrará para cada elemento.
+  final String Function(T)? displayField;
+
   final void Function(T)? onChanged;
 
   const ComboBusqueda({
@@ -39,283 +39,505 @@ class ComboBusqueda<T> extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _ComboBusquedaState<T> createState() => _ComboBusquedaState<T>();
+  State<ComboBusqueda<T>> createState() => _ComboBusquedaState<T>();
 }
 
 class _ComboBusquedaState<T> extends State<ComboBusqueda<T>> {
+  bool showX = false;
 
-  late bool showX; // Declaramos como una variable de estado
-
-  final _userEditTextController = TextEditingController(text: '');
+  final TextEditingController _userEditTextController =
+  TextEditingController();
 
   @override
   void initState() {
-    showX = false; // Inicializamos en false
     super.initState();
+
+    showX = _tieneSeleccion(widget.selectValue);
+  }
+
+  @override
+  void didUpdateWidget(covariant ComboBusqueda<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    /*
+     * Si desde el padre cambia el elemento seleccionado,
+     * actualizamos la visualización de la X.
+     */
+    final nuevoEstado = _tieneSeleccion(widget.selectValue);
+
+    if (showX != nuevoEstado) {
+      showX = nuevoEstado;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget wgComboBusqueda = DropdownSearch<T>(
-      selectedItem: widget.selectValue,
-      compareFn: (item, selectedItem) => item == selectedItem,
-      validator: (v) {
-        print("haolala");
-        return v == null ? "EL ${widget.title} Es requerido" : null;
-      },
+    /*
+     * Solo mostramos el buscador cuando realmente aporta utilidad.
+     *
+     * 1 - 5 elementos  -> Sin buscador
+     * 6 o más          -> Con buscador
+     */
+    final bool mostrarBuscador = widget.datos.length > 5;
+
+    final Widget wgComboBusqueda = DropdownSearch<T>(
       key: widget.openDropDownProgKey,
+
+      selectedItem: widget.selectValue,
+
+      compareFn: (item, selectedItem) => item == selectedItem,
+
+      /*
+       * Validación
+       */
+      validator: widget.validator ??
+              (value) {
+            if (value == null) {
+              return "EL ${widget.title} Es requerido";
+            }
+
+            return null;
+          },
+
+      /*
+       * Botón para limpiar la selección.
+       */
       suffixProps: DropdownSuffixProps(
-        clearButtonProps: ClearButtonProps(isVisible: showX, color: Colors.red),
-        //lo paso en falkse xq ya esta diseñado xq no encontraba formada de captuyra el evento de limpiar
-        // lo que fue seleccionado
+        clearButtonProps: ClearButtonProps(
+          isVisible: widget.showClearButton && showX,
+          color: Colors.red,
+        ),
       ),
+
+      /*
+       * Configuración del popup.
+       */
       popupProps: PopupProps.dialog(
         showSelectedItems: true,
         disableFilter: false,
-        itemBuilder: (context, item, isSelected, l) =>
-            _customDesingDataPopop(context, item, isSelected, l),
-        showSearchBox: true,
+
+        fit: FlexFit.loose,
+
+        // Solo se muestra si hay más de 5 opciones
+        showSearchBox: mostrarBuscador,
+
+        // Siempre se configura, aunque no se muestre
         searchFieldProps: getBusquedaPopup(),
+
+        itemBuilder: (
+            context,
+            item,
+            isDisabled,
+            isSelected,
+            ) {
+          return _customDesingDataPopop(
+            context,
+            item,
+            isDisabled,
+            isSelected,
+          );
+        },
+
         dialogProps: DialogProps(
           backgroundColor: Colors.white,
-
           barrierDismissible: true,
           barrierLabel: 'Cerrar diálogo',
 
-          insetPadding: EdgeInsets.symmetric(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+
+          insetPadding: const EdgeInsets.symmetric(
             horizontal: 20,
             vertical: 20,
           ),
 
-          actionsAlignment: MainAxisAlignment.end,
-
-          actionsPadding: EdgeInsets.only(
-            top: 10,
-            right: 10,
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 10,
           ),
         ),
       ),
+
+      /*
+       * Convierte cada objeto T al texto que
+       * utilizará DropdownSearch.
+       */
       itemAsString: (item) {
-        // Usa el callback displayField para obtener el texto dinámico
-        if (item != null && widget.displayField != null) {
+        if (widget.displayField != null) {
           return widget.displayField!(item);
         }
-        return '';
-      },
-      dropdownBuilder: (context, selectedItem) =>
-          _customDropDownExample(context, selectedItem),
-      items: (filter, infiniteScrollProps) => widget.datos,
 
+        return item.toString();
+      },
+
+      /*
+       * Diseño del valor seleccionado dentro
+       * del combo.
+       */
+      dropdownBuilder: (
+          context,
+          selectedItem,
+          ) {
+        return _customDropDownExample(
+          context,
+          selectedItem,
+        );
+      },
+
+      /*
+       * Datos disponibles.
+       */
+      items: (
+          filter,
+          infiniteScrollProps,
+          ) {
+        return widget.datos;
+      },
+
+      /*
+       * Cuando seleccionamos un elemento.
+       */
       onSelected: (value) {
-        print("cambiaa");
-        if (widget.complete != null) {
-          widget.complete!(value);
+        /*
+         * Limpiamos cualquier búsqueda anterior.
+         */
+        _userEditTextController.clear();
+
+        /*
+         * Actualizamos la X.
+         */
+        final nuevoEstado = _tieneSeleccion(value);
+
+        if (showX != nuevoEstado && mounted) {
+          setState(() {
+            showX = nuevoEstado;
+          });
+        }
+
+        /*
+         * Callback principal.
+         */
+        widget.complete?.call(value);
+
+        /*
+         * Callback adicional si lo necesitas.
+         */
+        if (value != null) {
+          widget.onChanged?.call(value);
         }
       },
     );
 
+    /*
+     * Diseño:
+     *
+     * Título | Combo
+     */
     return Row(
       children: [
         Expanded(
-          child: TituloTextWidget(title: widget.searchHint),
+          child: TituloTextWidget(
+            title: widget.searchHint,
+          ),
         ),
-        SizedBox(
+
+        const SizedBox(
           width: 5,
         ),
-        Expanded(flex: 3, child: wgComboBusqueda)
+
+        Expanded(
+          flex: 3,
+          child: wgComboBusqueda,
+        ),
       ],
     );
   }
 
+  // =========================================================
+  // BUSCADOR DEL POPUP
+  // =========================================================
+
   TextFieldProps getBusquedaPopup() {
     return TextFieldProps(
       controller: _userEditTextController,
+
       decoration: InputDecoration(
-        suffixIcon: Row(
-          mainAxisSize:
-              MainAxisSize.min, // Ajusta el tamaño para evitar expandir
-          children: [
-         /*
-         TODO: comentado
-         IconButton(
-              icon: Icon(Icons.clear),
-              onPressed: () {
-                _userEditTextController.clear(); // Limpia el campo de texto
-              },
-            ),*/
-         IconButton(
-              icon:
-                  Icon(Icons.close, color: Colors.red), // Botón "X" para cerrar
-              onPressed: () {
-                Navigator.of(context).pop(); // Cierra el diálogo
-              },
-            ),
-          ],
+        /*
+         * X para cerrar el diálogo.
+         */
+        suffixIcon: IconButton(
+          icon: const Icon(
+            Icons.close,
+            color: Colors.red,
+          ),
+          onPressed: () {
+            _userEditTextController.clear();
+
+            Navigator.of(context).pop();
+          },
         ),
-        border: OutlineInputBorder(),
-        contentPadding: EdgeInsets.fromLTRB(12, 12, 8, 0),
+
+        border: const OutlineInputBorder(),
+
+        contentPadding: const EdgeInsets.fromLTRB(
+          12,
+          12,
+          8,
+          0,
+        ),
+
         labelText: widget.searchHint,
       ),
     );
   }
 
-  Widget _customDropDownExample(BuildContext context, T? item) {
+  // =========================================================
+  // DISEÑO DEL COMBO CUANDO YA EXISTE UNA SELECCIÓN
+  // =========================================================
+
+  Widget _customDropDownExample(
+      BuildContext context,
+      T? item,
+      ) {
     final responsive = ResponsiveUtil();
 
-    Widget msjSelectDato = Text(
-      widget.textSeleccioneUndato ?? "Seleccione un dato",
-      style: TextStyle(color: Colors.red, fontSize: responsive.diagonalP(1)),
+    /*
+     * Mensaje cuando no existe selección.
+     */
+    final Widget msjSelectDato = Text(
+      widget.textSeleccioneUndato ??
+          "Seleccione un dato",
+      style: TextStyle(
+        color: Colors.red,
+        fontSize: responsive.diagonalP(1),
+      ),
     );
 
     if (item == null) {
       return msjSelectDato;
-    } else {
-      if (widget.displayField!(item).isEmpty) {
-
-        if (showX) {
-          Future.delayed(Duration.zero, () {
-            if (mounted) {
-              setState(() {
-                showX = false;
-              });
-            }
-          });
-        }
-
-
-        return msjSelectDato;
-      }
-
-      if (!showX) {
-        Future.delayed(Duration.zero, () {
-          if (mounted) {
-            setState(() {
-              showX = true;
-            });
-          }
-        });
-      }
-
-
-      return Text(
-        widget.displayField!(item),
-        textAlign: TextAlign.center, // Justifica el texto
-        style: TextStyle(
-          fontSize: responsive.diagonalP(1.2),
-        ),
-      );
-
-
     }
+
+    final String texto = _getDisplayText(item);
+
+    if (texto.isEmpty) {
+      return msjSelectDato;
+    }
+
+    return Text(
+      texto,
+      textAlign: TextAlign.center,
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(
+        fontSize: responsive.diagonalP(1.2),
+      ),
+    );
   }
 
+  // =========================================================
+  // DISEÑO DE LOS ELEMENTOS DEL POPUP
+  // =========================================================
+
   Widget _customDesingDataPopop(
-      BuildContext context, T? item, bool v, bool isSelected) {
+      BuildContext context,
+      T? item,
+      bool isDisabled,
+      bool isSelected,
+      ) {
     final responsive = ResponsiveUtil();
 
-    print("isSelected ${isSelected} ybb= ${v}");
-
-    Widget msjSelectDato = ListTile(
-      contentPadding: EdgeInsets.all(0),
+    /*
+     * Mensaje cuando no existe información.
+     */
+    final Widget msjSelectDato = ListTile(
+      contentPadding: EdgeInsets.zero,
       title: Text(
-        widget.textSeleccioneUndato ?? "Seleccione un dato",
-        style: TextStyle(color: Colors.red, fontSize: responsive.diagonalP(1)),
+        widget.textSeleccioneUndato ??
+            "Seleccione un dato",
+        style: TextStyle(
+          color: Colors.red,
+          fontSize: responsive.diagonalP(1),
+        ),
       ),
     );
 
+    if (item == null) {
+      return msjSelectDato;
+    }
+
+    final String texto = _getDisplayText(item);
+
+    if (texto.isEmpty) {
+      return msjSelectDato;
+    }
+
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 8),
-      decoration: !isSelected
-          ? null
-          : BoxDecoration(
-              border: Border.all(color: Colors.black),
-              borderRadius: BorderRadius.circular(5),
-              color: AppColors.colorAzul,
-            ),
-      child: (item == null)
-          ? msjSelectDato
-          : widget.displayField!(item).length == 0
-              ? msjSelectDato
-              : getDesing(
-                  colorTexto: isSelected ? Colors.white : Colors.black,
-                  titulo: widget.displayField!(item),
-                  icon: widget.icon,
-                  iconUrl: widget.imgUrl,
-                  isSelect: isSelected),
+      margin: const EdgeInsets.symmetric(
+        horizontal: 8,
+      ),
+
+      decoration: isSelected
+          ? BoxDecoration(
+        color: AppColors.colorAzul,
+        border: Border.all(
+          color: Colors.black,
+        ),
+        borderRadius: BorderRadius.circular(5),
+      )
+          : null,
+
+      child: getDesing(
+        colorTexto:
+        isSelected ? Colors.white : Colors.black,
+        titulo: texto,
+        icon: widget.icon,
+        iconUrl: widget.imgUrl,
+        isSelect: isSelected,
+      ),
     );
   }
 
-  Widget getOnlyDesing(
-      {required Widget icon,
-      String titulo = '',
-      Color colorTexto = Colors.black}) {
+  // =========================================================
+  // DISEÑO INTERNO DE CADA OPCIÓN
+  // =========================================================
+
+  Widget getOnlyDesing({
+    required Widget icon,
+    String titulo = '',
+    Color colorTexto = Colors.black,
+  }) {
     final responsive = ResponsiveUtil();
+
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          children: [
-            icon,
-            Flexible(
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 12,
+          ),
+          child: Row(
+            children: [
+              icon,
+
+              const SizedBox(width: 8),
+
+              Expanded(
                 child: Text(
-              titulo,
-              style: TextStyle(
-                fontSize: responsive.diagonalP(1.2),
-                color: colorTexto,
+                  titulo,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: responsive.diagonalP(1.2),
+                    color: colorTexto,
+                  ),
+                ),
               ),
-            )),
-          ],
+            ],
+          ),
         ),
-        SizedBox(
-          height: 4,
-        ),
+
         Container(
           height: 1,
-          color: Colors.black38,
-        )
+          color: Colors.black26,
+        ),
       ],
     );
   }
 
-  Widget getDesing(
-      {bool isSelect = false,
-      IconData? icon,
-      String titulo = '',
-      bool selected = false,
-      String? iconUrl,
-      Color colorTexto = Colors.black}) {
-    Widget _icon = getIcon(icon: icon, isSelecc: isSelect);
+  Widget getDesing({
+    bool isSelect = false,
+    IconData? icon,
+    String titulo = '',
+    bool selected = false,
+    String? iconUrl,
+    Color colorTexto = Colors.black,
+  }) {
+    final Widget iconWidget = getIcon(
+      icon: icon,
+      isSelecc: isSelect,
+    );
 
-    return getOnlyDesing(icon: _icon, titulo: titulo, colorTexto: colorTexto);
-
+    return getOnlyDesing(
+      icon: iconWidget,
+      titulo: titulo,
+      colorTexto: colorTexto,
+    );
   }
 
-  getIcon({IconData? icon, bool isSelecc = false}) {
+  // =========================================================
+  // ICONO
+  // =========================================================
 
+  Widget getIcon({
+    IconData? icon,
+    bool isSelecc = false,
+  }) {
+    Widget wg;
 
-    Widget wg=  icon != null
-        ? Icon(
-      icon,
-      color: AppColors.colorBotones,
-
-    )
-        : Icon(
-        Icons.description,
-        color: AppColors.colorBotones,);
-
+    /*
+     * Si está seleccionado mostramos CHECK.
+     */
     if (isSelecc) {
-      wg= Icon(
+      wg = const Icon(
         Icons.check_circle,
         color: Colors.white,
-
       );
     }
+
+    /*
+     * Si enviaron un icono personalizado.
+     */
+    else if (icon != null) {
+      wg = Icon(
+        icon,
+        color: AppColors.colorBotones,
+      );
+    }
+
+    /*
+     * Icono por defecto.
+     */
+    else {
+      wg = Icon(
+        Icons.description,
+        color: AppColors.colorBotones,
+      );
+    }
+
     return Container(
-      padding: EdgeInsets.all(5),
-      child: wg,);
+      padding: const EdgeInsets.all(5),
+      child: wg,
+    );
+  }
 
+  // =========================================================
+  // UTILIDADES
+  // =========================================================
 
+  String _getDisplayText(T item) {
+    if (widget.displayField != null) {
+      return widget.displayField!(item);
+    }
 
+    return item.toString();
+  }
 
+  bool _tieneSeleccion(T? item) {
+    if (item == null) {
+      return false;
+    }
 
+    return _getDisplayText(item).trim().isNotEmpty;
+  }
+
+  // =========================================================
+  // DISPOSE
+  // =========================================================
+
+  @override
+  void dispose() {
+    _userEditTextController.dispose();
+    super.dispose();
   }
 }

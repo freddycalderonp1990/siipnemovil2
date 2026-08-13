@@ -15,8 +15,19 @@ class SiipneMovilRepositoryImpl extends SiipneMovilRepository {
   }
 
   @override
-  Future<List<DataTipoOperativo>> getTipoOperativos({required GetTipoOperativosRequest request}) async {
+  Future<List<DataTipoOperativo>> getTipoOperativos({
+    required GetTipoOperativosRequest request,
+  }) async {
     return await this.siipneMovilRemoteDataSource.getTipoOperativos(
+      request: request,
+    );
+  }
+
+  @override
+  Future<DataCreateOp> crearOperativo({
+    required CreateOperativoRequest request,
+  }) async {
+    return await this.siipneMovilRemoteDataSource.crearOperativo(
       request: request,
     );
   }

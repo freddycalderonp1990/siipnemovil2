@@ -18,4 +18,10 @@ class SiipneMovilUseCase {
   }) {
     return repository.getTipoOperativos(request: request);
   }
+
+  Future<DataCreateOp> createOperativo({
+    required CreateOperativoRequest request,
+  }) {
+    return repository.crearOperativo(request: request);
+  }
 }

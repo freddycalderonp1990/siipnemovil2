@@ -17,8 +17,8 @@ class MenuSiipneMovilPage extends GetView<MenuSiipneMovilController> {
 
     return WorkAreaPageSiipneMovilWidget(
       showGps: true,
-      mostrarBtnAtras: false,
-      title: "PERMISOS DE APLICACIONES",
+      mostrarBtnAtras: true,
+      title: "Permisos de aplicaciones",
       contenido: getContenido(),
       peticionServer: controller.peticionServerState,
     );

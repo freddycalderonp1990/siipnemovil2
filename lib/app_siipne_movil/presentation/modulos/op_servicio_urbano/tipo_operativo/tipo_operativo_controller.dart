@@ -11,27 +11,15 @@ class TipoOperativoController extends GetxController {
   DataModulo dataModuloResponse = DataModulo.empty();
 
   /// Todos los registros recibidos desde el servidor
-  RxList<DataTipoOperativo> listTipoOperativos =
-      <DataTipoOperativo>[].obs;
+  RxList<DataTipoOperativo> listTipoOperativos = <DataTipoOperativo>[].obs;
 
   /// Último elemento seleccionado.
   /// Si no tiene hijos, este será el operativo final.
-  Rx<DataTipoOperativo> selectTipoOperativo =
-      DataTipoOperativo.empty().obs;
+  Rx<DataTipoOperativo> selectTipoOperativo = DataTipoOperativo.empty().obs;
 
-  /// Ruta que el usuario va seleccionando.
-  ///
-  /// Ejemplo:
-  /// [
-  ///   OPERATIVO SERVICIO URBANO,
-  ///   EXTRAORDINARIOS,
-  ///   INSTITUCIONAL,
-  ///   INSTITUCIONAL
-  /// ]
-  RxList<DataTipoOperativo> rutaSeleccionada =
-      <DataTipoOperativo>[].obs;
+  RxList<DataTipoOperativo> rutaSeleccionada = <DataTipoOperativo>[].obs;
 
-  RxBool showContinuar=false.obs;
+  RxBool showContinuar = false.obs;
 
   @override
   void onInit() {
@@ -69,21 +57,18 @@ class TipoOperativoController extends GetxController {
 
     await ExceptionDialogos.manejarErroresShowDialogo(
       showMsjNodata: false,
-          () async {
-        GetTipoOperativosRequest request =
-        GetTipoOperativosRequest(
+      () async {
+        GetTipoOperativosRequest request = GetTipoOperativosRequest(
           idGenModulo: dataModuloResponse.idGenModulo,
         );
 
-        listTipoOperativos.value =
-        await siipneMovilUseCase.getTipoOperativos(
+        listTipoOperativos.value = await siipneMovilUseCase.getTipoOperativos(
           request: request,
         );
 
         // Limpiamos cualquier selección anterior
         rutaSeleccionada.clear();
-        selectTipoOperativo.value =
-            DataTipoOperativo.empty();
+        selectTipoOperativo.value = DataTipoOperativo.empty();
 
         if (listTipoOperativos.isEmpty) {
           print("Sin permisos cerrar");
@@ -92,6 +77,56 @@ class TipoOperativoController extends GetxController {
     );
 
     peticionServerState(false);
+  }
+
+  Future<void> crearOperativo() async {
+    peticionServerState(true);
+
+    await ExceptionDialogos.manejarErroresShowDialogo(
+      showMsjNodata: false,
+      () async {
+        final locationBloc = BlocProvider.of<LocationBloc>(Get.context!);
+        LatLng pos = await locationBloc.getCurrentPosition();
+
+        String ip = await DeviceInfoApp.getIp;
+
+        String realiza = "Realiza: ${user.nombres}";
+        CreateOperativoRequest request = CreateOperativoRequest(
+          latitud: pos.latitude,
+          longitud: pos.longitude,
+          dataModuloIdGenTipoTipificacionEcu:
+              dataModuloResponse.idGenTipoTipificacionEcu,
+          dataModuloIdTipoServicio: dataModuloResponse.idHdrTipoServicio,
+          idTipoOperativo: selectTipoOperativo.value.idOperativo,
+          ip: ip,
+          idGenPersona: user.idGenPersona,
+          idGenUsuario: user.idGenUsuario,
+          realiza: realiza,
+        );
+
+        DataCreateOp dataCreateOp = await siipneMovilUseCase.createOperativo(
+          request: request,
+        );
+
+        if (dataCreateOp.idHdrEvento > 0) {
+          DialogosAwesome.getSucess(
+            descripcion: "Operativo creado con éxito",
+            btnOkOnPress: () {
+              goToPageOperativo(dataCreateOp);
+            },
+          );
+        }
+      },
+    );
+
+    peticionServerState(false);
+  }
+
+  goToPageOperativo(DataCreateOp dataCreateOp) {
+    Get.offAndToNamed(
+      SiipneMovilRoutes.OPERATIVOS_SERVICIO_URBANO,
+      arguments: {"dataCreateOp": dataCreateOp},
+    );
   }
 
   // =========================================================
@@ -137,8 +172,7 @@ class TipoOperativoController extends GetxController {
 
   bool tieneHijos(int idGenTipoTipificacion) {
     return listTipoOperativos.any(
-          (item) =>
-      item.idPadre == idGenTipoTipificacion,
+      (item) => item.idPadre == idGenTipoTipificacion,
     );
   }
 
@@ -165,19 +199,14 @@ class TipoOperativoController extends GetxController {
 
     final padre = rutaSeleccionada[nivel - 1];
 
-    return getHijos(
-      padre.idGenTipoTipificacion,
-    );
+    return getHijos(padre.idGenTipoTipificacion);
   }
 
   // =========================================================
   // SELECCIONAR
   // =========================================================
 
-  void seleccionarTipoOperativo(
-      int nivel,
-      DataTipoOperativo item,
-      ) {
+  void seleccionarTipoOperativo(int nivel, DataTipoOperativo item) {
     /*
      * Si el usuario regresa y cambia una selección anterior,
      * debemos eliminar todas las selecciones posteriores.
@@ -193,10 +222,7 @@ class TipoOperativoController extends GetxController {
      */
 
     if (rutaSeleccionada.length > nivel) {
-      rutaSeleccionada.removeRange(
-        nivel,
-        rutaSeleccionada.length,
-      );
+      rutaSeleccionada.removeRange(nivel, rutaSeleccionada.length);
     }
 
     // Guardamos la nueva selección
@@ -210,21 +236,20 @@ class TipoOperativoController extends GetxController {
     print('Descripción: ${item.descripcion}');
     print(
       'idGenTipoTipificacion: '
-          '${item.idGenTipoTipificacion}',
+      '${item.idGenTipoTipificacion}',
     );
     print('idPadre: ${item.idPadre}');
 
     // Comprobamos si debemos continuar
     if (tieneHijos(item.idGenTipoTipificacion)) {
       print('Tiene hijos -> mostrar otro combo');
-      showContinuar.value=false;
+      showContinuar.value = false;
     } else {
       print('No tiene hijos -> selección final');
       print('idOperativo final: ${item.idOperativo}');
-      
-      print("select idOperativo  ${ selectTipoOperativo.value.idOperativo}");
-      showContinuar.value=true;
 
+      print("select idOperativo  ${selectTipoOperativo.value.idOperativo}");
+      showContinuar.value = true;
     }
 
     print('-------------------------------');
@@ -256,9 +281,7 @@ class TipoOperativoController extends GetxController {
 
     final ultimo = rutaSeleccionada.last;
 
-    return !tieneHijos(
-      ultimo.idGenTipoTipificacion,
-    );
+    return !tieneHijos(ultimo.idGenTipoTipificacion);
   }
 
   // =========================================================
@@ -280,17 +303,13 @@ class TipoOperativoController extends GetxController {
   void limpiarTipoOperativo() {
     rutaSeleccionada.clear();
 
-    selectTipoOperativo.value =
-        DataTipoOperativo.empty();
+    selectTipoOperativo.value = DataTipoOperativo.empty();
   }
 
   void limpiarDesdeNivel(int nivel) {
-    showContinuar.value=false;
+    showContinuar.value = false;
     if (rutaSeleccionada.length > nivel) {
-      rutaSeleccionada.removeRange(
-        nivel,
-        rutaSeleccionada.length,
-      );
+      rutaSeleccionada.removeRange(nivel, rutaSeleccionada.length);
     }
 
     // Actualizamos el último seleccionado
@@ -303,7 +322,10 @@ class TipoOperativoController extends GetxController {
     rutaSeleccionada.refresh();
   }
 
-  gotToNextPage(){
-    Get.toNamed(SiipneMovilRoutes.OPERATIVOS_SERVICIO_URBANO,arguments:{"tipoOperativo": selectTipoOperativo}  );
+  gotToNextPage() {
+    Get.toNamed(
+      SiipneMovilRoutes.OPERATIVOS_SERVICIO_URBANO,
+      arguments: {"tipoOperativo": selectTipoOperativo},
+    );
   }
 }

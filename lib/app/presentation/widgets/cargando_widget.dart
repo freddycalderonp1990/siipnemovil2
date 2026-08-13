@@ -25,11 +25,11 @@ class _CargandoWidgetState extends State<CargandoWidget> {
                 Stack(
                   alignment: Alignment.center,
                   children: [
+
                     SizedBox(
                       width: 80,
                       height: 80,
                       child: CircularProgressIndicator(
-
                         strokeWidth: 2.5,
                         valueColor: AlwaysStoppedAnimation<Color>(AppColors.colorAzul),
                       ),

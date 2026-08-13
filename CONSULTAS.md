@@ -1,0 +1,17 @@
+PORQUE EN LA TABLA HDREVENTO EN EL CAMPO IP SE ASIGNA MOVIL?
+ Y LA CONSULTA DE OPERATIVOS PENDIENTES FILTRA POPR LA IP=MOVIL
+
+SELECT
+e.idHdrEvento,
+e.idGenGeoSenplades,
+e.idGenPersona,
+e.usuario,
+e.fechaEvento
+FROM
+hdrEvento e
+WHERE e.usuario = 55948
+AND e.estadoPolicia = '3'
+AND e.idGenPersona = 724115
+AND e.ip = 'movil'
+
+NO SE CONSIDERA EN MI FUNCION XQ VOY A INSERTAR LA IP DEL CELULAR EN ESE CAMPO
