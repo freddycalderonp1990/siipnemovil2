@@ -31,4 +31,13 @@ class SiipneMovilRepositoryImpl extends SiipneMovilRepository {
       request: request,
     );
   }
+
+  @override
+  Future<OpePersonaModelData> consultarPersona({
+    required ConsultarPersonaRequest request,
+  }) async {
+    return await this.siipneMovilRemoteDataSource.consultarPersona(
+      request: request,
+    );
+  }
 }

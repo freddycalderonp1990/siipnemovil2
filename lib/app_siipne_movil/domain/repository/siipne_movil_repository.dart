@@ -13,6 +13,10 @@ abstract class SiipneMovilRepository {
     required CreateOperativoRequest request,
   });
 
+  Future<OpePersonaModelData> consultarPersona({
+    required ConsultarPersonaRequest request,
+  });
+
 
 
 }
