@@ -45,6 +45,7 @@ class OpServicioUrbanoController extends GetxController {
 
   // end datos para la consulta con ocupantes
 
+  Rx<DataCreateOp> dataCreateOp=DataCreateOp.empty().obs;
 
   @override
   void onInit() async {
@@ -70,6 +71,29 @@ class OpServicioUrbanoController extends GetxController {
     super.onInit();
   }
 
+
+  Future<void> getDataToPage() async {
+    final arguments = Get.arguments as Map<String, dynamic>?;
+
+    if (arguments != null && arguments.containsKey('dataCreateOp')) {
+      try {
+        dataCreateOp.value = arguments['dataCreateOp'] as DataCreateOp;
+
+       // await getTipoOperativos();
+      } catch (e) {
+        print('Error getDataToPage: $e');
+      }
+    }
+    else{
+      DialogosAwesome.getWarning(
+          descripcion: "No se recibieron datos válidos. Vuelva a intentarlo.",
+          btnOkOnPress: (){
+        Get.offAllNamed(SiipneMovilRoutes.MENU_APP);
+      }
+      );
+    }
+  }
+
   void verificarIndicadorScroll() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!scrollController.hasClients) return;
@@ -82,7 +106,7 @@ class OpServicioUrbanoController extends GetxController {
   @override
   void onReady() async {
     // TODO: Donde la vista ya se presento
-
+    await getDataToPage();
     super.onReady();
   }
 

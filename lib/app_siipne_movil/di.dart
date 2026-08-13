@@ -19,7 +19,6 @@ class DependencyInjectionSiipneMovil extends Bindings{
     Get.lazyPut<SiipneMovilUseCase>(()=>SiipneMovilUseCase(repository: Get.find()),fenix: true);
 
 
-
     // Repository
     Get.lazyPut<SiipneMovilRepository>(() =>
         SiipneMovilRepositoryImpl(siipneMovilRemoteDataSource: Get.find()), fenix: true);

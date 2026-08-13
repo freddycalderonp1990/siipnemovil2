@@ -7,9 +7,12 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:siipnemovil_v2/app/presentation/widgets/custom_app_widgets.dart';
 
 import '../../../app/core/exceptions/exception_dialogos.dart';
 
+import '../../../app/core/utils/device_info_app.dart';
+import '../../../feactures/gps/presentation/location/location_bloc.dart';
 import '../../../feactures/user/domain/entities/user.dart';
 import '../../../feactures/user/presentation/modules/controllers.dart';
 import '../../data/models/models_siipne_movil.dart';

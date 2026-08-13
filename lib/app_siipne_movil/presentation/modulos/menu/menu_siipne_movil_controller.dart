@@ -51,6 +51,8 @@ class MenuSiipneMovilController extends GetxController {
           puedeHacerScroll &&
               position.pixels < position.maxScrollExtent - 5;
     });
+
+
   }
 
   @override

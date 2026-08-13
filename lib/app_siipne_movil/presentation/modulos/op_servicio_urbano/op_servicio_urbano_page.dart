@@ -12,13 +12,13 @@ class OpServicioUrbanoPage extends GetView<OpServicioUrbanoController> {
 
 
 
-    return WorkAreaPageSiipneMovilWidget(
+    return Obx(()=>WorkAreaPageSiipneMovilWidget(
       showGps: true,
-      mostrarBtnAtras: true,
-      title: "OPERATIVO N°123123122321312342324234234" ,
+      mostrarBtnAtras: false,
+      title: "OPERATIVO N°${controller.dataCreateOp.value.idHdrEvento}" ,
       contenido: getContenido(),
       peticionServer: controller.peticionServerState,
-    );
+    ));
   }
 
   getContenido() {

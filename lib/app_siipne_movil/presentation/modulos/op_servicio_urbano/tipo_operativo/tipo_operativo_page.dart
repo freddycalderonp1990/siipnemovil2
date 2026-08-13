@@ -43,7 +43,7 @@ class TipoOperativoPage extends GetView<TipoOperativoController> {
     return Obx(()=>controller.showContinuar.value?BtnIconWidget(
       icon: Icons.exit_to_app,
       titulo: "CONTINUAR",
-      onPressed: () =>controller.gotToNextPage(),
+      onPressed: () =>controller.crearOperativo(),
     ):Container());
   }
 

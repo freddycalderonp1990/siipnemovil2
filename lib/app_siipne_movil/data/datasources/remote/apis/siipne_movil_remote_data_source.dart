@@ -11,6 +11,10 @@ abstract class SiipneMovilRemoteDataSource {
   Future<List<DataTipoOperativo>> getTipoOperativos({
     required GetTipoOperativosRequest request,
   });
+
+  Future<DataCreateOp> crearOperativo({
+    required CreateOperativoRequest request,
+  });
 }
 
 class SiipneMovilRemoteDataSourceImpl implements SiipneMovilRemoteDataSource {
@@ -31,7 +35,9 @@ class SiipneMovilRemoteDataSourceImpl implements SiipneMovilRemoteDataSource {
   }
 
   @override
-  Future<List<DataTipoOperativo>> getTipoOperativos({required GetTipoOperativosRequest request}) async {
+  Future<List<DataTipoOperativo>> getTipoOperativos({
+    required GetTipoOperativosRequest request,
+  }) async {
     Map<String, dynamic> body = HeadAppSiipneMovilRequest(
       uri: SiipneMovilApiConstantes.SIIPNE_MOVIL_GET_TIPOS_OPERATIVOS,
       bodyRequest: request.toJson(),
@@ -41,6 +47,22 @@ class SiipneMovilRemoteDataSourceImpl implements SiipneMovilRemoteDataSource {
     return await ExceptionHelper.manejarErroresParseJsonException(() async {
       // Parsear y retornar el modelo correspondiente
       return tipoOperativoModelFromJson(json).dataTipoOperativos;
+    });
+  }
+
+  @override
+  Future<DataCreateOp> crearOperativo({
+    required CreateOperativoRequest request,
+  }) async {
+    Map<String, dynamic> body = HeadAppSiipneMovilRequest(
+      uri: SiipneMovilApiConstantes.SIIPNE_MOVIL_GET_CREATE_OPERATIVO,
+      bodyRequest: request.toJson(),
+    ).toJson();
+    String json = await UrlApiProviderAppCenso.post(body: body);
+
+    return await ExceptionHelper.manejarErroresParseJsonException(() async {
+      // Parsear y retornar el modelo correspondiente
+      return createOperativoModelFromJson(json).dataCreateOp;
     });
   }
 }
