@@ -16,7 +16,7 @@ abstract class SiipneMovilRemoteDataSource {
     required CreateOperativoRequest request,
   });
 
-  Future<OpePersonaModelData> consultarPersona({
+  Future<DataConsultaPersona> consultarPersona({
     required ConsultarPersonaRequest request,
   });
 }
@@ -71,7 +71,7 @@ class SiipneMovilRemoteDataSourceImpl implements SiipneMovilRemoteDataSource {
   }
 
   @override
-  Future<OpePersonaModelData> consultarPersona({required ConsultarPersonaRequest request})async {
+  Future<DataConsultaPersona> consultarPersona({required ConsultarPersonaRequest request})async {
     Map<String, dynamic> body = HeadAppSiipneMovilRequest(
       uri: SiipneMovilApiConstantes.SIIPNE_MOVIL_CONSULTAR_PERSONA,
       bodyRequest: request.toJson(),
@@ -80,7 +80,7 @@ class SiipneMovilRemoteDataSourceImpl implements SiipneMovilRemoteDataSource {
 
     return await ExceptionHelper.manejarErroresParseJsonException(() async {
       // Parsear y retornar el modelo correspondiente
-      return  OpePersonaModel.fromJson(json).data;
+      return  operativoPersonaModelFromJson(json).dataConsultaPersona;
     });
   }
 }

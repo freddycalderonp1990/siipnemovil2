@@ -3,7 +3,7 @@ import java.io.File
 import java.io.FileInputStream
 
 // Definir la ruta absoluta de key.properties
-val keystorePropertiesFile = File("/Users/policianacional/AndroidStudioProjects/siipnemovil_v2/android/key.properties")
+val keystorePropertiesFile = File("/Users/policianacional/AndroidStudioProjects/siipnemovil2/android/key.properties")
 
 
 // Verificar si el archivo existe antes de cargarlo

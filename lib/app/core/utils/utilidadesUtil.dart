@@ -10,10 +10,12 @@ import 'package:get/get.dart';
 
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 
 
 import 'package:flutter/material.dart';
+import 'package:vibration/vibration.dart';
 
 
 import '../../presentation/widgets/custom_app_widgets.dart';
@@ -164,6 +166,23 @@ class UtilidadesUtil {
     } catch (e) {
       DialogosAwesome.getWarning(descripcion: "No se pudo cargar la página");
     }
+  }
+
+  static void playAudio({required String nameAudio}) async {
+    // or as a local variable
+    // final player = AudioCache();
+    final player = AudioPlayer();
+    // call this method when desired
+    print("play audio");
+
+    Vibration.vibrate(
+      pattern: [500, 1000, 500, 900, 500, 800, 500, 500],
+      intensities: [0, 128, 0, 255, 0, 64, 0, 255],
+    );
+
+    // await player.play(UrlSource('https://example.com/my-audio.wav'));
+
+    await player.play(AssetSource(nameAudio));
   }
 
 

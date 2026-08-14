@@ -10,7 +10,7 @@ import 'colors_local.dart';
 import 'operativo_polco_local_widgets.dart';
 
 class DesingBusquedaPorCedulaWidget extends StatelessWidget {
-  final List<OpePersonaModelData> dataPersona;
+  final List<DataConsultaPersona> dataPersona;
   final VoidCallback? onPressedAceptar;
 
   const DesingBusquedaPorCedulaWidget({Key? key, required this.dataPersona, this.onPressedAceptar})
@@ -58,7 +58,7 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
           itemCount: dataPersona.length,
           shrinkWrap: true,
           itemBuilder: (context, i) {
-            OpePersonaModelData data =this. dataPersona[0];
+            DataConsultaPersona data =this. dataPersona[0];
             //********************** DATOS PERSON *****************************
             LocalPersonSuModel dataPersona = setDatosPersona(data);
             Widget wgDataPersona = DesingDatosPersonaWg(
@@ -69,11 +69,12 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
             //********************** ANT *****************************
             Widget wgAnt =  const SizedBox.shrink();
             if(data.datosAnt.success){
-               wgAnt =   DesingAntWg(
+              //comentado por que faklta el servico web aun
+               /*wgAnt =   DesingAntWg(
                 colorTitulos: colorTitulos,
                 colorTexto: colorTexto,
                 data: data.datosAnt.data,
-              );
+              );*/
             }
 
 
@@ -90,39 +91,12 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
               oficio: dataOrdenCaptura.oficio,
             );
 
-            //********************** desaparecidoDinased *****************************
-            DesaparecidoDinasedData? dataDesaparecido =
-            setDatosDesaparecidoDinased(data);
 
 
-            Widget wgDesaparecido =dataDesaparecido!=null? DesingDesaparecidoDinasedWg(
-              colorTitulos: colorTitulos,
-              colorTexto: colorTexto,
-              desaparecidoDinasedData: dataDesaparecido,
-            ):const SizedBox.shrink();
-
-            //**********************ALERTAS DNA*****************************
-            AlertaDnaData? dataAlertaDNA =
-            setDatosAlertaDna(data);
-            Widget wgAlertaDna = dataAlertaDNA!=null? DesingAlertaDnaWg(
-              colorTitulos: colorTitulos,
-              colorTexto: colorTexto,
-              data:dataAlertaDNA ,
-            ):const SizedBox.shrink();
-
-            //**********************PJ*****************************
-            AlertaInmediataPjData? dataAlertaInmediata =
-            setDatosAlertaPj(data);
-            Widget wgAlertaInmediata = dataAlertaInmediata!=null?DesingAlertaPjWg(
-                colorTitulos: colorTitulos,
-                colorTexto: colorTexto,
-                data: dataAlertaInmediata):const SizedBox.shrink();
 
             return Column(
               children: [
-                wgDesaparecido,
-                wgAlertaDna,
-                wgAlertaInmediata,
+
                 wgDataPersona,
                 wgOrdenCaptura,
                 wgAnt,
@@ -145,33 +119,33 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
   }
 
 
-  LocalPersonSuModel setDatosPersona(OpePersonaModelData data) {
+  LocalPersonSuModel setDatosPersona(DataConsultaPersona data) {
     //**********************  BD SIIPNE *****************************
     DataSiipne dataSiipne = data.dataSiipne;
     DataDinardap dataDinardap = data.dataDinardap;
     String nombres = "SIN DATOS", fechaNacimiento = "", edad = "", sexo = "";
-    String? foto = data.foto.success ? data.foto.fotoBase64 : null;
+    String? foto = data.dataSiipne.datosSiipne.foto64;
     String documento ="";
     String? pais;
     if (dataSiipne.success) {
-      nombres = dataSiipne.data.apenom;
-      pais = dataSiipne.data.pais;
-      fechaNacimiento = dataSiipne.data.fechaNacimiento;
-      sexo = dataSiipne.data.sexo;
-      documento=dataSiipne.data.documento;
-      Edad? _dataEdad = dataSiipne.data.edad;
+      nombres = dataSiipne.datosSiipne.apenom;
+      pais = dataSiipne.datosSiipne.pais;
+      fechaNacimiento = dataSiipne.datosSiipne.fechaNacimiento;
+      sexo = dataSiipne.datosSiipne.sexo;
+      documento=dataSiipne.datosSiipne.documento;
+      Edad? _dataEdad = dataSiipne.datosSiipne.edad;
 
-      foto=dataSiipne.data.foto64;
+      foto=dataSiipne.datosSiipne.foto64;
 
       if (edad != null) {
         edad =
             "${_dataEdad!.anos} AÑOS -${_dataEdad.meses} MESES -${_dataEdad.dias} DIAS";
       }
     } else if (dataDinardap.success) {
-      nombres = dataDinardap.data.nombre;
-      sexo = dataDinardap.data.genero;
-      fechaNacimiento = dataDinardap.data.fechaNacimiento;
-      Edad? _dataEdad = dataDinardap.data.edad;
+      nombres = dataDinardap.datosDinardap.nombre;
+      sexo = dataDinardap.datosDinardap.genero;
+      fechaNacimiento = dataDinardap.datosDinardap.fechaNacimiento;
+      Edad? _dataEdad = dataDinardap.datosDinardap.edad;
       if (edad != null) {
         edad =
             "${_dataEdad!.anos} AÑOS -${_dataEdad.meses} MESES -${_dataEdad.dias} DIAS";
@@ -179,22 +153,22 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
     }
 
     String? domicilio, estadoCivil, madre, padre, conyuge;
-    if (dataDinardap.success) {
-      documento = dataDinardap.data.cedula;
-      domicilio = dataDinardap.data.domicilio;
-      estadoCivil = dataDinardap.data.estadoCivil;
-      madre = dataDinardap.data.nombreMadre;
-      padre = dataDinardap.data.nombrePadre;
-      String _conyugue = dataDinardap.data.conyuge;
+    if (dataDinardap.datosDinardap!=null) {
+      documento = dataDinardap.datosDinardap.cedula;
+      domicilio = dataDinardap.datosDinardap.domicilio;
+      estadoCivil = dataDinardap.datosDinardap.estadoCivil;
+      madre = dataDinardap.datosDinardap.nombreMadre;
+      padre = dataDinardap.datosDinardap.nombrePadre;
+      String _conyugue = dataDinardap.datosDinardap.conyuge;
       if (_conyugue.length > 5) {
         conyuge = _conyugue;
       }
     }
 
     if (dataDinardap.success) {
-      if (dataDinardap.data != null) {
-        if (dataDinardap.data.fotografia != null) {
-          foto = dataDinardap.data.fotografia;
+      if (dataDinardap.datosDinardap != null) {
+        if (dataDinardap.datosDinardap.fotografia != null) {
+          foto = dataDinardap.datosDinardap.fotografia;
         }
       }
     }
@@ -216,14 +190,14 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
     );
   }
 
-  LocalOrdenCapturaSuModel setDatosOrdenCaptura(OpePersonaModelData data) {
+  LocalOrdenCapturaSuModel setDatosOrdenCaptura(DataConsultaPersona data) {
     String ordenCaptura_descripcion = "NO EXISTE";
     String ordenCaptura_documento = "";
     String ordenCaptura_oficio = "";
     if (data.ordenCaptura.success) {
-      ordenCaptura_descripcion = data.ordenCaptura.data.juzgado;
-      ordenCaptura_documento = data.ordenCaptura.data.documento;
-      ordenCaptura_oficio = data.ordenCaptura.data.numoficio;
+      ordenCaptura_descripcion = data.ordenCaptura.datosCaptura.juzgado;
+      ordenCaptura_documento = data.ordenCaptura.datosCaptura.documento;
+      ordenCaptura_oficio = data.ordenCaptura.datosCaptura.numoficio;
     }
 
     return LocalOrdenCapturaSuModel(
@@ -232,31 +206,8 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
         oficio: ordenCaptura_oficio);
   }
 
-  DesaparecidoDinasedData? setDatosDesaparecidoDinased(OpePersonaModelData data) {
-    if (data.desaparecidoDinased.success) {
-      DesaparecidoDinasedData dataDesaparecidos =
-          data.desaparecidoDinased.data;
-      return dataDesaparecidos;
-    } else {
-      return null;
-    }
-  }
 
-  AlertaDnaData? setDatosAlertaDna(OpePersonaModelData data) {
-    if (data.alertaDna.success) {
-      return data.alertaDna.data;
-    } else {
-      return null;
-    }
-  }
 
-  AlertaInmediataPjData? setDatosAlertaPj(OpePersonaModelData data) {
-    if (data.alertaInmediataPj.success) {
-      return data.alertaInmediataPj.data;
-    } else {
-      return null;
-    }
-  }
 
 
 }

@@ -107,7 +107,7 @@ class OpServicioUrbanoPage extends GetView<OpServicioUrbanoController> {
         title: "Nro. Documento",
         msjError: "documento vacio",
         onTap: () {
-          //controller.consultarPersonaPorCedula(key: _keyCedula);
+          controller.consultarPersonaPorCedula(key: _keyCedula);
         },
       );
 
