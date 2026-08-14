@@ -12,6 +12,9 @@ class AppSiipneMovilImages {
 
   static const rutaImg = "assets/siipne_movil/img/";
   static const rutaIcon = "assets/siipne_movil/icon/";
+  static const _rutaAudio = "assets/siipne_movil/audio/";
+
+  static const audio_Alerta = _rutaAudio + "alerta.mp3";
 
   //-*********************** ICONOS *******************************
   static const ic_operativos_su = rutaIcon + "ic_operativos_su.png";

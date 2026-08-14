@@ -25,7 +25,7 @@ class SiipneMovilUseCase {
     return repository.crearOperativo(request: request);
   }
 
-  Future<OpePersonaModelData> consultarPersona({
+  Future<DataConsultaPersona> consultarPersona({
     required ConsultarPersonaRequest request,
   }) async {
     return await repository.consultarPersona(request: request);
