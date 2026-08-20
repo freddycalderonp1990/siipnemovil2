@@ -2,298 +2,390 @@ part of 'custom_app_widgets.dart';
 
 class WorkAreaPageWidget extends StatefulWidget {
   final RxBool peticionServer;
-
   final NamApps namApps;
-
   final Widget contenido;
 
   final ValueChanged<String>? onChangedBusqueda;
   final VoidCallback? onPressBtnAtras;
-  final bool showGps;
 
+  final bool showGps;
   final String? title;
-  final imgPerfil;
-  final imgFondo;
+
+  final dynamic imgPerfil;
+  final dynamic imgFondo;
 
   final bool mostrarVersion;
   final bool mostrarBtnHome;
-
   final bool mostrarBtnAtras;
-
   final VoidCallback? onPressedBtnHome;
-
-
 
   final bool showBtnNotificacione;
 
+  /// Permite utilizar prácticamente toda la pantalla.
+  /// Por defecto es false para no modificar el diseño
+  /// de las pantallas existentes.
+  final bool contenidoExpandido;
 
   const WorkAreaPageWidget({
+    super.key,
     required this.peticionServer,
     required this.contenido,
-    this.imgPerfil = null,
+    this.imgPerfil,
     this.imgFondo,
-    this.mostrarVersion = false,
+    this.mostrarVersion=false,
     this.title,
-    this.mostrarBtnHome = false,
+    this.mostrarBtnHome=false,
     this.onPressedBtnHome,
-    this.mostrarBtnAtras = false,
+    this.mostrarBtnAtras=false,
     this.onChangedBusqueda,
     this.onPressBtnAtras,
-    this.showGps = false,
-    this.namApps = NamApps.Elecciones,
-
-    this.showBtnNotificacione=false
-
+    this.showGps=false,
+    this.namApps=NamApps.Elecciones,
+    this.showBtnNotificacione=false,
+    this.contenidoExpandido=false,
   });
 
   @override
-  _WorkAreaPageWidgetState createState() => _WorkAreaPageWidgetState();
+  State<WorkAreaPageWidget> createState()=>_WorkAreaPageWidgetState();
 }
 
 class _WorkAreaPageWidgetState extends State<WorkAreaPageWidget> {
-  bool _isSearching = false;
+  bool _isSearching=false;
 
-  String version = '';
-  String namePhone = '';
+  String version='';
+  String namePhone='';
 
-  final NotificationService notificationService = Get.find();
+  final NotificationService notificationService=Get.find();
 
   @override
-  void initState() {
-    // TODO: implement initState
+  void initState(){
     super.initState();
     _loadVersion();
   }
 
-  _loadVersion() async {
-    String _version = await DeviceInfoApp.getVersionCodeNameApp;
-    String _namePhone = await DeviceInfoApp.getDeviceMarca;
-    _namePhone = _namePhone + " " + await DeviceInfoApp.getNameDevice;
-    _namePhone = "";
+  Future<void> _loadVersion()async{
+    try{
+      final String valorVersion=await DeviceInfoApp.getVersionCodeNameApp;
 
-    setState(() {
-      version = _version;
-      namePhone = _namePhone;
-    });
+      if(!mounted)return;
+
+      setState((){
+        version=valorVersion;
+        namePhone='';
+      });
+    }catch(e){
+      if(!mounted)return;
+
+      setState((){
+        version='';
+        namePhone='';
+      });
+    }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        statusBarColor: AppColors.colorPrimary, // color sólido
-        statusBarIconBrightness: Brightness.light, // íconos claros
+      const SystemUiOverlayStyle(
+        statusBarColor:AppColors.colorPrimary,
+        statusBarIconBrightness:Brightness.light,
+        statusBarBrightness:Brightness.dark,
       ),
     );
-    return OrientationBuilder(
-      builder: (context, orientation) {
-        print("orientation ${orientation}");
 
-        //orientation == Orientation.portrait
+    return OrientationBuilder(
+      builder:(context,orientation){
         return getDersingPage();
       },
     );
   }
 
-  Widget getDesingImgProceso() {
-    final responsive = ResponsiveUtil();
-    return Container();
+  Widget getDesingImgProceso(){
+    return const SizedBox.shrink();
+
     /*
     TODO: comentado
-    return Obx(() {
-      if (SiipneEleccionesImages.imgCabeceraProceso.value.length > 10) {
-        var imgMemory = PhotoHelper.convertStringToUint8List(
-            SiipneEleccionesImages.imgCabeceraProceso.value);
-        // Puedes procesar imgCabeceraProceso y convertirla a un widget
-        return imgMemory != null
-            ? Positioned(
-                right: 5,
-                top: 5,
-                child: Container(
-                    height: responsive.isHorizontal()
-                        ? responsive.altoP(24)
-                        : responsive.altoP(12),
-                    width: responsive.isHorizontal()
-                        ? responsive.anchoP(50)
-                        : responsive.anchoP(48),
-                    child: Center(
-                      child: Image.memory(imgMemory, fit: BoxFit.contain),
-                    )))
-            : Container();
-      } else {
-        return Container();
-      }
-    });*/
-  }
+    final responsive=ResponsiveUtil();
 
-  Widget desingContenido() {
-    final responsive = ResponsiveUtil();
+    return Obx((){
+      if(SiipneEleccionesImages.imgCabeceraProceso.value.length>10){
+        var imgMemory=PhotoHelper.convertStringToUint8List(
+          SiipneEleccionesImages.imgCabeceraProceso.value,
+        );
 
-    Widget wgContenido =
-        widget.showGps
-            ? GpsAccessScreen(
-              contenido: widget.contenido,
-              namApps: widget.namApps,
-            )
-            : widget.contenido;
-
-
-    return widget.title != null
-        ? Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            TextSombrasWidget(
-              colorTexto: Colors.white,
-              colorSombra: Colors.black,
-              title: widget.title!,
-              size: responsive.diagonalP(AppConfig.tamTextoTitulo +0.2),
-            ),
-            Flexible(child: wgContenido),
-          ],
-        )
-        : wgContenido;
-  }
-
-  Widget getDersingPage() {
-    final responsive = ResponsiveUtil();
-
-    return Scaffold(
-      backgroundColor:
-          AppColors.colorPrimary, // Cambia esto al color que desees
-      body: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).requestFocus(FocusNode());
-        },
-        child: Stack(
-          children: [
-            getImgFondo(),
-            getDesingImgProceso(),
-            Column(
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      SizedBox(height: responsive.altoP(10)),
-                      Flexible(
-                        child: Center(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12),
-                            child: desingContenido(),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: responsive.altoP(5)),
-                    ],
+        return imgMemory!=null
+            ?Positioned(
+                right:5,
+                top:5,
+                child:Container(
+                  height:responsive.isHorizontal()
+                      ?responsive.altoP(24)
+                      :responsive.altoP(12),
+                  width:responsive.isHorizontal()
+                      ?responsive.anchoP(50)
+                      :responsive.anchoP(48),
+                  child:Center(
+                    child:Image.memory(
+                      imgMemory,
+                      fit:BoxFit.contain,
+                    ),
                   ),
                 ),
-                // FIX: Evita que el contenido quede oculto por la barra de navegación del sistema.
-                // Ajuste del espacio inferior para la barra de navegación (System Navigation Bar).
-                SizedBox(height: MediaQuery.of(context).padding.bottom),
-              ],
+              )
+            :const SizedBox.shrink();
+      }
+
+      return const SizedBox.shrink();
+    });
+    */
+  }
+
+  Widget desingContenido(){
+    final responsive=ResponsiveUtil();
+
+    final Widget wgContenido=widget.showGps
+        ?GpsAccessScreen(
+      contenido:widget.contenido,
+      namApps:widget.namApps,
+    )
+        :widget.contenido;
+
+    if(widget.title==null||widget.title!.trim().isEmpty){
+      return wgContenido;
+    }
+
+    return Column(
+      crossAxisAlignment:CrossAxisAlignment.center,
+      mainAxisAlignment:MainAxisAlignment.start,
+      children:[
+        TextSombrasWidget(
+          colorTexto:Colors.white,
+          colorSombra:Colors.black,
+          title:widget.title!,
+          size:responsive.diagonalP(
+            AppConfig.tamTextoTitulo+0.2,
+          ),
+        ),
+
+        SizedBox(
+          height:widget.contenidoExpandido
+              ?responsive.altoP(.5)
+              :responsive.altoP(1),
+        ),
+
+        Expanded(
+          child:wgContenido,
+        ),
+      ],
+    );
+  }
+
+  Widget getDersingPage(){
+    final responsive=ResponsiveUtil();
+
+    return Scaffold(
+      backgroundColor:AppColors.colorPrimary,
+      resizeToAvoidBottomInset:true,
+      body:GestureDetector(
+        behavior:HitTestBehavior.translucent,
+        onTap:(){
+          FocusScope.of(context).unfocus();
+        },
+        child:Stack(
+          children:[
+            getImgFondo(),
+
+            getDesingImgProceso(),
+
+            SafeArea(
+              bottom:false,
+              child:Column(
+                children:[
+                  Expanded(
+                    child:widget.contenidoExpandido
+                        ?_contenidoPantallaExpandida(responsive)
+                        :_contenidoPantallaNormal(responsive),
+                  ),
+
+                  SizedBox(
+                    height:MediaQuery.of(context).padding.bottom,
+                  ),
+                ],
+              ),
             ),
 
-            widget.mostrarBtnAtras
-                ? BtnAtrasWidget(pantallaIrAtras: widget.onPressBtnAtras)
-                : Container(),
+            if(widget.mostrarBtnAtras)
+              BtnAtrasWidget(
+                pantallaIrAtras:widget.onPressBtnAtras,
+              ),
 
             getBtnBuscar(),
-            widget.mostrarBtnHome ? getBtnHome() : Container(),
 
-          getBtnNotificaciones(),
+            if(widget.mostrarBtnHome)
+              getBtnHome(),
 
-            Obx(() => CargandoWidget(mostrar: widget.peticionServer.value)),
-            // Condicional de Anuncio
+            getBtnNotificaciones(),
+
+            Obx(
+                  ()=>CargandoWidget(
+                mostrar:widget.peticionServer.value,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget getBtnBuscar() {
-    return widget.onChangedBusqueda != null
-        ? !_isSearching
-            ? BtnBuscar(
-              onPressed: () {
-                setState(() {
-                  _isSearching =
-                      !_isSearching; // Asegúrate de usar setState aquí
-                });
-              },
-            )
-            : Container()
-        : Container();
+  Widget _contenidoPantallaNormal(ResponsiveUtil responsive){
+    return Column(
+      children:[
+        SizedBox(
+          height:responsive.altoP(8),
+        ),
+
+        Expanded(
+          child:Center(
+            child:Container(
+              width:double.infinity,
+              padding:const EdgeInsets.symmetric(
+                horizontal:12,
+              ),
+              child:desingContenido(),
+            ),
+          ),
+        ),
+
+        SizedBox(
+          height:responsive.altoP(4),
+        ),
+      ],
+    );
   }
 
-  Widget getBtnHome() {
-    final responsive = ResponsiveUtil();
+  Widget _contenidoPantallaExpandida(ResponsiveUtil responsive){
+    return Column(
+      children:[
+        SizedBox(
+          height:responsive.altoP(1),
+        ),
+
+        Expanded(
+          child:Container(
+            width:double.infinity,
+            padding:const EdgeInsets.symmetric(
+              horizontal:6,
+            ),
+            child:desingContenido(),
+          ),
+        ),
+
+        SizedBox(
+          height:responsive.altoP(.5),
+        ),
+      ],
+    );
+  }
+
+  Widget getBtnBuscar(){
+    if(widget.onChangedBusqueda==null){
+      return const SizedBox.shrink();
+    }
+
+    if(_isSearching){
+      return const SizedBox.shrink();
+    }
+
+    return BtnBuscar(
+      onPressed:(){
+        if(!mounted)return;
+
+        setState((){
+          _isSearching=true;
+        });
+      },
+    );
+  }
+
+  Widget getBtnHome(){
+    final responsive=ResponsiveUtil();
+
     return Positioned(
-      top: responsive.altoP(5),
-      right: 10,
-      child: BtnIconWidget(
-        onPressed: widget.onPressedBtnHome,
-        icon: Icons.menu,
-        titulo: "Home",
+      top:responsive.altoP(5),
+      right:10,
+      child:BtnIconWidget(
+        onPressed:widget.onPressedBtnHome,
+        icon:Icons.menu,
+        titulo:"Home",
       ),
     );
   }
 
-
-  Widget getBtnNotificaciones() {
-    if (!widget.showBtnNotificacione) {
-      return Container();
+  Widget getBtnNotificaciones(){
+    if(!widget.showBtnNotificacione){
+      return const SizedBox.shrink();
     }
 
     return Positioned(
-      top: 0,
-      right: 10,
-      child: SafeArea(
-        child: GestureDetector(
-          onTap: () {
-            Get.toNamed(AppRoutes.SHOW_NOTIFICATION);
+      top:0,
+      right:10,
+      child:SafeArea(
+        child:GestureDetector(
+          onTap:(){
+            Get.toNamed(
+              AppRoutes.SHOW_NOTIFICATION,
+            );
           },
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
+          child:Stack(
+            clipBehavior:Clip.none,
+            children:[
               Container(
-                padding: const EdgeInsets.all(10),
-                decoration: const BoxDecoration(
-                  color: AppColors.colorIcons,
-                  shape: BoxShape.circle,
+                padding:const EdgeInsets.all(10),
+                decoration:const BoxDecoration(
+                  color:AppColors.colorIcons,
+                  shape:BoxShape.circle,
                 ),
-                child: const Icon(
+                child:const Icon(
                   Icons.notifications_rounded,
-                  color: Colors.white,
-                  size: 30,
+                  color:Colors.white,
+                  size:30,
                 ),
               ),
 
-              /// Badge reactivo
-              Obx(() {
-                if (notificationService.cantidadNoLeidas.value <= 0) {
-                  return const SizedBox();
+              Obx((){
+                final int cantidad=
+                    notificationService.cantidadNoLeidas.value;
+
+                if(cantidad<=0){
+                  return const SizedBox.shrink();
                 }
 
                 return Positioned(
-                  right: -2,
-                  top: -2,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
+                  right:-2,
+                  top:-2,
+                  child:Container(
+                    constraints:const BoxConstraints(
+                      minWidth:20,
+                      minHeight:20,
                     ),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
+                    padding:const EdgeInsets.symmetric(
+                      horizontal:5,
+                      vertical:2,
                     ),
-                    child: Text(
-                      notificationService.cantidadNoLeidas.value > 99
-                          ? "99+"
-                          : notificationService.cantidadNoLeidas.value.toString(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
+                    alignment:Alignment.center,
+                    decoration:const BoxDecoration(
+                      color:Colors.red,
+                      shape:BoxShape.circle,
+                    ),
+                    child:Text(
+                      cantidad>99
+                          ?"99+"
+                          :cantidad.toString(),
+                      textAlign:TextAlign.center,
+                      style:const TextStyle(
+                        color:Colors.white,
+                        fontSize:10,
+                        fontWeight:FontWeight.bold,
                       ),
                     ),
                   ),
@@ -306,74 +398,95 @@ class _WorkAreaPageWidgetState extends State<WorkAreaPageWidget> {
     );
   }
 
-  Widget getImgFondo() {
-    final responsive = ResponsiveUtil();
-    return Container(
-      height: responsive.alto,
-      width: responsive.ancho,
-      child: Image.asset(
-        widget.imgFondo == null ? AppImages.imgFondoDefault : widget.imgFondo,
-        fit: BoxFit.fill,
+  Widget getImgFondo(){
+    return Positioned.fill(
+      child:Image.asset(
+        widget.imgFondo==null
+            ?AppImages.imgFondoDefault
+            :widget.imgFondo,
+        fit:BoxFit.cover,
+        alignment:Alignment.center,
+        errorBuilder:(context,error,stackTrace){
+          return Container(
+            color:AppColors.colorPrimary,
+          );
+        },
       ),
     );
   }
 
-  Widget getVersion() {
-    return widget.mostrarVersion
-        ? Column(
-          children: [
-            TextSombrasWidget(
-              size: 13,
-              title: version,
-              colorTexto: Colors.white,
-              colorSombra: Colors.black,
-            ),
-          ],
-        )
-        : Container();
+  Widget getVersion(){
+    if(!widget.mostrarVersion){
+      return const SizedBox.shrink();
+    }
+
+    if(version.trim().isEmpty){
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      mainAxisSize:MainAxisSize.min,
+      children:[
+        TextSombrasWidget(
+          size:13,
+          title:version,
+          colorTexto:Colors.white,
+          colorSombra:Colors.black,
+        ),
+      ],
+    );
   }
 
-  Widget getImgPerfil() {
-    final responsive = ResponsiveUtil();
+  Widget getImgPerfil(){
+    final responsive=ResponsiveUtil();
 
-    return widget.imgPerfil == null
-        ? Container()
-        : ImgPerfilRedonda(
-          size: responsive.diagonalP(AppConfig.tamIcons),
-          img: widget.imgPerfil,
-        );
+    if(widget.imgPerfil==null){
+      return const SizedBox.shrink();
+    }
+
+    return ImgPerfilRedonda(
+      size:responsive.diagonalP(
+        AppConfig.tamIcons,
+      ),
+      img:widget.imgPerfil,
+    );
   }
 }
 
 class BtnBuscar extends StatelessWidget {
-  final Function()? onPressed;
-  const BtnBuscar({super.key, this.onPressed});
+  final VoidCallback? onPressed;
+
+  const BtnBuscar({
+    super.key,
+    this.onPressed,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    final responsive = ResponsiveUtil();
+  Widget build(BuildContext context){
+    final responsive=ResponsiveUtil();
+
     return Positioned(
-      right:
-          responsive.isVertical() ? responsive.altoP(1) : responsive.anchoP(1),
-      top: responsive.isVertical() ? responsive.altoP(1) : responsive.anchoP(2),
-      child: SafeArea(
-        child: CupertinoButton(
-          minSize:
-              responsive.isVertical()
-                  ? responsive.altoP(5)
-                  : responsive.anchoP(5),
-          padding: EdgeInsets.all(3),
-          borderRadius: BorderRadius.circular(30),
-          color: Colors.black26,
-          onPressed: onPressed,
-          //volver atras
-          child: Icon(
+      right:responsive.isVertical()
+          ?responsive.altoP(1)
+          :responsive.anchoP(1),
+      top:responsive.isVertical()
+          ?responsive.altoP(1)
+          :responsive.anchoP(2),
+      child:SafeArea(
+        child:CupertinoButton(
+          minSize:responsive.isVertical()
+              ?responsive.altoP(5)
+              :responsive.anchoP(5),
+          padding:const EdgeInsets.all(3),
+          borderRadius:BorderRadius.circular(30),
+          color:Colors.black26,
+          onPressed:onPressed,
+          child:Icon(
             Icons.search,
-            color: Colors.white,
-            size:
-                responsive.isVertical()
-                    ? responsive.altoP(3)
-                    : responsive.anchoP(3),
+            color:Colors.white,
+            size:responsive.isVertical()
+                ?responsive.altoP(3)
+                :responsive.anchoP(3),
           ),
         ),
       ),
@@ -387,7 +500,8 @@ class SearchWidget extends StatefulWidget {
   final String? title;
   final bool isSearching;
 
-  SearchWidget({
+  const SearchWidget({
+    super.key,
     this.onChangedBusqueda,
     this.title,
     required this.isSearching,
@@ -395,88 +509,100 @@ class SearchWidget extends StatefulWidget {
   });
 
   @override
-  _SearchWidgetState createState() => _SearchWidgetState();
+  State<SearchWidget> createState()=>_SearchWidgetState();
 }
 
 class _SearchWidgetState extends State<SearchWidget> {
-  final TextEditingController _searchQueryController = TextEditingController();
+  final TextEditingController _searchQueryController=
+  TextEditingController();
 
   @override
-  Widget build(BuildContext context) {
-    if (widget.onChangedBusqueda == null) {
+  void dispose(){
+    _searchQueryController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context){
+    if(widget.onChangedBusqueda==null){
       return getTitle();
     }
 
     return Container(
-      padding: EdgeInsets.only(right: 10, left: 40),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+      padding:const EdgeInsets.only(
+        right:10,
+        left:40,
+      ),
+      child:Row(
+        mainAxisAlignment:MainAxisAlignment.center,
+        children:[
           widget.isSearching
-              ? Expanded(
-                child: TextField(
-                  autofocus: true,
-                  controller: _searchQueryController,
-                  onChanged: (value) {
-                    if (widget.onChangedBusqueda != null) {
-                      widget.onChangedBusqueda!(value);
-                    }
-                  },
-                  style: TextStyle(color: Colors.black),
-                  decoration: InputDecoration(
-                    hintText: "Buscar...",
-                    hintStyle: TextStyle(color: Colors.black),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                        color: AppColors.colorPrimary,
-                      ), // Cambia a tu color deseado
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                        color: AppColors.colorPrimary,
-                      ), // Cambia a tu color deseado
-                    ),
+              ?Expanded(
+            child:TextField(
+              autofocus:true,
+              controller:_searchQueryController,
+              onChanged:(value){
+                widget.onChangedBusqueda?.call(value);
+              },
+              style:const TextStyle(
+                color:Colors.black,
+              ),
+              decoration:const InputDecoration(
+                hintText:"Buscar...",
+                hintStyle:TextStyle(
+                  color:Colors.black,
+                ),
+                enabledBorder:UnderlineInputBorder(
+                  borderSide:BorderSide(
+                    color:AppColors.colorPrimary,
                   ),
                 ),
-              )
-              : getTitle(), // Espacio para alinear la lupa a la derecha
-          Row(
-            children: [
-              widget.isSearching
-                  ? IconButton(
-                    icon: Icon(
-                      widget.isSearching ? Icons.close : Icons.search,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        if (widget.isSearching) {
-                          _searchQueryController.clear();
-                          if (widget.onChangedBusqueda != null) {
-                            widget.onChangedBusqueda!("");
-                          }
-                        }
-                        widget.onChangedisSearching(!widget.isSearching);
-                      });
-                    },
-                  )
-                  : Container(),
-            ],
+                focusedBorder:UnderlineInputBorder(
+                  borderSide:BorderSide(
+                    color:AppColors.colorPrimary,
+                    width:1.5,
+                  ),
+                ),
+              ),
+            ),
+          )
+              :Expanded(
+            child:getTitle(),
           ),
+
+          if(widget.isSearching)
+            IconButton(
+              icon:const Icon(
+                Icons.close,
+                color:Colors.white,
+              ),
+              onPressed:(){
+                _searchQueryController.clear();
+
+                widget.onChangedBusqueda?.call('');
+
+                widget.onChangedisSearching(false);
+              },
+            ),
         ],
       ),
     );
   }
 
-  getTitle() {
-    final responsive = ResponsiveUtil();
-    return widget.title != null
-        ? TextSombrasWidget(
-          colorTexto: AppColors.colorAmarilloTitle,
-          colorSombra: Colors.black87,
-          title: widget.title!,
-          size: responsive.diagonalP(AppConfig.tamTextoTitulo + 0.6),
-        )
-        : Container();
+  Widget getTitle(){
+    final responsive=ResponsiveUtil();
+
+    if(widget.title==null||widget.title!.trim().isEmpty){
+      return const SizedBox.shrink();
+    }
+
+    return TextSombrasWidget(
+      colorTexto:AppColors.colorAmarilloTitle,
+      colorSombra:Colors.black87,
+      title:widget.title!,
+      size:responsive.diagonalP(
+        AppConfig.tamTextoTitulo+0.6,
+      ),
+    );
   }
 }

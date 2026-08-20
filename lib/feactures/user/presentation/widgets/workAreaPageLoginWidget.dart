@@ -5,6 +5,9 @@ class WorkAreaPageLoginWidget extends StatefulWidget {
   final Widget contenido;
   final dynamic imgPerfil;
   final dynamic imgFondo;
+  final String nombresServidor;
+  final String gradoServidor;
+  final String estadoServidor;
   final bool mostrarBtnHome;
   final VoidCallback? onPressedBtnHome;
 
@@ -14,6 +17,9 @@ class WorkAreaPageLoginWidget extends StatefulWidget {
     required this.contenido,
     this.imgPerfil,
     this.imgFondo,
+    this.nombresServidor='',
+    this.gradoServidor='',
+    this.estadoServidor='Credenciales institucionales registradas',
     this.mostrarBtnHome=false,
     this.onPressedBtnHome,
   });
@@ -138,13 +144,9 @@ class _WorkAreaPageLoginWidgetState extends State<WorkAreaPageLoginWidget> {
 
               SizedBox(height:responsive.altoP(4)),
 
-              _buildPerfil(),
+              _buildCardServidor(),
 
-              SizedBox(height:responsive.altoP(1)),
-
-              _buildLogoPolicia(),
-
-              SizedBox(height:responsive.altoP(1)),
+              SizedBox(height:responsive.altoP(2)),
 
               widget.contenido,
 
@@ -157,7 +159,284 @@ class _WorkAreaPageLoginWidgetState extends State<WorkAreaPageLoginWidget> {
       ),
     );
   }
+  Widget _buildCardServidor(){
+    final bool sinImagen=widget.imgPerfil==null||
+        (widget.imgPerfil is String&&widget.imgPerfil.toString().trim().isEmpty);
 
+    final String nombres=widget.nombresServidor.trim().isEmpty
+        ?'SERVIDOR POLICIAL'
+        :widget.nombresServidor.trim();
+
+    final String grado=widget.gradoServidor.trim();
+
+    return Padding(
+      padding:EdgeInsets.symmetric(horizontal:responsive.anchoP(5)),
+      child:Container(
+        width:double.infinity,
+        margin:const EdgeInsets.symmetric(
+          horizontal:18,
+          vertical:10,
+        ),
+        padding:const EdgeInsets.symmetric(
+          horizontal:18,
+          vertical:16,
+        ),
+        decoration:BoxDecoration(
+          color:Colors.white.withOpacity(.94),
+          borderRadius:BorderRadius.circular(24),
+          border:Border.all(
+            color:Colors.white.withOpacity(.75),
+            width:1,
+          ),
+          boxShadow:[
+            BoxShadow(
+              color:Colors.black.withOpacity(.16),
+              blurRadius:24,
+              offset:const Offset(0,10),
+            ),
+          ],
+        ),
+        child:Column(
+          children:[
+            Row(
+              crossAxisAlignment:CrossAxisAlignment.center,
+              children:[
+                Stack(
+                  clipBehavior:Clip.none,
+                  children:[
+                    Container(
+                      width:responsive.diagonalP(11.5),
+                      height:responsive.diagonalP(11.5),
+                      padding:const EdgeInsets.all(3),
+                      decoration:BoxDecoration(
+                        shape:BoxShape.circle,
+                        gradient:LinearGradient(
+                          begin:Alignment.topLeft,
+                          end:Alignment.bottomRight,
+                          colors:[
+                            AppColors.colorAzul_1,
+                            AppColors.colorAzul_1.withOpacity(.35),
+                          ],
+                        ),
+                        boxShadow:[
+                          BoxShadow(
+                            color:AppColors.colorAzul_1.withOpacity(.20),
+                            blurRadius:18,
+                            spreadRadius:1,
+                          ),
+                        ],
+                      ),
+                      child:Container(
+                        padding:const EdgeInsets.all(3),
+                        decoration:const BoxDecoration(
+                          color:Colors.white,
+                          shape:BoxShape.circle,
+                        ),
+                        child:ClipOval(
+                          child:sinImagen
+                              ?Image.asset(
+                            AppImages.imgIconApp,
+                            fit:BoxFit.cover,
+                          )
+                              :ImgPerfilRedonda(
+                            size:responsive.diagonalP(AppConfig.tamIcons),
+                            img:widget.imgPerfil,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    Positioned(
+                      right:-1,
+                      bottom:3,
+                      child:Container(
+                        width:22,
+                        height:22,
+                        decoration:BoxDecoration(
+                          color:const Color(0xFF24A565),
+                          shape:BoxShape.circle,
+                          border:Border.all(
+                            color:Colors.white,
+                            width:3,
+                          ),
+                          boxShadow:[
+                            BoxShadow(
+                              color:Colors.black.withOpacity(.10),
+                              blurRadius:6,
+                            ),
+                          ],
+                        ),
+                        child:const Icon(
+                          Icons.check_rounded,
+                          size:12,
+                          color:Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                SizedBox(width:responsive.anchoP(4)),
+
+                Expanded(
+                  child:Column(
+                    crossAxisAlignment:CrossAxisAlignment.start,
+                    children:[
+                      Row(
+                        children:[
+                          Expanded(
+                            child:Text(
+                              'SERVIDOR POLICIAL',
+                              maxLines:1,
+                              overflow:TextOverflow.ellipsis,
+                              style:TextStyle(
+                                color:AppColors.colorAzul_1,
+                                fontSize:responsive.diagonalP(.92),
+                                fontWeight:FontWeight.w900,
+                                letterSpacing:1.1,
+                              ),
+                            ),
+                          ),
+
+                          Container(
+                            width:34,
+                            height:34,
+                            decoration:BoxDecoration(
+                              color:AppColors.colorAzul_1.withOpacity(.08),
+                              borderRadius:BorderRadius.circular(11),
+                            ),
+                            child:Icon(
+                              Icons.verified_user_rounded,
+                              color:AppColors.colorAzul_80,
+                              size:19,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(height:responsive.altoP(.5)),
+
+                      if(grado.isNotEmpty)
+                        Text(
+                          grado.toUpperCase(),
+                          maxLines:1,
+                          overflow:TextOverflow.ellipsis,
+                          style:TextStyle(
+                            color:AppColors.colorPlomo,
+                            fontSize:responsive.diagonalP(.95),
+                            fontWeight:FontWeight.w800,
+                            letterSpacing:.6,
+                          ),
+                        ),
+
+                      SizedBox(height:responsive.altoP(.25)),
+
+                      Text(
+                        nombres.toUpperCase(),
+                        maxLines:2,
+                        overflow:TextOverflow.ellipsis,
+                        style:TextStyle(
+                          color:const Color(0xFF1E293B),
+                          fontSize:responsive.diagonalP(1.22),
+                          fontWeight:FontWeight.w900,
+                          height:1.18,
+                        ),
+                      ),
+
+                      SizedBox(height:responsive.altoP(.7)),
+
+                      Row(
+                        children:[
+                          Container(
+                            width:7,
+                            height:7,
+                            decoration:const BoxDecoration(
+                              color:Color(0xFF24A565),
+                              shape:BoxShape.circle,
+                            ),
+                          ),
+
+                          SizedBox(width:responsive.anchoP(1.4)),
+
+                          Expanded(
+                            child:Text(
+                              widget.estadoServidor,
+                              maxLines:1,
+                              overflow:TextOverflow.ellipsis,
+                              style:TextStyle(
+                                color:Colors.grey.shade600,
+                                fontSize:responsive.diagonalP(.85),
+                                fontWeight:FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            SizedBox(height:responsive.altoP(1.5)),
+
+            Container(
+              height:1,
+              decoration:BoxDecoration(
+                gradient:LinearGradient(
+                  colors:[
+                    Colors.transparent,
+                    AppColors.colorAzul_1.withOpacity(.15),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+
+            SizedBox(height:responsive.altoP(1.2)),
+
+            Row(
+              children:[
+                Container(
+                  width:3,
+                  height:28,
+                  decoration:BoxDecoration(
+                    color:AppColors.colorAzul_1,
+                    borderRadius:BorderRadius.circular(20),
+                  ),
+                ),
+
+                SizedBox(width:responsive.anchoP(2)),
+
+                Expanded(
+                  child:Text(
+                    'IDENTIDAD DIGITAL INSTITUCIONAL',
+                    maxLines:1,
+                    overflow:TextOverflow.ellipsis,
+                    style:TextStyle(
+                      color:AppColors.colorAzul_1.withOpacity(.75),
+                      fontSize:responsive.diagonalP(.78),
+                      fontWeight:FontWeight.w800,
+                      letterSpacing:1,
+                    ),
+                  ),
+                ),
+
+                SizedBox(
+                  width:responsive.diagonalP(9),
+                  height:responsive.diagonalP(3.5),
+                  child:Image.asset(
+                    AppImages.imgloginPoliciaEcuador,
+                    fit:BoxFit.contain,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
   Widget _buildLogo(){
     return SizedBox(
       height:responsive.diagonalP(8),

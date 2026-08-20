@@ -16,6 +16,8 @@ class AppImages{
 
 
 
+
+
   static const cabecera = _rutaImg + "cabecera.png";
   static const splash = _rutaImg + "splash.png";
   static const ic_beneficios1 = _rutaImg + "ic_beneficios.png";

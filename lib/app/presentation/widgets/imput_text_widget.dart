@@ -18,6 +18,7 @@ class ImputTextWidget extends StatefulWidget {
   final String imgString;
   final int? minLines;
   final int? maxLines;
+  final FocusNode? focusNode;
 
   const ImputTextWidget({
     Key? key,
@@ -34,7 +35,7 @@ class ImputTextWidget extends StatefulWidget {
     this.onChanged,
     this.keyboardType = TextInputType.text,
     this.imgString = "",
-    this.colorLabel = Colors.black, this.minLines, this.maxLines,
+    this.colorLabel = Colors.black, this.minLines, this.maxLines,this.focusNode,
   }) : super(key: key);
 
   @override
@@ -202,6 +203,7 @@ class _ImputTextWidgetState extends State<ImputTextWidget> {
       obscureText: widget.isSegura,
       validator: widget.validar,
       onChanged: widget.onChanged,
+      focusNode: widget.focusNode,
       cursorColor: AppColors.colorAzul,
       decoration: getDecorationTxt(),
 
@@ -224,6 +226,7 @@ class _ImputTextWidgetState extends State<ImputTextWidget> {
       decoration: getDecorationTxt(),
       minLines: widget.minLines,
       maxLines: widget.maxLines,
+      focusNode: widget.focusNode,
     );
   }
 
@@ -236,6 +239,7 @@ class _ImputTextWidgetState extends State<ImputTextWidget> {
       obscureText: isSegura,
       onChanged: widget.onChanged,
       validator: widget.validar,
+      focusNode: widget.focusNode,
       cursorColor: AppColors.colorAzul,
       decoration: getDecorationTxtPass(),
     );

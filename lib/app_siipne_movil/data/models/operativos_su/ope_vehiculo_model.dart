@@ -1,319 +1,185 @@
 part of '../models_siipne_movil.dart';
 
-class VehiculoModel {
-  VehiculoModel({
-    required this.success,
+OpeVehiculoModel opeVehiculoModelFromJson(String str) {
+  try {
+    final dynamic data = json.decode(str);
+    return OpeVehiculoModel.fromJson(
+      data is Map<String, dynamic> ? data : <String, dynamic>{},
+    );
+  } catch (_) {
+    return OpeVehiculoModel.empty();
+  }
+}
+
+String opeVehiculoModelToJson(OpeVehiculoModel data) =>
+    json.encode(data.toJson());
+
+Map<String, dynamic> _mapVehiculo(dynamic value) {
+  if (value is Map<String, dynamic>) return value;
+  if (value is Map) return Map<String, dynamic>.from(value);
+  return <String, dynamic>{};
+}
+
+bool _boolVehiculo(dynamic value, {bool defaultValue = false}) {
+  if (value == null) return defaultValue;
+  if (value is bool) return value;
+  if (value is num) return value == 1;
+
+  final String valor = ParseModel.parseToString(value).trim().toLowerCase();
+
+  if (valor == 'true' ||
+      valor == '1' ||
+      valor == 'si' ||
+      valor == 'sí' ||
+      valor == 's') {
+    return true;
+  }
+
+  if (valor == 'false' || valor == '0' || valor == 'no' || valor == 'n') {
+    return false;
+  }
+
+  return defaultValue;
+}
+
+class OpeVehiculoModel {
+  int statusCode;
+  String message;
+  DataVehiculo dataVehiculo;
+
+  OpeVehiculoModel({
     required this.statusCode,
     required this.message,
     required this.dataVehiculo,
   });
 
-  bool success;
-  int statusCode;
-  String message;
-  DataVehiculo dataVehiculo;
+  factory OpeVehiculoModel.fromJson(Map<String, dynamic> json) {
+    return OpeVehiculoModel(
+      statusCode: ParseModel.parseToInt(json["status_code"]),
+      message: ParseModel.parseToString(json["message"]),
+      dataVehiculo: DataVehiculo.fromJson(
+        _mapVehiculo(json["data"] ?? json["dataVehiculo"]),
+      ),
+    );
+  }
 
-  factory VehiculoModel.fromJson(String str) =>
-      VehiculoModel.fromMap(json.decode(str));
+  factory OpeVehiculoModel.empty() {
+    return OpeVehiculoModel(
+      statusCode: 0,
+      message: '',
+      dataVehiculo: DataVehiculo.empty(),
+    );
+  }
 
-  String toJson() => json.encode(toMap());
-
-  factory VehiculoModel.fromMap(Map<String, dynamic> json) =>
-      VehiculoModel(
-        success: ParseModel.parseToBool(json["success"]),
-        statusCode: ParseModel.parseToInt(json["status_code"]),
-        message: ParseModel.parseToString(json["message"]),
-        dataVehiculo: DataVehiculo.fromMap(json["data"]),
-      );
-
-  Map<String, dynamic> toMap() =>
-      {
-        "success": success == null ? null : success,
-        "status_code": statusCode == null ? null : statusCode,
-        "message": message == null ? null : message,
-        "data": dataVehiculo == null ? null : dataVehiculo.toMap(),
-      };
+  Map<String, dynamic> toJson() => {
+    "status_code": statusCode,
+    "message": message,
+    "data": dataVehiculo.toJson(),
+  };
 }
 
 class DataVehiculo {
-  DataVehiculo({
-    required this.idDaiConsulta,
-    required this.datosVehiculoSiipne,
-    required this.datosVehiculoAnt,
-    required this.restriccionPj,
-  });
-
-  int idDaiConsulta;
   DatosVehiculoSiipne datosVehiculoSiipne;
-  DatosVehiculoAnt datosVehiculoAnt;
+  Datospropietario datospropietario;
   RestriccionPj restriccionPj;
+  int idHdrEventoResum;
 
-  factory DataVehiculo.fromJson(String str) =>
-      DataVehiculo.fromMap(json.decode(str));
-
-  String toJson() => json.encode(toMap());
-
-  factory DataVehiculo.fromMap(Map<String, dynamic> json) =>
-      DataVehiculo(
-        idDaiConsulta: ParseModel.parseToInt(json["idDaiConsulta"]),
-        datosVehiculoSiipne: json["datosVehiculoSiipne"] == null
-            ? DatosVehiculoSiipne.empty()
-            : DatosVehiculoSiipne.fromMap(json["datosVehiculoSiipne"]),
-        datosVehiculoAnt: json["datosVehiculoANT"] == null
-            ? DatosVehiculoAnt.empty()
-            : DatosVehiculoAnt.fromMap(json["datosVehiculoANT"]),
-        restriccionPj: json["restriccionPJ"] == null
-            ? RestriccionPj.empty()
-            : RestriccionPj.fromMap(json["restriccionPJ"]),
-      );
-
-  Map<String, dynamic> toMap() =>
-      {
-        "idDaiConsulta":  idDaiConsulta,
-        "datosVehiculoSiipne":
-        datosVehiculoSiipne ,
-        "restriccionPJ": restriccionPj ,
-      };
-}
-
-class DatosVehiculoAnt {
-  DatosVehiculoAnt({required this.success,
-    required this.dataVehiculoAnt,
-    required this.mensaje});
-
-  bool success;
-  String mensaje;
-  DataVehiculoAnt dataVehiculoAnt;
-
-  factory DatosVehiculoAnt.empty() =>
-      DatosVehiculoAnt(
-          success: false,
-          dataVehiculoAnt: DataVehiculoAnt.empty(),
-          mensaje: "");
-
-  factory DatosVehiculoAnt.fromJson(String str) =>
-      DatosVehiculoAnt.fromMap(json.decode(str));
-
-  factory DatosVehiculoAnt.fromMap(Map<String, dynamic> json) =>
-      DatosVehiculoAnt(
-        success: ParseModel.parseToBool(json["success"]),
-        mensaje: ParseModel.parseToString(json["mensaje"]),
-        dataVehiculoAnt: json["data"] == null
-            ? DataVehiculoAnt.empty()
-            : ParseModel.parseToBool(json["success"]) == false
-            ? DataVehiculoAnt.empty()
-            : DataVehiculoAnt.fromMap(json["data"]),
-      );
-}
-
-class DataVehiculoAnt {
-  DataVehiculoAnt({
-    required this.activoVig,
-    required this.anio,
-    required this.anioMatriculado,
-    required this.cambioPropietario,
-    required this.canvcp,
-    required this.capacidad,
-    required this.carroceria,
-    required this.casaComercial,
-    required this.cedulaPropAnterior,
-    required this.celular,
-    required this.chasis,
-    required this.cilindraje,
-    required this.claseServicio,
-    required this.claseVehiculo,
-    required this.color,
-    required this.color2,
-    required this.combustible,
-    required this.correo,
-    required this.direccion,
-    required this.docPropietario,
-    required this.fechaCaducidad,
-    required this.fechaCompraVenta,
-    required this.fechaMatricula,
-    required this.marcaDesc,
-    required this.modeloDesc,
-    required this.motor,
-    required this.nombrePropAnterior,
-    required this.placaActual,
-    required this.placaAnterior,
-    required this.propietario,
-    required this.remarcadoChasis,
-    required this.remarcadoMotor,
-    required this.reservaDominio,
-    required this.robado,
-    required this.telefono,
-    required this.tipoServicio,
-    required this.tonelaje,
+  DataVehiculo({
+    required this.datosVehiculoSiipne,
+    required this.datospropietario,
+    required this.restriccionPj,
+    required this.idHdrEventoResum,
   });
 
-  final bool activoVig;
-  final int anio;
-  final int anioMatriculado;
-  final bool cambioPropietario;
-  final String canvcp;
-  final int capacidad;
-  final String carroceria;
-  final String casaComercial;
-  final String cedulaPropAnterior;
-  final String celular;
-  final String chasis;
-  final String cilindraje;
-  final String claseServicio;
-  final String claseVehiculo;
-  final String color;
-  final String color2;
-  final String combustible;
-  final String correo;
-  final String direccion;
-  final String docPropietario;
-  final String fechaCaducidad;
-  final String fechaCompraVenta;
-  final String fechaMatricula;
-  final String marcaDesc;
-  final String modeloDesc;
-  final String motor;
-  final String nombrePropAnterior;
-  final String placaActual;
-  final String placaAnterior;
-  final String propietario;
-  final bool remarcadoChasis;
-  final bool remarcadoMotor;
-  final bool reservaDominio;
-  final bool robado;
-  final String telefono;
-  final String tipoServicio;
-  final double tonelaje;
+  factory DataVehiculo.fromJson(Map<String, dynamic> json) {
+    return DataVehiculo(
+      datosVehiculoSiipne: DatosVehiculoSiipne.fromJson(
+        _mapVehiculo(json["datosVehiculoSiipne"]),
+      ),
+      datospropietario: Datospropietario.fromJson(
+        _mapVehiculo(json["datospropietario"] ?? json["datosPropietario"]),
+      ),
+      restriccionPj: RestriccionPj.fromJson(
+        _mapVehiculo(json["restriccionPJ"]),
+      ),
+      idHdrEventoResum: ParseModel.parseToInt(json["idHdrEventoResum"]),
+    );
+  }
 
-  factory DataVehiculoAnt.empty() =>
-      DataVehiculoAnt(
-          activoVig: false,
-          anio: 0,
-          anioMatriculado: 0,
-          cambioPropietario: false,
-          canvcp: "",
-          capacidad: 0,
-          carroceria: "",
-          casaComercial: "",
-          cedulaPropAnterior: "",
-          celular: "",
-          chasis: "",
-          cilindraje: "",
-          claseServicio: "",
-          claseVehiculo: "",
-          color: "",
-          color2: "",
-          combustible: "",
-          correo: "",
-          direccion: "",
-          docPropietario: "",
-          fechaCaducidad: "",
-          fechaCompraVenta: "",
-          fechaMatricula: "",
-          marcaDesc: "",
-          modeloDesc: "",
-          motor: "",
-          nombrePropAnterior: "",
-          placaActual: "",
-          placaAnterior: "",
-          propietario: "",
-          remarcadoChasis: false,
-          remarcadoMotor: false,
-          reservaDominio: false,
-          robado: false,
-          telefono: "",
-          tipoServicio: "",
-          tonelaje: 0);
+  factory DataVehiculo.empty() {
+    return DataVehiculo(
+      datosVehiculoSiipne: DatosVehiculoSiipne.empty(),
+      datospropietario: Datospropietario.empty(),
+      restriccionPj: RestriccionPj.empty(),
+      idHdrEventoResum: 0,
+    );
+  }
 
-  factory DataVehiculoAnt.fromJson(String str) =>
-      DataVehiculoAnt.fromMap(json.decode(str));
-
-  factory DataVehiculoAnt.fromMap(Map<String, dynamic> json) =>
-      DataVehiculoAnt(
-        activoVig:
-        ParseModel.parseToBool(json["activoVig"], valueCompareTrue: 'S'),
-        anio: ParseModel.parseToInt(json["anio"]),
-        anioMatriculado: ParseModel.parseToInt(json["anioMatriculado"]),
-        cambioPropietario: ParseModel.parseToBool(["cambioPropietario"],
-            valueCompareTrue: 'S'),
-        canvcp: ParseModel.parseToString(json["canvcp"]),
-        capacidad: ParseModel.parseToInt(json["capacidad"]),
-        carroceria: ParseModel.parseToString(json["carroceria"]),
-        casaComercial: ParseModel.parseToString(json["casaComercial"]),
-        cedulaPropAnterior:
-        ParseModel.parseToString(json["cedulaPropAnterior"]),
-        celular: ParseModel.parseToString(json["celular"]),
-        chasis: ParseModel.parseToString(json["chasis"]),
-        cilindraje: ParseModel.parseToString(json["cilindraje"]),
-        claseServicio: ParseModel.parseToString(json["claseServicio"]),
-        claseVehiculo: ParseModel.parseToString(json["claseVehiculo"]),
-        color: ParseModel.parseToString(json["color"]),
-        color2: ParseModel.parseToString(json["color2"]),
-        combustible: ParseModel.parseToString(json["combustible"]),
-        correo: ParseModel.parseToString(json["correo"]),
-        direccion: ParseModel.parseToString(json["direccion"]),
-        docPropietario: ParseModel.parseToString(json["docPropietario"]),
-        fechaCaducidad: ParseModel.parseToString(json["fechaCaducidad"]).replaceAll("00:00:00", ""),
-        fechaCompraVenta: ParseModel.parseToString(json["fechaCompraVenta"]).replaceAll("00:00:00", ""),
-        fechaMatricula: ParseModel.parseToString(json["fechaMatricula"]).replaceAll("00:00:00", ""),
-        marcaDesc: ParseModel.parseToString(json["marcaDesc"]),
-        modeloDesc: ParseModel.parseToString(json["modeloDesc"]),
-        motor: ParseModel.parseToString(json["motor"]),
-        nombrePropAnterior:
-        ParseModel.parseToString(json["nombrePropAnterior"]),
-        placaActual: ParseModel.parseToString(json["placaActual"]),
-        placaAnterior: ParseModel.parseToString(json["placaAnterior"]),
-        propietario: ParseModel.parseToString(json["propietario"]),
-        remarcadoChasis: ParseModel.parseToBool(json["remarcadoChasis"],
-            valueCompareTrue: 'S'),
-        remarcadoMotor: ParseModel.parseToBool(json["remarcadoMotor"],
-            valueCompareTrue: 'S'),
-        reservaDominio: ParseModel.parseToBool(json["reservaDominio"],
-            valueCompareTrue: 'S'),
-        robado: ParseModel.parseToBool(json["robado"], valueCompareTrue: 'S'),
-        telefono: ParseModel.parseToString(json["telefono"]),
-        tipoServicio: ParseModel.parseToString(json["tipoServicio"]),
-        tonelaje: ParseModel.parseToDouble(json["tonelaje"]),
-      );
+  Map<String, dynamic> toJson() => {
+    "datosVehiculoSiipne": datosVehiculoSiipne.toJson(),
+    "datospropietario": datospropietario.toJson(),
+    "restriccionPJ": restriccionPj.toJson(),
+    "idHdrEventoResum": idHdrEventoResum,
+  };
 }
 
 class DatosVehiculoSiipne {
+  bool success;
+  String message;
+  DatosVehiculoSiipneData data;
+
   DatosVehiculoSiipne({
     required this.success,
-    required this.dataVehiculoSiipne,
+    required this.message,
+    required this.data,
   });
 
-  bool success;
-  DataVehiculoSiipne dataVehiculoSiipne;
+  factory DatosVehiculoSiipne.fromJson(Map<String, dynamic> json) {
+    return DatosVehiculoSiipne(
+      success: _boolVehiculo(json["success"]),
+      message: ParseModel.parseToString(json["message"]),
+      data: DatosVehiculoSiipneData.fromJson(_mapVehiculo(json["data"])),
+    );
+  }
 
-  factory DatosVehiculoSiipne.empty()=>
-      DatosVehiculoSiipne(
-          success: false, dataVehiculoSiipne: DataVehiculoSiipne.empty());
+  factory DatosVehiculoSiipne.empty() {
+    return DatosVehiculoSiipne(
+      success: false,
+      message: '',
+      data: DatosVehiculoSiipneData.empty(),
+    );
+  }
 
-  factory DatosVehiculoSiipne.fromJson(String str) =>
-      DatosVehiculoSiipne.fromMap(json.decode(str));
-
-  String toJson() => json.encode(toMap());
-
-  factory DatosVehiculoSiipne.fromMap(Map<String, dynamic> json) =>
-      DatosVehiculoSiipne(
-        success: ParseModel.parseToBool(json["success"]),
-        dataVehiculoSiipne: json["data"] == null
-            ? DataVehiculoSiipne.empty()
-            : ParseModel.parseToBool(json["success"]) == false
-            ? DataVehiculoSiipne.empty()
-            : DataVehiculoSiipne.fromMap(json["data"]),
-      );
-
-  Map<String, dynamic> toMap() =>
-      {
-        "success": success,
-        "data": dataVehiculoSiipne.toMap(),
-      };
+  Map<String, dynamic> toJson() => {
+    "success": success,
+    "message": message,
+    "data": data.toJson(),
+  };
 }
 
-class DataVehiculoSiipne {
-  DataVehiculoSiipne({
+class DatosVehiculoSiipneData {
+  int idGenVehiculo;
+  int idGenMarca;
+  String marca;
+  int idGenModelo;
+  String modelo;
+  int idGenColor;
+  String color;
+  int idGenCombus;
+  String combustible;
+  String motor;
+  String chasis;
+  String placa;
+  String cilindraje;
+  int anoFabricacion;
+  int idGenClase;
+  String clase;
+  int idGenTipVehi;
+  String tipoVehiculo;
+  int idGenServicio;
+  String descServicio;
+
+  DatosVehiculoSiipneData({
     required this.idGenVehiculo,
     required this.idGenMarca,
     required this.marca,
@@ -336,125 +202,226 @@ class DataVehiculoSiipne {
     required this.descServicio,
   });
 
-  int idGenVehiculo;
-  int idGenMarca;
-  String marca;
-  int idGenModelo;
-  String modelo;
-  int idGenColor;
-  String color;
-  int idGenCombus;
-  String combustible;
-  String motor;
-  String chasis;
-  String placa;
-  String cilindraje;
-  String anoFabricacion;
-  int idGenClase;
-  String clase;
-  int idGenTipVehi;
-  String tipoVehiculo;
-  int idGenServicio;
-  String descServicio;
+  factory DatosVehiculoSiipneData.fromJson(Map<String, dynamic> json) {
+    return DatosVehiculoSiipneData(
+      idGenVehiculo: ParseModel.parseToInt(json["idGenVehiculo"]),
+      idGenMarca: ParseModel.parseToInt(json["idGenMarca"]),
+      marca: ParseModel.parseToString(json["marca"]),
+      idGenModelo: ParseModel.parseToInt(json["idGenModelo"]),
+      modelo: ParseModel.parseToString(json["modelo"]),
+      idGenColor: ParseModel.parseToInt(json["idGenColor"]),
+      color: ParseModel.parseToString(json["color"]),
+      idGenCombus: ParseModel.parseToInt(json["idGenCombus"]),
+      combustible: ParseModel.parseToString(json["combustible"]),
+      motor: ParseModel.parseToString(json["motor"]),
+      chasis: ParseModel.parseToString(json["chasis"]),
+      placa: ParseModel.parseToString(json["placa"]),
+      cilindraje: ParseModel.parseToString(json["cilindraje"]),
+      anoFabricacion: ParseModel.parseToInt(json["anoFabricacion"]),
+      idGenClase: ParseModel.parseToInt(json["idGenClase"]),
+      clase: ParseModel.parseToString(json["clase"]),
+      idGenTipVehi: ParseModel.parseToInt(json["idGenTipVehi"]),
+      tipoVehiculo: ParseModel.parseToString(json["tipoVehiculo"]),
+      idGenServicio: ParseModel.parseToInt(json["idGenServicio"]),
+      descServicio: ParseModel.parseToString(json["descServicio"]),
+    );
+  }
 
+  factory DatosVehiculoSiipneData.empty() {
+    return DatosVehiculoSiipneData(
+      idGenVehiculo: 0,
+      idGenMarca: 0,
+      marca: '',
+      idGenModelo: 0,
+      modelo: '',
+      idGenColor: 0,
+      color: '',
+      idGenCombus: 0,
+      combustible: '',
+      motor: '',
+      chasis: '',
+      placa: '',
+      cilindraje: '',
+      anoFabricacion: 0,
+      idGenClase: 0,
+      clase: '',
+      idGenTipVehi: 0,
+      tipoVehiculo: '',
+      idGenServicio: 0,
+      descServicio: '',
+    );
+  }
 
-  factory DataVehiculoSiipne.empty()=>
-      DataVehiculoSiipne(idGenVehiculo: 0,
-          idGenMarca: 0,
-          marca: "",
-          idGenModelo: 0,
-          modelo: "",
-          idGenColor: 0,
-          color: "",
-          idGenCombus: 0,
-          combustible: "",
-          motor: "",
-          chasis: "",
-          placa: "",
-          cilindraje: "",
-          anoFabricacion: "",
-          idGenClase: 0,
-          clase: "",
-          idGenTipVehi: 0,
-          tipoVehiculo: "",
-          idGenServicio: 0,
-          descServicio: "");
+  Map<String, dynamic> toJson() => {
+    "idGenVehiculo": idGenVehiculo,
+    "idGenMarca": idGenMarca,
+    "marca": marca,
+    "idGenModelo": idGenModelo,
+    "modelo": modelo,
+    "idGenColor": idGenColor,
+    "color": color,
+    "idGenCombus": idGenCombus,
+    "combustible": combustible,
+    "motor": motor,
+    "chasis": chasis,
+    "placa": placa,
+    "cilindraje": cilindraje,
+    "anoFabricacion": anoFabricacion,
+    "idGenClase": idGenClase,
+    "clase": clase,
+    "idGenTipVehi": idGenTipVehi,
+    "tipoVehiculo": tipoVehiculo,
+    "idGenServicio": idGenServicio,
+    "descServicio": descServicio,
+  };
+}
 
-  factory DataVehiculoSiipne.fromJson(String str) =>
-      DataVehiculoSiipne.fromMap(json.decode(str));
+class Datospropietario {
+  bool success;
+  String message;
+  DatospropietarioData data;
 
-  String toJson() => json.encode(toMap());
+  Datospropietario({
+    required this.success,
+    required this.message,
+    required this.data,
+  });
 
-  factory DataVehiculoSiipne.fromMap(Map<String, dynamic> json) =>
-      DataVehiculoSiipne(
-        idGenVehiculo: ParseModel.parseToInt(json["idGenVehiculo"]),
-        idGenMarca: ParseModel.parseToInt(json["idGenMarca"]),
-        marca: ParseModel.parseToString(json["marca"]),
-        idGenModelo: ParseModel.parseToInt(json["idGenModelo"]),
-        modelo: ParseModel.parseToString(json["modelo"]),
-        idGenColor: ParseModel.parseToInt(json["idGenColor"]),
-        color: ParseModel.parseToString(json["color"]),
-        idGenCombus: ParseModel.parseToInt(json["idGenCombus"]),
-        combustible: ParseModel.parseToString(json["combustible"]),
-        motor: ParseModel.parseToString(json["motor"]),
-        chasis: ParseModel.parseToString(json["chasis"]),
-        placa: ParseModel.parseToString(json["placa"]),
-        cilindraje: ParseModel.parseToString(json["cilindraje"]),
-        anoFabricacion: ParseModel.parseToString(json["anoFabricacion"]),
-        idGenClase: ParseModel.parseToInt(json["idGenClase"]),
-        clase: ParseModel.parseToString(json["clase"]),
-        idGenTipVehi: ParseModel.parseToInt(json["idGenTipVehi"]),
-        tipoVehiculo: ParseModel.parseToString(json["tipoVehiculo"]),
-        idGenServicio: ParseModel.parseToInt(json["idGenServicio"]),
-        descServicio: ParseModel.parseToString(json["descServicio"]),
-      );
+  factory Datospropietario.fromJson(Map<String, dynamic> json) {
+    return Datospropietario(
+      success: _boolVehiculo(json["success"]),
+      message: ParseModel.parseToString(json["message"]),
+      data: DatospropietarioData.fromJson(_mapVehiculo(json["data"])),
+    );
+  }
 
-  Map<String, dynamic> toMap() =>
-      {
-        "idGenVehiculo": idGenVehiculo == null ? null : idGenVehiculo,
-        "idGenMarca": idGenMarca == null ? null : idGenMarca,
-        "marca": marca == null ? null : marca,
-        "idGenModelo": idGenModelo == null ? null : idGenModelo,
-        "modelo": modelo == null ? null : modelo,
-        "idGenColor": idGenColor == null ? null : idGenColor,
-        "color": color == null ? null : color,
-        "idGenCombus": idGenCombus == null ? null : idGenCombus,
-        "combustible": combustible == null ? null : combustible,
-        "motor": motor == null ? null : motor,
-        "chasis": chasis == null ? null : chasis,
-        "placa": placa == null ? null : placa,
-        "cilindraje": cilindraje == null ? null : cilindraje,
-        "anoFabricacion": anoFabricacion == null ? null : anoFabricacion,
-        "idGenClase": idGenClase == null ? null : idGenClase,
-        "clase": clase == null ? null : clase,
-        "idGenTipVehi": idGenTipVehi == null ? null : idGenTipVehi,
-        "tipoVehiculo": tipoVehiculo == null ? null : tipoVehiculo,
-        "idGenServicio": idGenServicio == null ? null : idGenServicio,
-        "descServicio": descServicio == null ? null : descServicio,
-      };
+  factory Datospropietario.empty() {
+    return Datospropietario(
+      success: false,
+      message: '',
+      data: DatospropietarioData.empty(),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "success": success,
+    "message": message,
+    "data": data.toJson(),
+  };
+}
+
+class DatospropietarioData {
+  String propietario;
+  String docPropietario;
+  String fechaCaducidad;
+  String institucionRenova;
+  String telefono;
+  String correo;
+  String fototo64;
+  String fechaDefuncion;
+
+  DatospropietarioData({
+    required this.propietario,
+    required this.docPropietario,
+    required this.fechaCaducidad,
+    required this.institucionRenova,
+    required this.telefono,
+    required this.correo,
+    required this.fototo64,
+    required this.fechaDefuncion
+  });
+
+  factory DatospropietarioData.fromJson(Map<String, dynamic> json) {
+    return DatospropietarioData(
+      propietario: ParseModel.parseToString(json["propietario"]),
+      docPropietario: ParseModel.parseToString(json["docPropietario"]),
+      fechaCaducidad: ParseModel.parseToString(json["fechaCaducidad"]),
+      institucionRenova: ParseModel.parseToString(json["institucionRenova"]),
+      telefono: ParseModel.parseToString(json["telefono"]),
+      correo: ParseModel.parseToString(json["correo"]),
+      fototo64: ParseModel.parseToString(json["fototo64"]),
+      fechaDefuncion: ParseModel.parseToString(json["fechaDefuncion"]),
+    );
+  }
+
+  factory DatospropietarioData.empty() {
+    return DatospropietarioData(
+      propietario: '',
+      docPropietario: '',
+      fechaCaducidad: '',
+      institucionRenova: '',
+      telefono: '',
+      correo: '',
+      fototo64: '',
+      fechaDefuncion:'',
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "propietario": propietario,
+    "docPropietario": docPropietario,
+    "fechaCaducidad": fechaCaducidad,
+    "institucionRenova": institucionRenova,
+    "telefono": telefono,
+    "correo": correo,
+    "fototo64": fototo64,
+    "fechaDefuncion":fechaDefuncion
+  };
 }
 
 class RestriccionPj {
+  bool success;
+  String message;
+  RestriccionPjData data;
+
   RestriccionPj({
-    required this.robado,
+    required this.success,
+    required this.message,
+    required this.data,
   });
 
+  factory RestriccionPj.fromJson(Map<String, dynamic> json) {
+    return RestriccionPj(
+      success: _boolVehiculo(json["success"]),
+      message: ParseModel.parseToString(json["message"]),
+      data: RestriccionPjData.fromJson(_mapVehiculo(json["data"])),
+    );
+  }
+
+  factory RestriccionPj.empty() {
+    return RestriccionPj(
+      success: false,
+      message: '',
+      data: RestriccionPjData.empty(),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "success": success,
+    "message": message,
+    "data": data.toJson(),
+  };
+}
+
+class RestriccionPjData {
   bool robado;
+  String detBusqueda;
 
-  factory RestriccionPj.empty()=>RestriccionPj(robado: false);
+  RestriccionPjData({required this.robado, required this.detBusqueda});
 
-  factory RestriccionPj.fromJson(String str) =>
-      RestriccionPj.fromMap(json.decode(str));
+  factory RestriccionPjData.fromJson(Map<String, dynamic> json) {
+    return RestriccionPjData(
+      robado: _boolVehiculo(json["robado"]),
+      detBusqueda: ParseModel.parseToString(json["detBusqueda"]),
+    );
+  }
 
-  String toJson() => json.encode(toMap());
+  factory RestriccionPjData.empty() {
+    return RestriccionPjData(robado: false, detBusqueda: '');
+  }
 
-  factory RestriccionPj.fromMap(Map<String, dynamic> json) =>
-      RestriccionPj(
-        robado: ParseModel.parseToBool(json["robado"]),
-      );
-
-  Map<String, dynamic> toMap() =>
-      {
-        "robado": robado == null ? null : robado,
-      };
+  Map<String, dynamic> toJson() => {
+    "robado": robado,
+    "detBusqueda": detBusqueda,
+  };
 }

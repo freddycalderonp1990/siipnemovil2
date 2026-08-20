@@ -168,21 +168,98 @@ class UtilidadesUtil {
     }
   }
 
-  static void playAudio({required String nameAudio}) async {
-    // or as a local variable
-    // final player = AudioCache();
-    final player = AudioPlayer();
-    // call this method when desired
-    print("play audio");
+  static Future<void> playAudio({required String nameAudio})async{
+    try{
+      final AudioPlayer player=AudioPlayer();
 
-    Vibration.vibrate(
-      pattern: [500, 1000, 500, 900, 500, 800, 500, 500],
-      intensities: [0, 128, 0, 255, 0, 64, 0, 255],
-    );
+      print("play audio");
 
-    // await player.play(UrlSource('https://example.com/my-audio.wav'));
+      /// ==========================================================
+      /// VIBRACIÓN
+      /// ==========================================================
+      try{
+        final bool? tieneVibrador=await Vibration.hasVibrator();
 
-    await player.play(AssetSource(nameAudio));
+        if(tieneVibrador==true){
+          await Vibration.vibrate(
+            pattern:[
+              500,
+              1000,
+              500,
+              900,
+              500,
+              800,
+              500,
+              500,
+            ],
+            intensities:[
+              0,
+              128,
+              0,
+              255,
+              0,
+              64,
+              0,
+              255,
+            ],
+          );
+        }
+      }catch(e){
+        debugPrint(
+          "ERROR VIBRACIÓN: $e",
+        );
+      }
+
+      /// ==========================================================
+      /// AUDIO
+      ///
+      /// AssetSource YA trabaja dentro de assets/.
+      ///
+      /// Si recibimos:
+      /// assets/siipne_movil/audio/alerta.mp3
+      ///
+      /// lo transformamos en:
+      /// siipne_movil/audio/alerta.mp3
+      /// ==========================================================
+
+      String ruta=nameAudio.trim();
+
+      if(ruta.startsWith("assets/")){
+        ruta=ruta.substring(
+          "assets/".length,
+        );
+      }
+
+      debugPrint(
+        "AUDIO ORIGINAL: $nameAudio",
+      );
+
+      debugPrint(
+        "AUDIO ASSETSOURCE: $ruta",
+      );
+
+      if(ruta.isEmpty){
+        debugPrint(
+          "AUDIO -> RUTA VACÍA",
+        );
+        return;
+      }
+
+      await player.play(
+        AssetSource(ruta),
+      );
+    }catch(e,stackTrace){
+      /// MUY IMPORTANTE:
+      /// un problema de audio nunca debe romper
+      /// una consulta operativa.
+      debugPrint(
+        "ERROR REPRODUCIENDO AUDIO: $e",
+      );
+
+      debugPrint(
+        "$stackTrace",
+      );
+    }
   }
 
 

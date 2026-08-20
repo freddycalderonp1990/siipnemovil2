@@ -25,7 +25,13 @@ class AppSiipneMovilImages {
   //-*********************** ICONOS OPERATIVOS SERVICIO URBANO *******************************
   static const _rutaIcon = "assets/siipne_movil/op_servicio_urbano/";
   static const iconIdentificacion = Icons.document_scanner_outlined;
+  static const img_modulos_dgo = _rutaIcon + "operaciones.png";
+  static const img_modulos_transito = _rutaIcon + "transito.png";
+  static const img_modulos_metro = _rutaIcon + "metro.png";
 
+  static const img_auto_fondo = _rutaIcon + "automovil.png";
+  static const img_anexarse = _rutaIcon + "anexarse.png";
+  static const img_crear_operativo = _rutaIcon + "crearOperativo.png";
 
 
   static const icon_consult_person = _rutaIcon + "icon_consult_person.png";

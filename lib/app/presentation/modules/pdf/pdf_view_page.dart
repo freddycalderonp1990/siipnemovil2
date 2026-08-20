@@ -60,7 +60,6 @@ class PdfViewPage extends GetView<PdfViewController> {
           ),
         ),
         body: ContenedorDesingWidget(
-
             margin: EdgeInsets.all(5),
             child: Container(
               margin: EdgeInsets.all(5),

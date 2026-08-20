@@ -32,25 +32,27 @@ class DataCreateOp {
   final int idHdrEvento;
   final int idGenGeoSenplades;
   final String fechaEvento;
+  final int idTipoOperativo;
 
   DataCreateOp({
     required this.idHdrEvento,
     required this.idGenGeoSenplades,
     required this.fechaEvento,
+    required this.idTipoOperativo
   });
 
-  factory DataCreateOp.empty()=>DataCreateOp(idHdrEvento: 0, idGenGeoSenplades: 0, fechaEvento: "");
-
-
+  factory DataCreateOp.empty()=>DataCreateOp(idHdrEvento: 0, idGenGeoSenplades: 0, fechaEvento: "",idTipoOperativo:0);
   factory DataCreateOp.fromJson(Map<String, dynamic> json) => DataCreateOp(
     idHdrEvento:ParseModel.parseToInt( json["idHdrEvento"]),
     idGenGeoSenplades: ParseModel.parseToInt( json["idGenGeoSenplades"]),
     fechaEvento:ParseModel.parseToString( json["fechaEvento"]),
+    idTipoOperativo:ParseModel.parseToInt( json["idTipoOperativo"]),
   );
 
   Map<String, dynamic> toJson() => {
     "idHdrEvento": idHdrEvento,
     "idGenGeoSenplades": idGenGeoSenplades,
     "fechaEvento": fechaEvento,
+    "idTipoOperativo":idTipoOperativo,
   };
 }

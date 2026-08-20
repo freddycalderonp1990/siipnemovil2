@@ -33,10 +33,6 @@ class DesingShowDataTitleDetalle extends StatelessWidget {
             title: title,
             size: responsive.diagonalP(AppConfig.tamTextoTitulo),
           ),
-
-
-
-
           Container(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,

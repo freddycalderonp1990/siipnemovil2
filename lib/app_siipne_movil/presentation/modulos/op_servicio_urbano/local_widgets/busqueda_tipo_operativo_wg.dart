@@ -11,64 +11,107 @@ class BusquedaTipoOperativoWg extends StatelessWidget {
   final Icon? icono;
   final double anchoPorcentaje;
   final TextEditingController controller;
+  final FocusNode? focusNode;
 
-  const BusquedaTipoOperativoWg({this.onTap,required this.title,required this.msjError,required this.myKey, this.maxLength=11, this.keyboardType=TextInputType.text, this.icono, this.anchoPorcentaje=100, required this.controller,this.tipo='N'}) ;
+  const BusquedaTipoOperativoWg({
+    this.onTap,
+    required this.title,
+    required this.msjError,
+    required this.myKey,
+    this.maxLength = 11,
+    this.keyboardType = TextInputType.text,
+    this.icono,
+    this.anchoPorcentaje = 100,
+    required this.controller,
+    this.tipo = 'N',
+    required ValueKey<String> key,
+    this.focusNode,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final ResponsiveUtil responsive = ResponsiveUtil();
 
-
-    final responsive = ResponsiveUtil();
     return Container(
+      width: responsive.anchoP(anchoPorcentaje),
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFD7E3EE)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Form(
+              key: myKey,
+              child: ImputTextWidget(
+                controller: controller,
+                focusNode:focusNode,
+                keyboardType: keyboardType,
+                maxLength: maxLength,
+                icono: icono,
+                activar: true,
+                label: title,
+                fonSize: responsive.diagonalP(2),
+                validar: (value) {
+                  if (value == null || value.toString().trim().isEmpty) {
+                    return msjError;
+                  }
 
-        padding: EdgeInsets.only(bottom: 2,top: 0),
-        width: responsive.anchoP(anchoPorcentaje),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.8),
-          borderRadius: BorderRadius.circular(AppConfig.radioBordecajas),
-          border: Border.all(color: AppColors.colorBordecajas, width: 1),
-        ),
-        child: Container(
-          margin: EdgeInsets.only(left: 0.0, right: 20.0),
-
-
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              SizedBox(
-                width: responsive.altoP(1),
+                  return null;
+                },
               ),
-              Expanded(
-                  child: Form(
-                    key: myKey,
-                    child: ImputTextWidget(
-                      controller: controller,
-                      keyboardType: keyboardType,
-                      maxLength: maxLength,
-                      icono: icono,
-                      activar: true,
-                   
-                      label: title,
-                      fonSize: responsive.diagonalP(2),
-                      validar: (value) {
-                        if (value.toString().length == 0) {
-                          return msjError;
-                        }
-                      },
-                    ),
-                  )),
-              SizedBox(
-                width: responsive.altoP(1),
-              ),
-              BtnIconOperativoWidget(
-                icon: Icons.find_in_page,
-                titulo: tipo=='N'?'Buscar':'',
-                onPressed: onTap,
-               // stringImg:  AppImages.icon_buscar,
-              ),
-            ],
+            ),
           ),
-        ));
+
+          const SizedBox(width: 6),
+
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                height: 46,
+                padding: const EdgeInsets.symmetric(horizontal: 9),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF195BA6), Color(0xFF0A3D7E)],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.search_rounded,
+                      color: Colors.white,
+                      size: 19,
+                    ),
+
+                    if (tipo == 'N') ...[
+                      const SizedBox(width: 4),
+
+                      const Text(
+                        "BUSCAR",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 8,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

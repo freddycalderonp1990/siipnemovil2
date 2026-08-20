@@ -8,6 +8,8 @@ class ConsultarPersonaRequest {
   final String ip;
   final int idGenUsuario;
   final int idVariableResultado;
+  final int hdrIdHdrResum;
+  final String tipoRelacion;
 
   ConsultarPersonaRequest({
     required this.idOperativo,
@@ -17,11 +19,12 @@ class ConsultarPersonaRequest {
     required this.ip,
     required this.idGenUsuario,
     required this.idVariableResultado,
+    this.hdrIdHdrResum = 0,
+    this.tipoRelacion = '',
   });
 
-  /// Método para convertir el objeto a JSON
   Map<String, dynamic> toJson() {
-    return {
+    final Map<String, dynamic> data = {
       "idOperativo": idOperativo,
       "documento": documento,
       "latitud": latitud,
@@ -30,5 +33,15 @@ class ConsultarPersonaRequest {
       "idGenUsuario": idGenUsuario,
       "idVariableResultado": idVariableResultado,
     };
+
+    if (hdrIdHdrResum > 0) {
+      data["hdr_idHdrEventoResum"] = hdrIdHdrResum;
+    }
+
+    if (tipoRelacion.trim().isNotEmpty) {
+      data["tipoRelacion"] = tipoRelacion.trim().toUpperCase();
+    }
+
+    return data;
   }
 }

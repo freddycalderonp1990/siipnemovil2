@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-
-
 class DesignBtnLoginRapidoWidget extends StatelessWidget {
   final IconData icon;
   final String titulo;
@@ -17,82 +15,117 @@ class DesignBtnLoginRapidoWidget extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-      child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        elevation: 2,
-        shadowColor: Colors.black,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(24),
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 18,
-              vertical: 16,
-            ),
-            child: Row(
-              children: [
+  Widget build(BuildContext context){
+    const Color azul=Color(0xFF0D4C9C);
+    const Color fondoIcono=Color(0xFFF0F5FF);
 
-                /// ICONO
+    return Material(
+      color:Colors.transparent,
+      child:InkWell(
+        borderRadius:BorderRadius.circular(22),
+        onTap:onTap,
+        child:Ink(
+          decoration:BoxDecoration(
+            color:Colors.white,
+            borderRadius:BorderRadius.circular(22),
+            border:Border.all(
+              color:azul.withOpacity(.10),
+              width:1,
+            ),
+            boxShadow:[
+              BoxShadow(
+                color:Colors.black.withOpacity(.06),
+                blurRadius:18,
+                offset:const Offset(0,7),
+              ),
+            ],
+          ),
+          child:Padding(
+            padding:const EdgeInsets.symmetric(
+              horizontal:14,
+              vertical:13,
+            ),
+            child:Column(
+              mainAxisSize:MainAxisSize.min,
+              children:[
                 Container(
-                  width: 58,
-                  height: 58,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF0F5FF),
-                    shape: BoxShape.circle,
+                  width:62,
+                  height:62,
+                  decoration:BoxDecoration(
+                    color:fondoIcono,
+                    shape:BoxShape.circle,
+                    border:Border.all(
+                      color:azul.withOpacity(.08),
+                    ),
                   ),
-                  child: Icon(
+                  child:Icon(
                     icon,
-                    size: 30,
-                    color: const Color(0xFF0D4C9C),
+                    size:32,
+                    color:azul,
                   ),
                 ),
 
-                const SizedBox(width: 18),
+                const SizedBox(height:11),
 
-                /// TEXTOS
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
+                Text(
+                  titulo,
+                  textAlign:TextAlign.center,
+                  maxLines:2,
+                  overflow:TextOverflow.ellipsis,
+                  style:const TextStyle(
+                    fontSize:13,
+                    height:1.15,
+                    fontWeight:FontWeight.w800,
+                    color:azul,
+                  ),
+                ),
 
+                const SizedBox(height:5),
+
+                Text(
+                  descripcion,
+                  textAlign:TextAlign.center,
+                  maxLines:2,
+                  overflow:TextOverflow.ellipsis,
+                  style:TextStyle(
+                    fontSize:10.5,
+                    height:1.2,
+                    fontWeight:FontWeight.w500,
+                    color:Colors.grey.shade600,
+                  ),
+                ),
+
+                const SizedBox(height:12),
+
+                Container(
+                  padding:const EdgeInsets.symmetric(
+                    horizontal:11,
+                    vertical:6,
+                  ),
+                  decoration:BoxDecoration(
+                    color:azul.withOpacity(.07),
+                    borderRadius:BorderRadius.circular(20),
+                  ),
+                  child:const Row(
+                    mainAxisSize:MainAxisSize.min,
+                    children:[
                       Text(
-                        titulo,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF0D4C9C),
+                        "INGRESAR",
+                        style:TextStyle(
+                          color:azul,
+                          fontSize:9,
+                          fontWeight:FontWeight.w800,
+                          letterSpacing:.5,
                         ),
                       ),
-
-                      const SizedBox(height: 4),
-
-                      Text(
-                        descripcion,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey.shade600,
-                        ),
+                      SizedBox(width:4),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        size:14,
+                        color:azul,
                       ),
                     ],
                   ),
-                ),
-
-                const SizedBox(width: 10),
-
-                /// FLECHA
-                const Icon(
-                  Icons.chevron_right_rounded,
-                  color: Color(0xFF0D4C9C),
-                  size: 30,
                 ),
               ],
             ),

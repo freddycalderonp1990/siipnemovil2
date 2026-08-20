@@ -20,6 +20,7 @@ import 'package:get/get.dart';
 
 
 import '../../../../app/core/app_config.dart';
+import '../../../../app/core/utils/device_info_app.dart';
 import '../../../../app/core/utils/responsiveUtil.dart';
 import '../../../../app/core/values/app_colors.dart';
 import '../../../../app/core/values/app_images.dart';
@@ -27,6 +28,7 @@ import '../../../../app/core/values/app_images.dart';
 
 import '../../../../app/domain/enums/enums.dart';
 
+import '../../../../app/presentation/widgets/custom_app_widgets.dart';
 import '../widgets/user_custom_widgets.dart';
 
 import 'controllers.dart';

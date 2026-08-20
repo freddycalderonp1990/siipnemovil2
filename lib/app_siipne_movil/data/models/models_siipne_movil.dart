@@ -21,4 +21,13 @@ part 'operativos_su/operativo_persona_model.dart';
 
 part 'operativos_su/local/local_person_su_model.dart';
 part 'operativos_su/local/local_orden_captura_su_model.dart';
-
+part 'anexarse_model.dart';
+part 'insertar_acuerdo_model.dart';
+part 'variables_resultado_model.dart';
+part 'pendiente_model.dart';
+part 'finalizar_model.dart';
+part 'integrantes_policia_model.dart';
+part 'datos_operativo_usuario_model.dart';
+part 'actualiza_resultado_model.dart';
+part 'resultados_operativo_model.dart';
+part 'antecedentes_model.dart';
