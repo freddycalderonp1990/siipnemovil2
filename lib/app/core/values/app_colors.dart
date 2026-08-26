@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart' show Color, Colors;
-class AppColors{
 
+class AppColors {
   static const Color colorPrimary = AppColors.colorAzul_1;
 
   static final dark = Color(0xFF03091E);
   static const Color colorLineas = Color(0xFF9E9D9D);
 
-
   static const Color colorAmarilloTitle = Color(0xFFF5C12D);
   static const Color colorAzulTitle = Color(0xFF0A2877);
-
 
   static const Color colorBotonesWidget = Colors.lightBlue;
   static const Color colorBordeBotones = Colors.blueAccent;
@@ -19,8 +17,6 @@ class AppColors{
 
   static const Color colorFondo = colorAzul;
   static const Color colorIcons = colorAzul;
-
-
 
   //hexadecimal #164987
   static const int _baseAzul = 0x164987; // Definimos el color base sin opacidad
@@ -34,15 +30,14 @@ class AppColors{
 
   //AZUL INSTITUCIONAL SECUNDARIO
 
-
-  static const int _baseAzulSecond = 0x1A468D; // Definimos el color base sin opacidad
+  static const int _baseAzulSecond =
+      0x1A468D; // Definimos el color base sin opacidad
 
   static const Color colorAzulSecond = Color(0xFF000000 | _baseAzulSecond);
   static const Color colorAzulSecond_80 = Color(0xCC000000 | _baseAzulSecond);
   static const Color colorAzulSecond_60 = Color(0x99000000 | _baseAzulSecond);
   static const Color colorAzulSecond_40 = Color(0x66000000 | _baseAzulSecond);
   static const Color colorAzulSecond_20 = Color(0x33000000 | _baseAzulSecond);
-
 
   //PLOMO INSTITUCIONAL
 
@@ -58,10 +53,9 @@ class AppColors{
   static const Color colorPlomo_10 = Color(0x1A000000 | _basePlomo);
   static const Color colorPlomo_1 = Color(0x03000000 | _basePlomo);
 
-//El valor 0x66 representa la opacidad del 40% (equivalente a 40 en el rango de 0-100).
-// El valor A7A9AC corresponde al color RGB (167, 169, 172).
+  //El valor 0x66 representa la opacidad del 40% (equivalente a 40 en el rango de 0-100).
+  // El valor A7A9AC corresponde al color RGB (167, 169, 172).
   static const Color colorContenedores = Color(0x66A7A9AC);
-
 
   //AMARILLO
 
@@ -73,7 +67,6 @@ class AppColors{
   static const Color colorAmarillo_40 = Color(0x66000000 | _baseAmarillo);
   static const Color colorAmarillo_20 = Color(0x33000000 | _baseAmarillo);
   static const Color colorAmarillo_10 = Color(0x1A000000 | _baseAmarillo);
-
 
   //ROJO
 
@@ -88,7 +81,6 @@ class AppColors{
 
   //VERDE
 
-
   static const int baseVerde = 0x00833E; // Color base sin opacidad
 
   static const Color colorVerde = Color(0xFF000000 | baseVerde);
@@ -96,5 +88,4 @@ class AppColors{
   static const Color colorVerde_60 = Color(0x99000000 | baseVerde);
   static const Color colorVerde_40 = Color(0x66000000 | baseVerde);
   static const Color colorVerde_20 = Color(0x33000000 | baseVerde);
-
 }

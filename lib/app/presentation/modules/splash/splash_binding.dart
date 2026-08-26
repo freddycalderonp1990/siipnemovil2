@@ -5,7 +5,5 @@ class SplashBinding extends Bindings {
   void dependencies() {
     //Inyeccion de dependencias
     Get.lazyPut(() => SplashController(), fenix: true);
-
-
   }
 }

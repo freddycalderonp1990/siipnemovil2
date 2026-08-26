@@ -1,14 +1,11 @@
 part of '../controllers.dart';
 
 class LoginController extends GetxController {
-
-
-
   final LocalStoreUseCase _localStoreUseCase = Get.find<LocalStoreUseCase>();
   final AuthUseCase authUseCase = Get.find();
   final GetDataUserUseCase getDataUserUseCase = Get.find();
 
-  final  user = UserEntities.empty().obs;
+  final user = UserEntities.empty().obs;
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   GlobalKey<FormState> formKey2 = GlobalKey<FormState>();
   GlobalKey<FormState> formKeyPinCode = GlobalKey<FormState>();
@@ -27,7 +24,7 @@ class LoginController extends GetxController {
 
   @override
   void onInit() {
-   /* controllerUser.text="cpfn1206762401";
+    /* controllerUser.text="cpfn1206762401";
     controllerPass.text="1206762401";*/
     verificarSitieneBiometrico();
     connectionStatusController();
@@ -36,7 +33,6 @@ class LoginController extends GetxController {
 
   @override
   void onReady() {
-
     _init();
     verificarCredenciales();
     super.onReady();
@@ -96,7 +92,6 @@ class LoginController extends GetxController {
 
     int idGenUsuario = TokenUtil.extractIdGenUsuario(dataAuth.token);
 
-
     //consultamos los datos del usuario
     userResponse = await getDataUserUseCase(
       token: dataAuth.token,
@@ -109,7 +104,6 @@ class LoginController extends GetxController {
       await localStoreImpl.setUser(user);
       await localStoreImpl.setPass(pass);
       await localStoreImpl.setLastIdGenUsuario(userResponse.idGenUsuario);
-
 
       await localStoreImpl.setUserModel(userResponse);
 
@@ -318,7 +312,6 @@ class LoginController extends GetxController {
     return false;
   }
 
-
   Future<bool> verificarUserTestAppSeguridades({
     required String user,
     required String pass,
@@ -369,10 +362,9 @@ class LoginController extends GetxController {
 
   String getName() {
     String nombre = user.value.nombres;
-    String res =
-        user.value.sexo == "HOMBRE"
-            ? "Bienvenido: " + nombre
-            : "Bienvenida: " + nombre;
+    String res = user.value.sexo == "HOMBRE"
+        ? "Bienvenido: " + nombre
+        : "Bienvenida: " + nombre;
 
     return res.toUpperCase();
   }

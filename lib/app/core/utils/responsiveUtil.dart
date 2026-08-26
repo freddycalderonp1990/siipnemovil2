@@ -3,14 +3,9 @@ import 'dart:math' as math;
 import 'package:get/get.dart';
 
 class ResponsiveUtil {
-
-
-
-
   double? ancho, alto, diagonal;
 
   ResponsiveUtil() {
-
     ancho = Get.width;
     alto = Get.height;
     diagonal = math.sqrt(math.pow(ancho!, 2) + math.pow(alto!, 2));

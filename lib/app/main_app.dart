@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
@@ -13,7 +12,6 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       //theme: AppTheme.lightTheme,
@@ -25,15 +23,11 @@ class MainApp extends StatelessWidget {
       locale: Locale('es'),
       // translations will be displayed in that locale
       fallbackLocale: Locale('es'),
-      initialRoute:AppRoutes.SPLASH_APP ,
+      initialRoute: AppRoutes.SPLASH_APP,
       initialBinding: DependencyInjectionApp(),
       getPages: AppPages.getPages(),
       home: Scaffold(
-        body: SafeArea(
-          child: Center(
-            child: Text(''),
-          ),
-        ),
+        body: SafeArea(child: Center(child: Text(''))),
       ),
     );
   }

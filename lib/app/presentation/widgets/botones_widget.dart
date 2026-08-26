@@ -6,8 +6,12 @@ class BotonesWidget extends StatefulWidget {
   final IconData? iconData;
   final EdgeInsetsGeometry? padding;
 
-  const BotonesWidget(
-      {this.onPressed, this.title = '', this.iconData, this.padding});
+  const BotonesWidget({
+    this.onPressed,
+    this.title = '',
+    this.iconData,
+    this.padding,
+  });
 
   @override
   _BotonesWidgetState createState() => _BotonesWidgetState();
@@ -35,17 +39,16 @@ class _BotonesWidgetState extends State<BotonesWidget> {
                     size: responsive.diagonalP(AppConfig.tamIcons),
                   )
                 : Container(),
-            SizedBox(
-              width: responsive.anchoP(1),
-            ),
+            SizedBox(width: responsive.anchoP(1)),
             widget.title != ''
                 ? Text(
                     widget.title,
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: responsive.diagonalP(AppConfig.tamTexto)),
+                      color: Colors.white,
+                      fontSize: responsive.diagonalP(AppConfig.tamTexto),
+                    ),
                   )
-                : Container()
+                : Container(),
           ],
         ),
       ),

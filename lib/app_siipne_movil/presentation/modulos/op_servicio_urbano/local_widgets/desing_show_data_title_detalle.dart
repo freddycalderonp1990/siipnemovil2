@@ -10,7 +10,9 @@ class DesingShowDataTitleDetalle extends StatelessWidget {
     Key? key,
     this.colorTitulos = Colors.black,
 
-    required this.title, required this.imagen, required this.datos,
+    required this.title,
+    required this.imagen,
+    required this.datos,
   }) : super(key: key);
 
   @override
@@ -41,24 +43,14 @@ class DesingShowDataTitleDetalle extends StatelessWidget {
                   flex: 1,
                   child: Container(
                     height: responsive.diagonalP(8),
-                    child: imagen
-
+                    child: imagen,
                   ),
                 ),
 
-                Expanded(
-                    flex: 3,
-                    child: Container(
-                      child: datos,
-                    ))
+                Expanded(flex: 3, child: Container(child: datos)),
               ],
             ),
-          )
-
-
-
-
-
+          ),
         ],
       ),
     );

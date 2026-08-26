@@ -9,10 +9,8 @@ import 'package:get/get.dart' hide Transition;
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-
 import '../../../app/core/app_config.dart';
 import '../../../app/core/utils/responsiveUtil.dart';
-
 
 import '../../../app/core/values/app_colors.dart';
 import '../../../app/core/values/app_images.dart';

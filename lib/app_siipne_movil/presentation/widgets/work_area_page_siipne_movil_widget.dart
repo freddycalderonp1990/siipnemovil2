@@ -26,27 +26,27 @@ class WorkAreaPageSiipneMovilWidget extends StatelessWidget {
     this.imgPerfil,
     this.imgFondo,
     this.title,
-    this.mostrarBtnAtras=false,
+    this.mostrarBtnAtras = false,
     this.onPressBtnAtras,
-    this.showGps=false,
-    this.showBtnNotificacione=false,
-    this.contenidoExpandido=false,
+    this.showGps = false,
+    this.showBtnNotificacione = false,
+    this.contenidoExpandido = false,
   });
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return WorkAreaPageWidget(
-      namApps:NamApps.SiipneMovil,
-      peticionServer:peticionServer,
-      contenido:contenido,
-      imgPerfil:imgPerfil,
-      imgFondo:imgFondo,
-      title:title,
-      mostrarBtnAtras:mostrarBtnAtras,
-      onPressBtnAtras:onPressBtnAtras,
-      showGps:showGps,
-      showBtnNotificacione:showBtnNotificacione,
-      contenidoExpandido:contenidoExpandido,
+      namApps: NamApps.SiipneMovil,
+      peticionServer: peticionServer,
+      contenido: contenido,
+      imgPerfil: imgPerfil,
+      imgFondo: imgFondo,
+      title: title,
+      mostrarBtnAtras: mostrarBtnAtras,
+      onPressBtnAtras: onPressBtnAtras,
+      showGps: showGps,
+      showBtnNotificacione: showBtnNotificacione,
+      contenidoExpandido: contenidoExpandido,
     );
   }
 }

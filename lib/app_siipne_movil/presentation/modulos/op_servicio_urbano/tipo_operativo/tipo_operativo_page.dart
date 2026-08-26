@@ -2851,95 +2851,98 @@ class TipoOperativoPage extends GetView<TipoOperativoController> {
                         // BOTONES
                         // ==============================================
                         Row(
-                          children:[
+                          children: [
                             Expanded(
-                              child:OutlinedButton(
-                                onPressed:(){
+                              child: OutlinedButton(
+                                onPressed: () {
                                   Navigator.pop(dialogContext);
                                 },
-                                style:OutlinedButton.styleFrom(
-                                  minimumSize:const Size(0,52),
-                                  foregroundColor:const Color(0xFF63768A),
-                                  side:const BorderSide(
-                                    color:Color(0xFFCAD6E2),
-                                    width:1.2,
+                                style: OutlinedButton.styleFrom(
+                                  minimumSize: const Size(0, 52),
+                                  foregroundColor: const Color(0xFF63768A),
+                                  side: const BorderSide(
+                                    color: Color(0xFFCAD6E2),
+                                    width: 1.2,
                                   ),
-                                  shape:RoundedRectangleBorder(
-                                    borderRadius:BorderRadius.circular(14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
                                   ),
                                 ),
-                                child:const Text(
+                                child: const Text(
                                   "CANCELAR",
-                                  textAlign:TextAlign.center,
-                                  style:TextStyle(
-                                    fontSize:10.5,
-                                    fontWeight:FontWeight.w900,
-                                    letterSpacing:.3,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: .3,
                                   ),
                                 ),
                               ),
                             ),
 
-                            const SizedBox(width:9),
+                            const SizedBox(width: 9),
 
                             Expanded(
-                              child:Material(
-                                color:Colors.transparent,
-                                borderRadius:BorderRadius.circular(14),
-                                child:InkWell(
-                                  borderRadius:BorderRadius.circular(14),
-                                  onTap:(){
+                              child: Material(
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(14),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(14),
+                                  onTap: () {
                                     Navigator.pop(dialogContext);
 
                                     Future.delayed(
-                                      const Duration(milliseconds:100),
-                                          (){
+                                      const Duration(milliseconds: 100),
+                                      () {
                                         controller.crearOperativo();
                                       },
                                     );
                                   },
-                                  child:Ink(
-                                    height:52,
-                                    decoration:BoxDecoration(
-                                      gradient:const LinearGradient(
-                                        begin:Alignment.centerLeft,
-                                        end:Alignment.centerRight,
-                                        colors:[
+                                  child: Ink(
+                                    height: 52,
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                        colors: [
                                           Color(0xFF195BA6),
                                           Color(0xFF0A3D7E),
                                         ],
                                       ),
-                                      borderRadius:BorderRadius.circular(14),
-                                      boxShadow:[
+                                      borderRadius: BorderRadius.circular(14),
+                                      boxShadow: [
                                         BoxShadow(
-                                          color:const Color(0xFF195BA6).withOpacity(.22),
-                                          blurRadius:9,
-                                          offset:const Offset(0,4),
+                                          color: const Color(
+                                            0xFF195BA6,
+                                          ).withOpacity(.22),
+                                          blurRadius: 9,
+                                          offset: const Offset(0, 4),
                                         ),
                                       ],
                                     ),
-                                    child:const Row(
-                                      mainAxisAlignment:MainAxisAlignment.center,
-                                      children:[
+                                    child: const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
                                         Icon(
                                           Icons.check_circle_outline_rounded,
-                                          color:Colors.white,
-                                          size:18,
+                                          color: Colors.white,
+                                          size: 18,
                                         ),
 
-                                        SizedBox(width:5),
+                                        SizedBox(width: 5),
 
                                         Flexible(
-                                          child:Text(
+                                          child: Text(
                                             "SÍ, CREAR OPERATIVO",
-                                            textAlign:TextAlign.center,
-                                            maxLines:1,
-                                            overflow:TextOverflow.ellipsis,
-                                            style:TextStyle(
-                                              color:Colors.white,
-                                              fontSize:9.5,
-                                              fontWeight:FontWeight.w900,
-                                              letterSpacing:.2,
+                                            textAlign: TextAlign.center,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 9.5,
+                                              fontWeight: FontWeight.w900,
+                                              letterSpacing: .2,
                                             ),
                                           ),
                                         ),

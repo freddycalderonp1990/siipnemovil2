@@ -3,9 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-
 import 'package:get/get.dart';
-
 
 import '../../../../app/presentation/widgets/custom_app_widgets.dart';
 import '../../../user/domain/entities/user.dart';
@@ -14,7 +12,6 @@ import '../../data/models/models_push_notification.dart';
 import '../../domain/use_cases/notification_local_usecases.dart';
 import '../../presentation/widgets/my_dialogo_notificacion.dart';
 import '../notification_service.dart';
-
 
 class LocalNotification {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
@@ -37,9 +34,7 @@ class LocalNotification {
 
   /// Inicializar notificaciones
   static Future<void> initializeLocalNotifications() async {
-    const androidInit = AndroidInitializationSettings(
-      '@drawable/ic_app',
-    );
+    const androidInit = AndroidInitializationSettings('@drawable/ic_app');
 
     const iosInit = DarwinInitializationSettings();
 
@@ -49,21 +44,14 @@ class LocalNotification {
     );
 
     await _notificationsPlugin.initialize(
-      settings:  initSettings,
-      onDidReceiveNotificationResponse: (
-          NotificationResponse response,
-          ) {
+      settings: initSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
         try {
-
-          if (response.payload == null ||
-              response.payload!.isEmpty) {
+          if (response.payload == null || response.payload!.isEmpty) {
             return;
           }
 
-          final notification =
-          notificationModelFromJson(
-            response.payload!,
-          );
+          final notification = notificationModelFromJson(response.payload!);
 
           print("========== CLICK NOTIFICACION ==========");
           print("accion: ${notification.accion}");
@@ -73,14 +61,9 @@ class LocalNotification {
           print("body: ${notification.body}");
           print("========================================");
 
-
           switch (notification.accion) {
-
             case "abrir_censo":
-
-              print(
-                "Abrir pantalla de censo: ${notification.idAccion}",
-              );
+              print("Abrir pantalla de censo: ${notification.idAccion}");
 
               // navigatorKey.currentState?.pushNamed(
               //   '/detalleCenso',
@@ -90,10 +73,7 @@ class LocalNotification {
               break;
 
             case "abrir_eleccion":
-
-              print(
-                "Abrir pantalla de elecciones: ${notification.idAccion}",
-              );
+              print("Abrir pantalla de elecciones: ${notification.idAccion}");
 
               // navigatorKey.currentState?.pushNamed(
               //   '/detalleEleccion',
@@ -102,11 +82,8 @@ class LocalNotification {
 
               break;
           }
-
         } catch (e) {
-          print(
-            "Error procesando payload de notificación: $e",
-          );
+          print("Error procesando payload de notificación: $e");
         }
       },
     );
@@ -126,7 +103,7 @@ class LocalNotification {
 
     );*/
 
-  /*  const androidDetails = AndroidNotificationDetails(
+    /*  const androidDetails = AndroidNotificationDetails(
       'default_channel_id', // 👈 obligatorio en Android 8+
       'General Notifications', // 👈 nombre visible del canal
       channelDescription: 'Canal de notificaciones por defecto',
@@ -135,7 +112,6 @@ class LocalNotification {
       playSound: true,
       icon: '@mipmap/launcher_icon', // ✅ funciona seguro
     );*/
-
 
     // fix
 
@@ -169,41 +145,34 @@ class LocalNotification {
 
     try {
       final GuardarNotificacionRemotaUseCase guardarNotificacionRemotaUseCase =
-      Get.find<GuardarNotificacionRemotaUseCase>();
+          Get.find<GuardarNotificacionRemotaUseCase>();
 
-
-      final LocalStoreUseCase _localStoreUseCase = Get.find<LocalStoreUseCase>();
+      final LocalStoreUseCase _localStoreUseCase =
+          Get.find<LocalStoreUseCase>();
 
       final UserEntities user = await _localStoreUseCase.getUserModel();
 
       await guardarNotificacionRemotaUseCase(
         notification: notification,
-        idGenUsuario: user.idGenUsuario
+        idGenUsuario: user.idGenUsuario,
       );
     } catch (e) {
       debugPrint("Error guardando notificación: $e");
     }
 
-    await Get.find<NotificationService>()
-        .cargar();
+    await Get.find<NotificationService>().cargar();
 
     DialogosAwesome.getInformation(
       title: notification.title,
-        descripcion: notification.body);
-
-    
-
-    await _notificationsPlugin.show(
-
-      notificationDetails: notificationDetails,
-      payload: notificationModelToJson(notification), id: id,
-      title: notification.title,
-      body: notification.body,
-
+      descripcion: notification.body,
     );
 
-
-
-
- }
+    await _notificationsPlugin.show(
+      notificationDetails: notificationDetails,
+      payload: notificationModelToJson(notification),
+      id: id,
+      title: notification.title,
+      body: notification.body,
+    );
+  }
 }

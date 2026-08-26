@@ -1,6 +1,7 @@
 part of 'models_siipne_movil.dart';
 
-FinalizarModel finalizarModelFromJson(String str) => FinalizarModel.fromJson(json.decode(str));
+FinalizarModel finalizarModelFromJson(String str) =>
+    FinalizarModel.fromJson(json.decode(str));
 
 String finalizarModelToJson(FinalizarModel data) => json.encode(data.toJson());
 
@@ -31,15 +32,10 @@ class FinalizarModel {
 class Finalizar {
   int idHdrEvento;
 
-  Finalizar({
-    required this.idHdrEvento,
-  });
+  Finalizar({required this.idHdrEvento});
 
-  factory Finalizar.fromJson(Map<String, dynamic> json) => Finalizar(
-    idHdrEvento: json["idHdrEvento"],
-  );
+  factory Finalizar.fromJson(Map<String, dynamic> json) =>
+      Finalizar(idHdrEvento: json["idHdrEvento"]);
 
-  Map<String, dynamic> toJson() => {
-    "idHdrEvento": idHdrEvento,
-  };
+  Map<String, dynamic> toJson() => {"idHdrEvento": idHdrEvento};
 }

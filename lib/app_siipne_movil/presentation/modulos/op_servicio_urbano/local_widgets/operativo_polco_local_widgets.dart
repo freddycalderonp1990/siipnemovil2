@@ -16,9 +16,6 @@ import '../../../../data/models/models_siipne_movil.dart';
 import 'btnIconOperativoWidget.dart';
 import 'colors_local.dart';
 
-
-
-
 part 'btn_tipo_operativo_wg.dart';
 part 'busqueda_tipo_operativo_wg.dart';
 part 'persona/desing_alerta_dna_wg.dart';

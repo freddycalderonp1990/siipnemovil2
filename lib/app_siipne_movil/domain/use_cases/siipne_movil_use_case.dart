@@ -100,6 +100,7 @@ class SiipneMovilUseCase {
   }) async {
     return await repository.getDatosResultadosOperativo(request: request);
   }
+
   Future<DataAntecedentes> getDatosAntecedentes({
     required AntecedentesRequest request,
   }) async {

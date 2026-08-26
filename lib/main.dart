@@ -27,7 +27,6 @@ import 'feactures/pushNotification/services/bloc/notifications_bloc.dart';
 import 'feactures/pushNotification/services/localNotification/local_notification.dart';
 import 'firebase_options.dart';
 
-
 //solucion:OS Error:   CERTIFICATE_VERIFY_FAILED
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -38,28 +37,20 @@ class MyHttpOverrides extends HttpOverrides {
   }
 }
 
-
 // === Handler para notificaciones en segundo plano
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // Mostrar notificación local si llega en background
   if (message.notification != null) {
+    NotificationModel notification = NotificationModel.fromJson(message.data);
 
-    NotificationModel notification =
-    NotificationModel.fromJson(
-      message.data,
+    notification = notification.copyWith(
+      title:
+          '${message.notification?.title ?? ''} ${notification.appName ?? ''}',
+      body: message.notification?.body,
     );
 
-    notification=  notification.copyWith(
-        title:
-        '${message.notification?.title ?? ''} ${notification.appName ?? ''}',
-        body: message.notification?.body) ;
-
-
-
-    await LocalNotification.showLocalNotification(
-        notification: notification
-    );
+    await LocalNotification.showLocalNotification(notification: notification);
   }
 }
 
@@ -83,14 +74,11 @@ void main() async {
     print("error certificados $e");
   }
 
-
-
-
-
-  try{
+  try {
     // Inicializar Firebase
     await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
 
     // Configurar handler en background
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
@@ -100,8 +88,7 @@ void main() async {
 
     // === Solicitar permisos de notificación (iOS + Android 13+) 👇
     // await LocalNotification.requestPermissionLocalNotifications();
-  }
-  catch (e){
+  } catch (e) {
     print(" Error en Firebase Notificaciones: ${e.toString()}");
   }
 

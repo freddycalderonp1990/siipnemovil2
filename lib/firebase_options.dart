@@ -65,5 +65,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'siipne-elecciones-y-censo.firebasestorage.app',
     iosBundleId: 'ecuador.policianacional.dntic.siipnemovil',
   );
-
 }

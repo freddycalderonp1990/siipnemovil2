@@ -17,22 +17,14 @@ class ResultadoOperativoModel {
     required this.resultadosOperativo,
   });
 
-  factory ResultadoOperativoModel.fromJson(
-      Map<String, dynamic> json,
-      ) {
+  factory ResultadoOperativoModel.fromJson(Map<String, dynamic> json) {
     final dynamic data = json["data"];
 
     return ResultadoOperativoModel(
-      statusCode: ParseModel.parseToInt(
-        json["status_code"],
-      ),
-      message: ParseModel.parseToString(
-        json["message"],
-      ),
+      statusCode: ParseModel.parseToInt(json["status_code"]),
+      message: ParseModel.parseToString(json["message"]),
       resultadosOperativo: data is Map
-          ? ResultadosOperativo.fromJson(
-        Map<String, dynamic>.from(data),
-      )
+          ? ResultadosOperativo.fromJson(Map<String, dynamic>.from(data))
           : ResultadosOperativo.empty(),
     );
   }
@@ -110,119 +102,65 @@ class ResultadosOperativo {
     required this.variablesResultado,
   });
 
-  factory ResultadosOperativo.fromJson(
-      Map<String, dynamic> json,
-      ) {
-    final dynamic variables =
-    json["variablesResultado"];
+  factory ResultadosOperativo.fromJson(Map<String, dynamic> json) {
+    final dynamic variables = json["variablesResultado"];
 
     return ResultadosOperativo(
-      idHdrEvento: ParseModel.parseToInt(
-        json["idHdrEvento"],
-      ),
+      idHdrEvento: ParseModel.parseToInt(json["idHdrEvento"]),
 
-      codigoEvento: ParseModel.parseToString(
-        json["codigoEvento"],
-      ),
+      codigoEvento: ParseModel.parseToString(json["codigoEvento"]),
 
-      descripcionOperativo:
-      ParseModel.parseToString(
+      descripcionOperativo: ParseModel.parseToString(
         json["descripcionOperativo"],
       ),
 
-      fechaEvento: ParseModel.parseToString(
-        json["fechaEvento"],
-      ),
+      fechaEvento: ParseModel.parseToString(json["fechaEvento"]),
 
-      fechaRegistro: ParseModel.parseToString(
-        json["fechaRegistro"],
-      ),
+      fechaRegistro: ParseModel.parseToString(json["fechaRegistro"]),
 
-      fechaFinalizacion:
-      ParseModel.parseToString(
-        json["fechaFinalizacion"],
-      ),
+      fechaFinalizacion: ParseModel.parseToString(json["fechaFinalizacion"]),
 
-      zona: ParseModel.parseToString(
-        json["zona"],
-      ),
+      zona: ParseModel.parseToString(json["zona"]),
 
-      subzona: ParseModel.parseToString(
-        json["subzona"],
-      ),
+      subzona: ParseModel.parseToString(json["subzona"]),
 
-      distrito: ParseModel.parseToString(
-        json["distrito"],
-      ),
+      distrito: ParseModel.parseToString(json["distrito"]),
 
-      circuito: ParseModel.parseToString(
-        json["circuito"],
-      ),
+      circuito: ParseModel.parseToString(json["circuito"]),
 
-      subcircuito: ParseModel.parseToString(
-        json["subcircuito"],
-      ),
+      subcircuito: ParseModel.parseToString(json["subcircuito"]),
 
-      tipoOperativo:
-      ParseModel.parseToString(
-        json["tipoOperativo"],
-      ),
+      tipoOperativo: ParseModel.parseToString(json["tipoOperativo"]),
 
-      totalConsultas: ParseModel.parseToInt(
-        json["totalConsultas"],
-      ),
+      totalConsultas: ParseModel.parseToInt(json["totalConsultas"]),
 
-      totalPersonas: ParseModel.parseToInt(
-        json["totalPersonas"],
-      ),
+      totalPersonas: ParseModel.parseToInt(json["totalPersonas"]),
 
-      totalVehiculos: ParseModel.parseToInt(
-        json["totalVehiculos"],
-      ),
+      totalVehiculos: ParseModel.parseToInt(json["totalVehiculos"]),
 
-      totalAlertas: ParseModel.parseToInt(
-        json["totalAlertas"],
-      ),
+      totalAlertas: ParseModel.parseToInt(json["totalAlertas"]),
 
-      totalAlertasPersona:
-      ParseModel.parseToInt(
-        json["totalAlertasPersona"],
-      ),
+      totalAlertasPersona: ParseModel.parseToInt(json["totalAlertasPersona"]),
 
-      totalAlertasVehiculo:
-      ParseModel.parseToInt(
-        json["totalAlertasVehiculo"],
-      ),
+      totalAlertasVehiculo: ParseModel.parseToInt(json["totalAlertasVehiculo"]),
 
-      totalVehiculosRobados:
-      ParseModel.parseToInt(
+      totalVehiculosRobados: ParseModel.parseToInt(
         json["totalVehiculosRobados"],
       ),
 
-      totalConductores:
-      ParseModel.parseToInt(
-        json["totalConductores"],
-      ),
+      totalConductores: ParseModel.parseToInt(json["totalConductores"]),
 
-      totalOcupantes:
-      ParseModel.parseToInt(
-        json["totalOcupantes"],
-      ),
+      totalOcupantes: ParseModel.parseToInt(json["totalOcupantes"]),
 
-      variablesResultado:
-      variables is List
+      variablesResultado: variables is List
           ? variables
-          .whereType<Map>()
-          .map(
-            (dynamic item) =>
-            VariableResultadoOperativo
-                .fromJson(
-              Map<String, dynamic>.from(
-                item,
-              ),
-            ),
-      )
-          .toList()
+                .whereType<Map>()
+                .map(
+                  (dynamic item) => VariableResultadoOperativo.fromJson(
+                    Map<String, dynamic>.from(item),
+                  ),
+                )
+                .toList()
           : <VariableResultadoOperativo>[],
     );
   }
@@ -250,8 +188,7 @@ class ResultadosOperativo {
       totalVehiculosRobados: 0,
       totalConductores: 0,
       totalOcupantes: 0,
-      variablesResultado:
-      <VariableResultadoOperativo>[],
+      variablesResultado: <VariableResultadoOperativo>[],
     );
   }
 
@@ -259,27 +196,18 @@ class ResultadosOperativo {
   // GETTERS
   // ============================================================
 
-  bool get tieneDatos =>
-      idHdrEvento > 0;
+  bool get tieneDatos => idHdrEvento > 0;
 
-  bool get tieneConsultas =>
-      totalConsultas > 0;
+  bool get tieneConsultas => totalConsultas > 0;
 
-  bool get tieneAlertas =>
-      totalAlertas > 0;
+  bool get tieneAlertas => totalAlertas > 0;
 
-  bool get tieneVariablesResultado =>
-      variablesResultado.isNotEmpty;
+  bool get tieneVariablesResultado => variablesResultado.isNotEmpty;
 
-  int get totalVariablesResultado =>
-      variablesResultado.fold<int>(
-        0,
-            (
-            int total,
-            VariableResultadoOperativo item,
-            ) =>
-        total + item.cantidad,
-      );
+  int get totalVariablesResultado => variablesResultado.fold<int>(
+    0,
+    (int total, VariableResultadoOperativo item) => total + item.cantidad,
+  );
 
   // ============================================================
   // JSON
@@ -288,12 +216,10 @@ class ResultadosOperativo {
   Map<String, dynamic> toJson() => {
     "idHdrEvento": idHdrEvento,
     "codigoEvento": codigoEvento,
-    "descripcionOperativo":
-    descripcionOperativo,
+    "descripcionOperativo": descripcionOperativo,
     "fechaEvento": fechaEvento,
     "fechaRegistro": fechaRegistro,
-    "fechaFinalizacion":
-    fechaFinalizacion,
+    "fechaFinalizacion": fechaFinalizacion,
     "zona": zona,
     "subzona": subzona,
     "distrito": distrito,
@@ -304,24 +230,13 @@ class ResultadosOperativo {
     "totalPersonas": totalPersonas,
     "totalVehiculos": totalVehiculos,
     "totalAlertas": totalAlertas,
-    "totalAlertasPersona":
-    totalAlertasPersona,
-    "totalAlertasVehiculo":
-    totalAlertasVehiculo,
-    "totalVehiculosRobados":
-    totalVehiculosRobados,
-    "totalConductores":
-    totalConductores,
-    "totalOcupantes":
-    totalOcupantes,
-    "variablesResultado":
-    variablesResultado
-        .map(
-          (
-          VariableResultadoOperativo item,
-          ) =>
-          item.toJson(),
-    )
+    "totalAlertasPersona": totalAlertasPersona,
+    "totalAlertasVehiculo": totalAlertasVehiculo,
+    "totalVehiculosRobados": totalVehiculosRobados,
+    "totalConductores": totalConductores,
+    "totalOcupantes": totalOcupantes,
+    "variablesResultado": variablesResultado
+        .map((VariableResultadoOperativo item) => item.toJson())
         .toList(),
   };
 }
@@ -341,21 +256,11 @@ class VariableResultadoOperativo {
     required this.desHdrTipoResum,
   });
 
-  factory VariableResultadoOperativo.fromJson(
-      Map<String, dynamic> json,
-      ) {
+  factory VariableResultadoOperativo.fromJson(Map<String, dynamic> json) {
     return VariableResultadoOperativo(
-      cantidad: ParseModel.parseToInt(
-        json["cantidad"],
-      ),
-      idHdrTipoResum:
-      ParseModel.parseToInt(
-        json["idHdrTipoResum"],
-      ),
-      desHdrTipoResum:
-      ParseModel.parseToString(
-        json["desHdrTipoResum"],
-      ),
+      cantidad: ParseModel.parseToInt(json["cantidad"]),
+      idHdrTipoResum: ParseModel.parseToInt(json["idHdrTipoResum"]),
+      desHdrTipoResum: ParseModel.parseToString(json["desHdrTipoResum"]),
     );
   }
 
@@ -368,14 +273,11 @@ class VariableResultadoOperativo {
   }
 
   bool get tieneDatos =>
-      idHdrTipoResum > 0 &&
-          desHdrTipoResum.trim().isNotEmpty;
+      idHdrTipoResum > 0 && desHdrTipoResum.trim().isNotEmpty;
 
   Map<String, dynamic> toJson() => {
     "cantidad": cantidad,
-    "idHdrTipoResum":
-    idHdrTipoResum,
-    "desHdrTipoResum":
-    desHdrTipoResum,
+    "idHdrTipoResum": idHdrTipoResum,
+    "desHdrTipoResum": desHdrTipoResum,
   };
 }

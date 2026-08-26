@@ -39,14 +39,10 @@ class AntecedentesModel {
 class DataAntecedentes {
   final List<String> antecedentes;
 
-  const DataAntecedentes({
-    required this.antecedentes,
-  });
+  const DataAntecedentes({required this.antecedentes});
 
   factory DataAntecedentes.empty() {
-    return const DataAntecedentes(
-      antecedentes: <String>[],
-    );
+    return const DataAntecedentes(antecedentes: <String>[]);
   }
 
   factory DataAntecedentes.fromJson(Map<String, dynamic> json) {
@@ -62,14 +58,10 @@ class DataAntecedentes {
         .where((String item) => item.isNotEmpty)
         .toList();
 
-    return DataAntecedentes(
-      antecedentes: datos,
-    );
+    return DataAntecedentes(antecedentes: datos);
   }
 
   bool get tieneAntecedentes => antecedentes.isNotEmpty;
 
-  Map<String, dynamic> toJson() => {
-    "antecedentes": antecedentes,
-  };
+  Map<String, dynamic> toJson() => {"antecedentes": antecedentes};
 }

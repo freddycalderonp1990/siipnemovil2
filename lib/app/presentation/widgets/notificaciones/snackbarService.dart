@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import '../../../core/values/app_colors.dart';
 import '../../../core/values/app_images.dart';
 
-
 class SnackbarService {
   static void show({
     required String titulo,
@@ -27,14 +26,17 @@ class SnackbarService {
           width: 60,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) =>
-          const Icon(Icons.broken_image, color: Colors.white54),
+              const Icon(Icons.broken_image, color: Colors.white54),
           loadingBuilder: (context, child, progress) {
             if (progress == null) return child;
             return const SizedBox(
               height: 60,
               width: 60,
               child: Center(
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
               ),
             );
           },
@@ -52,11 +54,11 @@ class SnackbarService {
         borderRadius: BorderRadius.circular(8),
         child: imagenBytes != null
             ? Image.memory(
-          imagenBytes,
-          height: 60,
-          width: 60,
-          fit: BoxFit.cover,
-        )
+                imagenBytes,
+                height: 60,
+                width: 60,
+                fit: BoxFit.cover,
+              )
             : const Icon(Icons.broken_image, color: Colors.white54),
       );
     }
@@ -74,11 +76,7 @@ class SnackbarService {
             color: Colors.white,
             letterSpacing: 0.5,
             shadows: [
-              Shadow(
-                color: Colors.white,
-                offset: Offset(0, 1),
-                blurRadius: 1,
-              ),
+              Shadow(color: Colors.white, offset: Offset(0, 1), blurRadius: 1),
             ],
           ),
         ),

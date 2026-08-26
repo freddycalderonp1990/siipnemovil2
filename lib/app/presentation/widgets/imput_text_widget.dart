@@ -35,7 +35,10 @@ class ImputTextWidget extends StatefulWidget {
     this.onChanged,
     this.keyboardType = TextInputType.text,
     this.imgString = "",
-    this.colorLabel = Colors.black, this.minLines, this.maxLines,this.focusNode,
+    this.colorLabel = Colors.black,
+    this.minLines,
+    this.maxLines,
+    this.focusNode,
   }) : super(key: key);
 
   @override
@@ -60,26 +63,20 @@ class _ImputTextWidgetState extends State<ImputTextWidget> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           widget.imgString == ""
-              ? Container(
-                  child: widget.icono,
-                )
+              ? Container(child: widget.icono)
               : Container(
                   width: responsive.diagonalP(AppConfig.tamIcons + 2.5),
                   child: Image.asset(widget.imgString),
                 ),
-          SizedBox(
-            width: responsive.anchoP(2),
-          ),
+          SizedBox(width: responsive.anchoP(2)),
           Expanded(
             child: widget.isSegura
                 ? getTxtPass()
                 : widget.maxLength > 0
-                    ? getTxtConLeng()
-                    : getTxtNormal(),
+                ? getTxtConLeng()
+                : getTxtNormal(),
           ),
-          SizedBox(
-            width: 14,
-          )
+          SizedBox(width: 14),
         ],
       ),
     );
@@ -99,10 +96,7 @@ class _ImputTextWidgetState extends State<ImputTextWidget> {
       ),
       labelText: widget.label,
       hintText: widget.hitText,
-      contentPadding: const EdgeInsets.symmetric(
-        vertical: 10,
-        horizontal: 0,
-      ),
+      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
     );
   }
 
@@ -123,16 +117,11 @@ class _ImputTextWidgetState extends State<ImputTextWidget> {
       labelText: widget.label,
       hintText: widget.hitText,
 
-      contentPadding: const EdgeInsets.symmetric(
-        vertical: 10,
-        horizontal: 0,
-      ),
+      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
 
       suffixIcon: IconButton(
         icon: Icon(
-          isSegura
-              ? Icons.visibility_outlined
-              : Icons.visibility_off_outlined,
+          isSegura ? Icons.visibility_outlined : Icons.visibility_off_outlined,
           color: AppColors.colorAzul,
           size: responsive.diagonalP(AppConfig.tamIcons),
         ),
@@ -147,51 +136,54 @@ class _ImputTextWidgetState extends State<ImputTextWidget> {
 
   InputDecoration getDecorationTxtOld() {
     return InputDecoration(
+      focusedBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: AppColors.colorAzul),
+      ),
+      enabledBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: AppColors.colorAzul),
+      ),
 
-
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: AppColors.colorAzul),
-
-        ),
-     enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: AppColors.colorAzul),
-        ),
-
-        labelStyle:
-            TextStyle(fontSize: widget.fonSize, color: AppColors.colorAzul),
-        labelText: widget.label,
-        hintText: widget.hitText,
-        contentPadding: EdgeInsets.symmetric(vertical: 10));
+      labelStyle: TextStyle(
+        fontSize: widget.fonSize,
+        color: AppColors.colorAzul,
+      ),
+      labelText: widget.label,
+      hintText: widget.hitText,
+      contentPadding: EdgeInsets.symmetric(vertical: 10),
+    );
   }
 
   InputDecoration getDecorationTxtPassOld() {
     final responsive = ResponsiveUtil();
     return InputDecoration(
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: AppColors.colorAzul),
+      focusedBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: AppColors.colorAzul),
+      ),
+      enabledBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: AppColors.colorAzul),
+      ),
+      labelStyle: TextStyle(
+        fontSize: widget.fonSize,
+        color: AppColors.colorAzul,
+      ),
+      labelText: widget.label,
+      hintText: widget.hitText,
+      contentPadding: EdgeInsets.symmetric(vertical: 10),
+      suffixIcon: IconButton(
+        icon: Icon(
+          // Based on passwordVisible state choose the icon
+          isSegura ? Icons.visibility : Icons.visibility_off,
+          color: AppColors.colorIcons,
+          size: responsive.diagonalP(AppConfig.tamIcons),
         ),
-        enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: AppColors.colorAzul),
-        ),
-        labelStyle:
-            TextStyle(fontSize: widget.fonSize, color: AppColors.colorAzul),
-        labelText: widget.label,
-        hintText: widget.hitText,
-        contentPadding: EdgeInsets.symmetric(vertical: 10),
-        suffixIcon: IconButton(
-          icon: Icon(
-            // Based on passwordVisible state choose the icon
-            isSegura ? Icons.visibility : Icons.visibility_off,
-            color: AppColors.colorIcons,
-            size: responsive.diagonalP(AppConfig.tamIcons),
-          ),
-          onPressed: () {
-            // Update the state i.e. toogle the state of passwordVisible variable
-            setState(() {
-              isSegura = !isSegura;
-            });
-          },
-        ));
+        onPressed: () {
+          // Update the state i.e. toogle the state of passwordVisible variable
+          setState(() {
+            isSegura = !isSegura;
+          });
+        },
+      ),
+    );
   }
 
   Widget getTxtNormal() {
@@ -207,7 +199,7 @@ class _ImputTextWidgetState extends State<ImputTextWidget> {
       cursorColor: AppColors.colorAzul,
       decoration: getDecorationTxt(),
 
-      minLines:widget. minLines,
+      minLines: widget.minLines,
       maxLines: widget.maxLines,
     );
   }

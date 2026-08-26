@@ -1,18 +1,15 @@
-part of  '../../../datasource_impl_siipne_movil.dart';
+part of '../../../datasource_impl_siipne_movil.dart';
 
-class HostAppSiipneMovil{
+class HostAppSiipneMovil {
   //se utiliza el onlyUrl para no incluir el segmento
   // api/v1/siipne-movil/
 
   static gethost() {
     String segmento = dotenv.env['SEGMENTO_APP_SIIPNE_MOVIL'] ?? '';
-    String url = HostApp.gethost( segmento: segmento);
+    String url = HostApp.gethost(segmento: segmento);
     return url;
   }
-
 }
-
-
 
 class HeadAppSiipneMovilRequest {
   final String? modulo;
@@ -28,7 +25,10 @@ class HeadAppSiipneMovilRequest {
   /// Método para convertir el objeto a JSON
   Map<String, dynamic> toJson() {
     Map<String, dynamic> body = {
-      "modulo": modulo ?? SiipneMovilApiConstantes.MODULO, // Usa ?? en lugar de operador ternario
+      "modulo":
+          modulo ??
+          SiipneMovilApiConstantes
+              .MODULO, // Usa ?? en lugar de operador ternario
       "uri": uri,
       ...bodyRequest, // Agrega los valores del bodyRequest al mapa usando spread operator
     };
@@ -36,4 +36,3 @@ class HeadAppSiipneMovilRequest {
     return body;
   }
 }
-

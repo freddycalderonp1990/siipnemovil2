@@ -32,7 +32,9 @@ class _MyTextAreaWidgetState extends State<MyTextAreaWidget> {
     super.initState();
 
     // Usa el controller externo si existe, si no crea uno nuevo
-    _controller = widget.controller ?? TextEditingController(text: widget.initialText ?? '');
+    _controller =
+        widget.controller ??
+        TextEditingController(text: widget.initialText ?? '');
     _caracteresUsados = _controller.text.length;
 
     _controller.addListener(() {

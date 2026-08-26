@@ -1,6 +1,5 @@
 part of 'models_push_notification.dart';
 
-
 NotificationModel notificationModelFromJson(String str) =>
     NotificationModel.fromJson(json.decode(str));
 
@@ -31,15 +30,14 @@ class NotificationModel {
     String? body,
     String? title,
     String? clickAction,
-  }) =>
-      NotificationModel(
-        accion: accion ?? this.accion,
-        appName: appName ?? this.appName,
-        idAccion: idAccion ?? this.idAccion,
-        body: body ?? this.body,
-        title: title ?? this.title,
-        clickAction: clickAction ?? this.clickAction,
-      );
+  }) => NotificationModel(
+    accion: accion ?? this.accion,
+    appName: appName ?? this.appName,
+    idAccion: idAccion ?? this.idAccion,
+    body: body ?? this.body,
+    title: title ?? this.title,
+    clickAction: clickAction ?? this.clickAction,
+  );
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) =>
       NotificationModel(

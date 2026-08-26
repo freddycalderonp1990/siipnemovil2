@@ -334,29 +334,20 @@ class TipoOperativoController extends GetxController {
   // =========================================================
   // LIMPIAR MENSAJE BACKEND ANEXARSE
   // =========================================================
-  String _limpiarMensajeAnexarse(
-      String mensaje,
-      ){
-    String resultado=
-    mensaje.trim();
+  String _limpiarMensajeAnexarse(String mensaje) {
+    String resultado = mensaje.trim();
 
-    if(resultado.isEmpty){
+    if (resultado.isEmpty) {
       return 'No fue posible verificar el operativo.';
     }
 
-    resultado=resultado.replaceFirst(
-      RegExp(
-        r'^Exception:\s*',
-        caseSensitive:false,
-      ),
+    resultado = resultado.replaceFirst(
+      RegExp(r'^Exception:\s*', caseSensitive: false),
       '',
     );
 
-    resultado=resultado.replaceFirst(
-      RegExp(
-        r'^BadRequest:\s*',
-        caseSensitive:false,
-      ),
+    resultado = resultado.replaceFirst(
+      RegExp(r'^BadRequest:\s*', caseSensitive: false),
       '',
     );
 
@@ -409,12 +400,11 @@ class TipoOperativoController extends GetxController {
   // =========================================================
 
   // =========================================================
-// IR AL OPERATIVO
-// =========================================================
+  // IR AL OPERATIVO
+  // =========================================================
 
   void goToPageOperativo(DataCreateOp dataCreateOp) {
-    final String nombreOperativo =
-    selectTipoOperativo.value.descripcion.trim();
+    final String nombreOperativo = selectTipoOperativo.value.descripcion.trim();
 
     debugPrint('==========================================');
     debugPrint('ABRIENDO OPERATIVO CREADO');

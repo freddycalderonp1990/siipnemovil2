@@ -1,6 +1,3 @@
-
-
-
 import '../../domain/repository/apps_repository.dart';
 import '../../domain/request/verificar_update_request.dart';
 import '../datasources/apps_remote_data_source.dart';
@@ -11,12 +8,10 @@ class AppsRepositoryImpl implements AppsRepository {
 
   AppsRepositoryImpl({required this.appsRemoteDataSource});
 
-
   @override
-  Future<DataApp> verificarUpdateApp({required VerificarUpdateRequest request})  async {
-
-   return appsRemoteDataSource.verificarUpdateApp(request: request);
+  Future<DataApp> verificarUpdateApp({
+    required VerificarUpdateRequest request,
+  }) async {
+    return appsRemoteDataSource.verificarUpdateApp(request: request);
   }
-
-
 }

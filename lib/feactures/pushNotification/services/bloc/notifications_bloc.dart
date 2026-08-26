@@ -6,7 +6,6 @@ import 'package:equatable/equatable.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 
-
 import '../../../../app/core/utils/device_info_app.dart';
 import '../../../../app/core/utils/utilidadesUtil.dart';
 import '../../../../app/domain/enums/enums.dart';
@@ -30,8 +29,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   var title = mensaje['title'];
 
   print("firebaseMessagingBackgroundHandler : $mensaje");
-  final notification =
-  NotificationModel.fromJson(message.data);
+  final notification = NotificationModel.fromJson(message.data);
 
   print('accion: ${notification.accion}');
   print('appName: ${notification.appName}');
@@ -39,7 +37,6 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('body: ${notification.body}');
   print('title: ${notification.title}');
   print('clickAction: ${notification.clickAction}');
-
 
   LocalNotification.showLocalNotification(notification: notification);
 }
@@ -52,9 +49,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
 
     _onForegroundMessage();
 
-    FirebaseMessaging.onMessageOpenedApp.listen(
-      _onMessageOpenedApp,
-    );
+    FirebaseMessaging.onMessageOpenedApp.listen(_onMessageOpenedApp);
 
     _listenTokenRefresh();
   }
@@ -87,7 +82,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       // ✅ OK
-      await  _getFCMtoken(
+      await _getFCMtoken(
         topics: topics,
         appName: appName,
         idGenUsuario: idGenUsuario,
@@ -105,7 +100,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   void _mostrarMensajePermisoDenegado() {
     DialogosAwesome.getInformationSiNo(
       descripcion:
-      "Activa las notificaciones para recibir alertas y novedades importantes.\n\n"
+          "Activa las notificaciones para recibir alertas y novedades importantes.\n\n"
           "Sin este permiso, no podremos enviarte mensajes.\n\n"
           "¿Deseas activarlas?",
       title: "Queremos mantenerte informado",
@@ -120,13 +115,12 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     await openAppSettings();
   }
 
-// Obtener el token de FCM y suscribirse a topics
+  // Obtener el token de FCM y suscribirse a topics
   Future<void> _getFCMtoken({
     List<String>? topics,
     required NamApps appName,
     required int idGenUsuario,
   }) async {
-
     const String TAG = "[FCM]";
 
     final settings = await messaging.getNotificationSettings();
@@ -137,9 +131,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     print("$TAG AuthorizationStatus: ${settings.authorizationStatus}");
     print("$TAG ======================================");
 
-    if (settings.authorizationStatus !=
-        AuthorizationStatus.authorized) {
-
+    if (settings.authorizationStatus != AuthorizationStatus.authorized) {
       print("$TAG ❌ Usuario no autorizó notificaciones");
 
       return;
@@ -148,40 +140,29 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     String? token;
 
     try {
-
       // Solo para diagnóstico en iOS
       if (Platform.isIOS) {
-
         try {
-
-          final apnsToken =
-          await FirebaseMessaging.instance.getAPNSToken();
+          final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
 
           print("$TAG 🍎 APNS TOKEN: $apnsToken");
 
           if (apnsToken == null) {
-
             print(
               "$TAG ⚠️ APNS TOKEN es NULL. "
-                  "Posiblemente estás en simulador "
-                  "o APNs no está configurado.",
+              "Posiblemente estás en simulador "
+              "o APNs no está configurado.",
             );
           }
-
         } catch (e) {
-
-          print(
-            "$TAG ❌ Error obteniendo APNS TOKEN: $e",
-          );
+          print("$TAG ❌ Error obteniendo APNS TOKEN: $e");
         }
       }
 
       token = await FirebaseMessaging.instance.getToken();
 
       print("$TAG 🔥 FCM TOKEN: $token");
-
     } catch (e, stackTrace) {
-
       print("$TAG ❌ Error obteniendo FCM TOKEN");
       print("$TAG ERROR: $e");
       print("$TAG STACKTRACE: $stackTrace");
@@ -190,49 +171,27 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     }
 
     try {
+      await FirebaseMessaging.instance.subscribeToTopic(appName.nameString);
 
-      await FirebaseMessaging.instance.subscribeToTopic(
-        appName.nameString,
-      );
-
-      print(
-        "$TAG ✅ Suscrito al topic: ${appName.nameString}",
-      );
-
+      print("$TAG ✅ Suscrito al topic: ${appName.nameString}");
     } catch (e) {
-
-      print(
-        "$TAG ❌ Error suscribiendo al topic: $e",
-      );
+      print("$TAG ❌ Error suscribiendo al topic: $e");
     }
 
     if (topics != null && topics.isNotEmpty) {
-
       for (final topic in topics) {
-
         try {
+          await FirebaseMessaging.instance.subscribeToTopic(topic);
 
-          await FirebaseMessaging.instance.subscribeToTopic(
-            topic,
-          );
-
-          print(
-            "$TAG ✅ Suscrito al topic adicional: $topic",
-          );
-
+          print("$TAG ✅ Suscrito al topic adicional: $topic");
         } catch (e) {
-
-          print(
-            "$TAG ❌ Error suscribiendo al topic $topic: $e",
-          );
+          print("$TAG ❌ Error suscribiendo al topic $topic: $e");
         }
       }
     }
 
     if (token != null && token.isNotEmpty) {
-
       try {
-
         insertToken(
           tokenFcm: token,
           appName: appName.nameString,
@@ -240,12 +199,8 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
         );
 
         print("$TAG ✅ Token enviado al backend");
-
       } catch (e) {
-
-        print(
-          "$TAG ❌ Error guardando token en backend: $e",
-        );
+        print("$TAG ❌ Error guardando token en backend: $e");
       }
     }
 
@@ -274,7 +229,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     required int idGenUsuario,
   }) async {
     final InsertTokenFcmUseCase _insertTokenFcmUseCase =
-    Get.find<InsertTokenFcmUseCase>();
+        Get.find<InsertTokenFcmUseCase>();
 
     try {
       String ip = await DeviceInfoApp.getIp;
@@ -289,11 +244,10 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
         ip: ip,
       );
 
-      if(ApiConfig.token.length>10) {
+      if (ApiConfig.token.length > 10) {
         print("tengo autorizacion para insertar token");
         final result = await _insertTokenFcmUseCase.call(request: request);
-      }
-      else{
+      } else {
         print("Nooo tengo autorizacion para insertar token");
       }
     } catch (ex) {
@@ -307,17 +261,13 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     FirebaseMessaging.onMessage.listen(handleRemoteMessage);
   }
 
-// Mensajes recibidos en minimizado
+  // Mensajes recibidos en minimizado
   void _onMessageOpenedApp(RemoteMessage message) {
-
     print("========= onMessageOpenedApp =========");
 
     print(message.data);
 
-    final notification =
-    NotificationModel.fromJson(
-      message.data,
-    );
+    final notification = NotificationModel.fromJson(message.data);
 
     print('accion: ${notification.accion}');
     print('appName: ${notification.appName}');
@@ -325,19 +275,15 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     print('body: ${notification.body}');
     print('title: ${notification.title}');
   }
+
   /// Manejo de mensajes en cualquier estado
   void handleRemoteMessage(RemoteMessage message) {
-
-
     print("MENSAJE RECIBIDO: ${message.data}");
     print("messageId: ${message.messageId}");
     print("collapseKey: ${message.collapseKey}");
     print("contentAvailable: ${message.contentAvailable}");
 
-
-
-    final notification =
-    NotificationModel.fromJson(message.data);
+    final notification = NotificationModel.fromJson(message.data);
 
     print('accion: ${notification.accion}');
     print('appName: ${notification.appName}');
@@ -345,7 +291,6 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     print('body: ${notification.body}');
     print('title: ${notification.title}');
     print('clickAction: ${notification.clickAction}');
-
 
     LocalNotification.showLocalNotification(notification: notification);
   }

@@ -328,7 +328,7 @@ class DatospropietarioData {
     required this.telefono,
     required this.correo,
     required this.fototo64,
-    required this.fechaDefuncion
+    required this.fechaDefuncion,
   });
 
   factory DatospropietarioData.fromJson(Map<String, dynamic> json) {
@@ -353,7 +353,7 @@ class DatospropietarioData {
       telefono: '',
       correo: '',
       fototo64: '',
-      fechaDefuncion:'',
+      fechaDefuncion: '',
     );
   }
 
@@ -365,7 +365,7 @@ class DatospropietarioData {
     "telefono": telefono,
     "correo": correo,
     "fototo64": fototo64,
-    "fechaDefuncion":fechaDefuncion
+    "fechaDefuncion": fechaDefuncion,
   };
 }
 

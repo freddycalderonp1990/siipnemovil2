@@ -6,15 +6,14 @@ class HomePage extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<HomeController>(
-      builder:
-          (_) => WorkAreaPageWidget(
-            mostrarBtnHome: true,
-            onPressedBtnHome: () {
-              controller.setAppPageSelect(PageAppsSelect.Bienvenida);
-            },
-            contenido: getContenido(),
-            peticionServer: false.obs,
-          ),
+      builder: (_) => WorkAreaPageWidget(
+        mostrarBtnHome: true,
+        onPressedBtnHome: () {
+          controller.setAppPageSelect(PageAppsSelect.Bienvenida);
+        },
+        contenido: getContenido(),
+        peticionServer: false.obs,
+      ),
     );
   }
 

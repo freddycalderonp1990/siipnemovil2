@@ -1,22 +1,17 @@
-class AppImages{
+class AppImages {
   static const _rutaImg = "assets/img/";
   static const _rutaIcon = "assets/icon/";
 
-
   //-*********************** IMAGENES *******************************
   static const imgFondoDefault = _rutaImg + "fondo_default.png";
-  static const imgFondoLogin= _rutaImg + "fondo_login.png";
+  static const imgFondoLogin = _rutaImg + "fondo_login.png";
 
-  static const imgLoginHeader= _rutaImg + "header.png";
-  static const imgSiipneMovil= _rutaImg + "siipne_movil.png";
-  static const imgloginPoliciaEcuador= _rutaImg + "policia_ecuador.png";
+  static const imgLoginHeader = _rutaImg + "header.png";
+  static const imgSiipneMovil = _rutaImg + "siipne_movil.png";
+  static const imgloginPoliciaEcuador = _rutaImg + "policia_ecuador.png";
 
   static const escudopolicia = _rutaImg + "escudo_policia.png";
   static const escudopoliciaPlomo = _rutaImg + "img_btn_plomo_escudo.png";
-
-
-
-
 
   static const cabecera = _rutaImg + "cabecera.png";
   static const splash = _rutaImg + "splash.png";
@@ -26,11 +21,6 @@ class AppImages{
   static const pdf = _rutaImg + "pdf.png";
   static const imgLocationAccess = _rutaImg + "location_access.png";
 
-
-
-
-
-
   //-*********************** ICONOS *******************************
   static const iconNoImg = _rutaIcon + "icon_no_img.png";
   static const icon = _rutaIcon + "icon.png";
@@ -38,21 +28,9 @@ class AppImages{
   static const imgIconApp = _rutaIcon + "icon_app.png";
   static const icon_usuario = _rutaIcon + "icon_usuario.png";
   static const icon_clave = _rutaIcon + "icon_clave.png";
-  static const icon_huella= _rutaIcon + "icon_huella.png";
+  static const icon_huella = _rutaIcon + "icon_huella.png";
   static const ic_empresa = _rutaIcon + "ic_empresa.png";
   static const icon_camara = _rutaIcon + "icon_camara.png";
 
-
   static const imgIconD = _rutaIcon + "iconD.png";
-
-
-
-
-
-
-
-
-
-
-
 }

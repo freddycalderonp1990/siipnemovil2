@@ -245,12 +245,12 @@ class OpServicioUrbanoController extends GetxController {
   // INIT
   // ============================================================
   final RxString nombreOperativoActual = ''.obs;
-// ============================================================
-// ANTECEDENTES PERSONA
-// ============================================================
+  // ============================================================
+  // ANTECEDENTES PERSONA
+  // ============================================================
 
   final Rxn<DataAntecedentes> datosAntecedentesPersona =
-  Rxn<DataAntecedentes>();
+      Rxn<DataAntecedentes>();
 
   final RxBool consultandoAntecedentesPersona = false.obs;
 
@@ -303,11 +303,9 @@ class OpServicioUrbanoController extends GetxController {
     puedeFinalizarOperativo.value = false;
 
     final dynamic arguments = Get.arguments;
-    final String nombreOperativoArgumento =
-    ParseModel.parseToString(
+    final String nombreOperativoArgumento = ParseModel.parseToString(
       arguments['nombreOperativo'],
     ).trim();
-
 
     debugPrint('==========================================');
     debugPrint('OP SERVICIO URBANO - ARGUMENTOS');
@@ -320,8 +318,7 @@ class OpServicioUrbanoController extends GetxController {
       return;
     }
     if (nombreOperativoArgumento.isNotEmpty) {
-      nombreOperativoActual.value =
-          nombreOperativoArgumento;
+      nombreOperativoActual.value = nombreOperativoArgumento;
     }
     final String tipoAcceso = ParseModel.parseToString(
       arguments['tipoAcceso'],
@@ -446,13 +443,11 @@ class OpServicioUrbanoController extends GetxController {
         idOperativoVariablesActual.value = datoNuevo.idTipoOperativo;
       }
       // RESPALDO DEL NOMBRE ENVIADO AL CREAR
-      final String nombreArgumento =
-      ParseModel.parseToString(
+      final String nombreArgumento = ParseModel.parseToString(
         arguments['nombreOperativo'],
       ).trim();
       if (nombreArgumento.isNotEmpty) {
-        nombreOperativoActual.value =
-            nombreArgumento;
+        nombreOperativoActual.value = nombreArgumento;
       }
       esOperativoPendiente.value = false;
       esOperativoAnexado.value = false;
@@ -2007,12 +2002,12 @@ class OpServicioUrbanoController extends GetxController {
     }
   }
   // ============================================================
-// CONSULTAR ANTECEDENTES PERSONA
-// ============================================================
+  // CONSULTAR ANTECEDENTES PERSONA
+  // ============================================================
 
-// ============================================================
-// CONSULTAR ANTECEDENTES PERSONA
-// ============================================================
+  // ============================================================
+  // CONSULTAR ANTECEDENTES PERSONA
+  // ============================================================
 
   Future<bool> consultarAntecedentesPersona({
     DataConsultaPersona? personaConsulta,
@@ -2036,7 +2031,7 @@ class OpServicioUrbanoController extends GetxController {
     if (persona == null) {
       if (dataPersona.isEmpty) {
         mensajeErrorAntecedentesPersona =
-        'Primero debe realizar la consulta de una persona.';
+            'Primero debe realizar la consulta de una persona.';
 
         return false;
       }
@@ -2051,8 +2046,7 @@ class OpServicioUrbanoController extends GetxController {
     // ============================================================
 
     if (persona.dataSiipne.success) {
-      documento =
-          persona.dataSiipne.datosSiipne.documento.trim();
+      documento = persona.dataSiipne.datosSiipne.documento.trim();
     }
 
     // ============================================================
@@ -2060,15 +2054,11 @@ class OpServicioUrbanoController extends GetxController {
     // ============================================================
 
     if (documento.isEmpty) {
-      final dynamic dinardap =
-          persona.dataDinardap.datosDinardap;
+      final dynamic dinardap = persona.dataDinardap.datosDinardap;
 
       if (dinardap != null) {
         try {
-          documento =
-              (dinardap.cedula ?? '')
-                  .toString()
-                  .trim();
+          documento = (dinardap.cedula ?? '').toString().trim();
         } catch (_) {
           documento = '';
         }
@@ -2077,7 +2067,7 @@ class OpServicioUrbanoController extends GetxController {
 
     if (documento.isEmpty) {
       mensajeErrorAntecedentesPersona =
-      'No fue posible determinar el documento de la persona consultada.';
+          'No fue posible determinar el documento de la persona consultada.';
 
       return false;
     }
@@ -2093,32 +2083,26 @@ class OpServicioUrbanoController extends GetxController {
       );
       debugPrint('==========================================');
 
-      final DataAntecedentes resultado =
-      await siipneMovilUseCase.getDatosAntecedentes(
-        request: AntecedentesRequest(
-          documento: documento,
-        ),
-      );
+      final DataAntecedentes resultado = await siipneMovilUseCase
+          .getDatosAntecedentes(
+            request: AntecedentesRequest(documento: documento),
+          );
 
       datosAntecedentesPersona.value = resultado;
 
       debugPrint('==========================================');
       debugPrint('ANTECEDENTES CONSULTADOS');
-      debugPrint(
-        'CANTIDAD: ${resultado.antecedentes.length}',
-      );
+      debugPrint('CANTIDAD: ${resultado.antecedentes.length}');
       debugPrint('==========================================');
 
       return true;
     } catch (e, stackTrace) {
       datosAntecedentesPersona.value = null;
 
-      mensajeErrorAntecedentesPersona =
-          UrlApiProviderAppCenso.mensajeException(
-            e,
-            fallback:
-            'No fue posible consultar los antecedentes de la persona.',
-          );
+      mensajeErrorAntecedentesPersona = UrlApiProviderAppCenso.mensajeException(
+        e,
+        fallback: 'No fue posible consultar los antecedentes de la persona.',
+      );
 
       debugPrint('==========================================');
       debugPrint('ERROR CONSULTANDO ANTECEDENTES');
@@ -2131,7 +2115,6 @@ class OpServicioUrbanoController extends GetxController {
       consultandoAntecedentesPersona.value = false;
     }
   }
-
 
   // ============================================================
   // CLOSE
@@ -2153,5 +2136,4 @@ class OpServicioUrbanoController extends GetxController {
 
     super.onClose();
   }
-
 }

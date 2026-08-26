@@ -1,5 +1,7 @@
 part of 'models_siipne_movil.dart';
-PendienteModel pendienteModelFromJson(String str) => PendienteModel.fromJson(json.decode(str));
+
+PendienteModel pendienteModelFromJson(String str) =>
+    PendienteModel.fromJson(json.decode(str));
 
 String pendienteModelToJson(PendienteModel data) => json.encode(data.toJson());
 
@@ -39,7 +41,7 @@ class Pendiente {
     required this.idGenGeoSenplades,
     required this.fechaEvento,
     required this.descripcion,
-    required this.idTipoOperativo
+    required this.idTipoOperativo,
   });
 
   factory Pendiente.fromJson(Map<String, dynamic> json) => Pendiente(
@@ -55,6 +57,6 @@ class Pendiente {
     "idGenGeoSenplades": idGenGeoSenplades,
     "fechaEvento": fechaEvento,
     "descripcion": descripcion,
-    "idTipoOperativo":idTipoOperativo
+    "idTipoOperativo": idTipoOperativo,
   };
 }

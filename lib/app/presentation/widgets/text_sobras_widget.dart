@@ -6,11 +6,12 @@ class TextSombrasWidget extends StatelessWidget {
   final Color colorSombra;
   final double size;
 
-  const TextSombrasWidget(
-      {required this.title,
-      this.colorTexto = Colors.black,
-      this.colorSombra = Colors.white,
-      this.size = 15});
+  const TextSombrasWidget({
+    required this.title,
+    this.colorTexto = Colors.black,
+    this.colorSombra = Colors.white,
+    this.size = 15,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,22 +19,14 @@ class TextSombrasWidget extends StatelessWidget {
       title == "null" ? "" : title,
       textAlign: TextAlign.center,
       style: TextStyle(
-
-          color: colorTexto,
-          shadows: [
-            Shadow(
-              blurRadius: 10,
-              color: colorSombra,
-              offset: Offset(2, 2),
-            ),
-            Shadow(
-              blurRadius: 10,
-              color: colorSombra,
-              offset: Offset(-2, 2),
-            ),
-          ],
-          fontWeight: FontWeight.bold,
-          fontSize: size),
+        color: colorTexto,
+        shadows: [
+          Shadow(blurRadius: 10, color: colorSombra, offset: Offset(2, 2)),
+          Shadow(blurRadius: 10, color: colorSombra, offset: Offset(-2, 2)),
+        ],
+        fontWeight: FontWeight.bold,
+        fontSize: size,
+      ),
     );
   }
 }

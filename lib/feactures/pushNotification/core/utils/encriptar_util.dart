@@ -7,8 +7,7 @@ import '../../../../../app/core/app_config.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class EncriptarUtil {
-
-  static String key_securiry_pass= dotenv.env['SECRET_KEY_APP_ENCRYP'] ?? '';
+  static String key_securiry_pass = dotenv.env['SECRET_KEY_APP_ENCRYP'] ?? '';
   static String generateMd5(String input) {
     return md5.convert(utf8.encode(input)).toString();
   }
@@ -45,7 +44,7 @@ class EncriptarUtil {
     return result;
   }
 
-// Función para descifrar texto
+  // Función para descifrar texto
   static String decryptMovil(String encryptedText) {
     String key = AppConfig.key_securiry_qr;
     String result = '';
@@ -71,15 +70,13 @@ class EncriptarUtil {
       int byte = bytes[i];
       String keyChar =
           key[i % keyLength]; // Repetir la clave si es más corta que el texto
-      result += String.fromCharCode((byte - keyChar.codeUnitAt(0) + 256) %
-          256); // Resta ASCII de los caracteres
+      result += String.fromCharCode(
+        (byte - keyChar.codeUnitAt(0) + 256) % 256,
+      ); // Resta ASCII de los caracteres
     }
 
     return result;
   }
-
-
-
 
   static Map<String, String> getKeyPass() {
     Map<String, String> _decryptMap = {
@@ -144,30 +141,24 @@ class EncriptarUtil {
       'W': 'y',
       'X': 'l',
       'Y': 'm',
-      'Z': 'g'
+      'Z': 'g',
     };
     return _decryptMap;
   }
 
-
-
   static String asignarLlave(String clave) {
     String key = key_securiry_pass;
     Random random = Random();
-    int numRandom=random.nextInt(clave.length-1)+1;
+    int numRandom = random.nextInt(clave.length - 1) + 1;
 
     String part1 = clave.substring(0, numRandom);
     String part2 = clave.substring(numRandom);
     String result = part1 + key + part2;
 
     return result;
-
-
   }
 
-
   static String myEncryptPass(String input) {
-
     Map<String, String> decryptMap = getKeyPass();
 
     StringBuffer encrypted = StringBuffer();
@@ -175,32 +166,26 @@ class EncriptarUtil {
       String char = input[i];
       encrypted.write(decryptMap[char] ?? char);
     }
-    String value= encrypted.toString();
+    String value = encrypted.toString();
     value = value.split('').reversed.join('');
 
-     value=   asignarLlave(value);
-
-
+    value = asignarLlave(value);
 
     return value;
-
-
   }
 
   static String myDecryptPass(String input) {
-
-
     String key = key_securiry_pass;
 
     //remover la llave
-    input= input.replaceAll(key, '');
+    input = input.replaceAll(key, '');
 
     input = input.split('').reversed.join('');
 
-
     Map<String, String> decryptMap = getKeyPass();
-    Map<String, String> reversedMap =
-        decryptMap.map((key, value) => MapEntry(value, key));
+    Map<String, String> reversedMap = decryptMap.map(
+      (key, value) => MapEntry(value, key),
+    );
 
     StringBuffer decrypted = StringBuffer();
     for (int i = 0; i < input.length; i++) {
@@ -209,7 +194,6 @@ class EncriptarUtil {
     }
 
     return decrypted.toString();
-
   }
 
   static String _generarSha256(String input) {

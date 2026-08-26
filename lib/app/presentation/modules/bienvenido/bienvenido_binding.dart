@@ -5,7 +5,5 @@ class BienvenidoBinding extends Bindings {
   void dependencies() {
     //Inyeccion de dependencias
     Get.lazyPut(() => BienvenidoController(), fenix: true);
-
-
   }
 }

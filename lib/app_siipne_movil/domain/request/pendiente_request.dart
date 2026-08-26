@@ -11,9 +11,6 @@ class GetOperativosPendientesRequest {
 
   /// Método para convertir el objeto a JSON
   Map<String, dynamic> toJson() {
-    return {
-      "idGenPersona": idGenPersona,
-      "idGenUsuario": idGenUsuario,
-    };
+    return {"idGenPersona": idGenPersona, "idGenUsuario": idGenUsuario};
   }
 }

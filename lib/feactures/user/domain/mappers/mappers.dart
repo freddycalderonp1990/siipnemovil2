@@ -2,7 +2,10 @@ import '../../data/models/models_user.dart';
 import '../entities/user.dart';
 
 class Mappers {
-  static UserEntities fromDataUserToUserEntities(UserModel dataUser, {String token = ""}) {
+  static UserEntities fromDataUserToUserEntities(
+    UserModel dataUser, {
+    String token = "",
+  }) {
     return UserEntities(
       idGenUsuario: dataUser.idGenUsuario,
       idGenPersona: dataUser.idGenPersona,

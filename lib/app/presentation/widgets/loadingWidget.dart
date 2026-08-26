@@ -4,17 +4,13 @@ class Loading extends StatefulWidget {
   final double radius;
   final double dotRadius;
 
-  Loading({
-    this.radius = 30.0,
-    this.dotRadius = 3.0,
-  });
+  Loading({this.radius = 30.0, this.dotRadius = 3.0});
 
   @override
   _LoadingState createState() => _LoadingState();
 }
 
-class _LoadingState extends State<Loading>
-    with SingleTickerProviderStateMixin {
+class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
   late AnimationController controller;
 
   @override
@@ -39,8 +35,7 @@ class _LoadingState extends State<Loading>
       child: AnimatedBuilder(
         animation: controller,
         builder: (_, __) {
-          final double pulse =
-              .96 + (sin(controller.value * 2 * pi) * .04);
+          final double pulse = .96 + (sin(controller.value * 2 * pi) * .04);
 
           return Stack(
             alignment: Alignment.center,
@@ -78,9 +73,7 @@ class _LoadingState extends State<Loading>
                 angle: -controller.value * 2 * pi,
                 child: CustomPaint(
                   size: Size(size * .78, size * .78),
-                  painter: _HologramInnerPainter(
-                    color: azul,
-                  ),
+                  painter: _HologramInnerPainter(color: azul),
                 ),
               ),
 
@@ -171,10 +164,7 @@ class Dot extends StatelessWidget {
   final double radius;
   final Color color;
 
-  Dot({
-    required this.radius,
-    required this.color,
-  });
+  Dot({required this.radius, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -200,10 +190,7 @@ class _HologramRingPainter extends CustomPainter {
   final Color color;
   final Color secondaryColor;
 
-  _HologramRingPainter({
-    required this.color,
-    required this.secondaryColor,
-  });
+  _HologramRingPainter({required this.color, required this.secondaryColor});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -229,12 +216,7 @@ class _HologramRingPainter extends CustomPainter {
           color.withOpacity(.90),
           Colors.transparent,
         ],
-      ).createShader(
-        Rect.fromCircle(
-          center: center,
-          radius: r2,
-        ),
-      );
+      ).createShader(Rect.fromCircle(center: center, radius: r2));
 
     final thin = Paint()
       ..style = PaintingStyle.stroke
@@ -246,10 +228,7 @@ class _HologramRingPainter extends CustomPainter {
     canvas.drawCircle(center, r2, base);
 
     canvas.drawArc(
-      Rect.fromCircle(
-        center: center,
-        radius: r2,
-      ),
+      Rect.fromCircle(center: center, radius: r2),
       -pi / 2,
       pi * 1.35,
       false,
@@ -257,10 +236,7 @@ class _HologramRingPainter extends CustomPainter {
     );
 
     canvas.drawArc(
-      Rect.fromCircle(
-        center: center,
-        radius: r1,
-      ),
+      Rect.fromCircle(center: center, radius: r1),
       pi / 3,
       pi * .85,
       false,
@@ -280,11 +256,7 @@ class _HologramRingPainter extends CustomPainter {
         center.dy + (r2 + 3) * sin(angle),
       );
 
-      canvas.drawLine(
-        p1,
-        p2,
-        thin,
-      );
+      canvas.drawLine(p1, p2, thin);
     }
   }
 
@@ -297,9 +269,7 @@ class _HologramRingPainter extends CustomPainter {
 class _HologramInnerPainter extends CustomPainter {
   final Color color;
 
-  _HologramInnerPainter({
-    required this.color,
-  });
+  _HologramInnerPainter({required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -314,10 +284,7 @@ class _HologramInnerPainter extends CustomPainter {
 
     for (int i = 0; i < 4; i++) {
       canvas.drawArc(
-        Rect.fromCircle(
-          center: center,
-          radius: radius - (i * 3),
-        ),
+        Rect.fromCircle(center: center, radius: radius - (i * 3)),
         (pi / 2) * i,
         pi / 5,
         false,

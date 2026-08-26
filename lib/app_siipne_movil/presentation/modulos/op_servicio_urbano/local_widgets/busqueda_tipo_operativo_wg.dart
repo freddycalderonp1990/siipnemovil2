@@ -48,7 +48,7 @@ class BusquedaTipoOperativoWg extends StatelessWidget {
               key: myKey,
               child: ImputTextWidget(
                 controller: controller,
-                focusNode:focusNode,
+                focusNode: focusNode,
                 keyboardType: keyboardType,
                 maxLength: maxLength,
                 icono: icono,

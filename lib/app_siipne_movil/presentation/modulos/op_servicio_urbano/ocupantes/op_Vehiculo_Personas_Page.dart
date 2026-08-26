@@ -304,7 +304,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                   icon: Icons.groups_2_rounded,
                   titulo: "OCUPANTES",
                   detalle:
-                  "$cantidadOcupantes REGISTRADO${cantidadOcupantes == 1 ? '' : 'S'}",
+                      "$cantidadOcupantes REGISTRADO${cantidadOcupantes == 1 ? '' : 'S'}",
                   activo: cantidadOcupantes > 0,
                 ),
               ),
@@ -511,19 +511,19 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                 ),
                 suffixIcon: cargando
                     ? const Padding(
-                  padding: EdgeInsets.all(13),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Color(0xFF195BA6),
-                  ),
-                )
+                        padding: EdgeInsets.all(13),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Color(0xFF195BA6),
+                        ),
+                      )
                     : IconButton(
-                  onPressed: _consultarPersona,
-                  icon: const Icon(
-                    Icons.search_rounded,
-                    color: Color(0xFF195BA6),
-                  ),
-                ),
+                        onPressed: _consultarPersona,
+                        icon: const Icon(
+                          Icons.search_rounded,
+                          color: Color(0xFF195BA6),
+                        ),
+                      ),
                 filled: true,
                 fillColor: const Color(0xFFF7F9FC),
                 contentPadding: const EdgeInsets.symmetric(
@@ -598,8 +598,8 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
           decoration: BoxDecoration(
             gradient: seleccionado
                 ? const LinearGradient(
-              colors: [Color(0xFF195BA6), Color(0xFF0A3D7E)],
-            )
+                    colors: [Color(0xFF195BA6), Color(0xFF0A3D7E)],
+                  )
                 : null,
             color: seleccionado ? null : const Color(0xFFF5F8FB),
             borderRadius: BorderRadius.circular(11),
@@ -646,7 +646,6 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
       ),
     );
   }
-
 
   // ============================================================
   // VARIABLE RESULTADO PERSONA
@@ -742,8 +741,8 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
 
       if (seleccionada != null &&
           variables.any(
-                (VariablesResultado item) =>
-            item.idVariable == seleccionada.idVariable,
+            (VariablesResultado item) =>
+                item.idVariable == seleccionada.idVariable,
           )) {
         valorActual = seleccionada;
       }
@@ -831,8 +830,8 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                 onChanged: controller.consultandoPersonaVehiculo.value
                     ? null
                     : (VariablesResultado? value) {
-                  controller.seleccionarVariableResultado(value);
-                },
+                        controller.seleccionarVariableResultado(value);
+                      },
               ),
             ),
           ),
@@ -846,15 +845,14 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
   // ============================================================
 
   Future<void> _mostrarAntecedentesPersonaVehiculo(
-      DataConsultaPersona persona,
-      String rol,
-      ) async {
+    DataConsultaPersona persona,
+    String rol,
+  ) async {
     if (controller.consultandoAntecedentesPersona.value) return;
 
     FocusManager.instance.primaryFocus?.unfocus();
 
-    final bool resultado =
-    await controller.consultarAntecedentesPersona(
+    final bool resultado = await controller.consultarAntecedentesPersona(
       personaConsulta: persona,
     );
 
@@ -899,8 +897,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
     if (persona.dataSiipne.success) {
       documento = persona.dataSiipne.datosSiipne.documento.trim();
 
-      final String nombreSiipne =
-      persona.dataSiipne.datosSiipne.apenom.trim();
+      final String nombreSiipne = persona.dataSiipne.datosSiipne.apenom.trim();
 
       if (nombreSiipne.isNotEmpty) nombres = nombreSiipne;
     }
@@ -916,16 +913,16 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
 
       if (nombres == "PERSONA CONSULTADA") {
         try {
-          final String nombreDinardap =
-          (dinardap.nombre ?? "").toString().trim();
+          final String nombreDinardap = (dinardap.nombre ?? "")
+              .toString()
+              .trim();
 
           if (nombreDinardap.isNotEmpty) nombres = nombreDinardap;
         } catch (_) {}
       }
     }
 
-    final bool tieneAntecedentes =
-        antecedentes.antecedentes.isNotEmpty;
+    final bool tieneAntecedentes = antecedentes.antecedentes.isNotEmpty;
 
     showDialog<void>(
       context: context,
@@ -937,7 +934,10 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
 
         return Dialog(
           backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 15,
+            vertical: 18,
+          ),
           child: Container(
             width: double.infinity,
             constraints: BoxConstraints(maxHeight: alto * .86),
@@ -962,10 +962,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                     padding: const EdgeInsets.fromLTRB(13, 11, 6, 11),
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [
-                          Color(0xFF334E68),
-                          Color(0xFF243B53),
-                        ],
+                        colors: [Color(0xFF334E68), Color(0xFF243B53)],
                       ),
                     ),
                     child: Row(
@@ -1053,7 +1050,8 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         nombres,
@@ -1128,60 +1126,59 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                           ),
                           if (tieneAntecedentes) ...[
                             const SizedBox(height: 8),
-                            ...List.generate(
-                              antecedentes.antecedentes.length,
-                                  (int index) {
-                                final String dato =
-                                antecedentes.antecedentes[index];
+                            ...List.generate(antecedentes.antecedentes.length, (
+                              int index,
+                            ) {
+                              final String dato =
+                                  antecedentes.antecedentes[index];
 
-                                return Container(
-                                  width: double.infinity,
-                                  margin: const EdgeInsets.only(bottom: 6),
-                                  padding: const EdgeInsets.all(9),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(11),
-                                    border: Border.all(
-                                      color: const Color(0xFFD8E2EB),
+                              return Container(
+                                width: double.infinity,
+                                margin: const EdgeInsets.only(bottom: 6),
+                                padding: const EdgeInsets.all(9),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(11),
+                                  border: Border.all(
+                                    color: const Color(0xFFD8E2EB),
+                                  ),
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: 26,
+                                      height: 26,
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFEAF2F8),
+                                        borderRadius: BorderRadius.circular(7),
+                                      ),
+                                      child: Text(
+                                        "${index + 1}",
+                                        style: const TextStyle(
+                                          color: Color(0xFF334E68),
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        width: 26,
-                                        height: 26,
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFEAF2F8),
-                                          borderRadius: BorderRadius.circular(7),
-                                        ),
-                                        child: Text(
-                                          "${index + 1}",
-                                          style: const TextStyle(
-                                            color: Color(0xFF334E68),
-                                            fontSize: 8,
-                                            fontWeight: FontWeight.w900,
-                                          ),
+                                    const SizedBox(width: 7),
+                                    Expanded(
+                                      child: Text(
+                                        dato,
+                                        style: const TextStyle(
+                                          color: Color(0xFF405A72),
+                                          fontSize: 8.5,
+                                          fontWeight: FontWeight.w600,
+                                          height: 1.3,
                                         ),
                                       ),
-                                      const SizedBox(width: 7),
-                                      Expanded(
-                                        child: Text(
-                                          dato,
-                                          style: const TextStyle(
-                                            color: Color(0xFF405A72),
-                                            fontSize: 8.5,
-                                            fontWeight: FontWeight.w600,
-                                            height: 1.3,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
                           ],
                           const SizedBox(height: 9),
                           SizedBox(
@@ -1237,7 +1234,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
       DialogosAwesome.getWarning(
         title: "PERSONA YA REGISTRADA",
         descripcion:
-        "La persona con documento $documento ya se encuentra relacionada con este vehículo.",
+            "La persona con documento $documento ya se encuentra relacionada con este vehículo.",
       );
 
       return;
@@ -1413,9 +1410,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
           width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-              color: const Color(0xFFC7D8E7),
-            ),
+            border: Border.all(color: const Color(0xFFC7D8E7)),
             boxShadow: [
               BoxShadow(
                 color: const Color(0xFF195BA6).withOpacity(.06),
@@ -1469,14 +1464,8 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                 // ======================================================
                 // CONTENIDO
                 // ======================================================
-
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    9,
-                    9,
-                    9,
-                    11,
-                  ),
+                  padding: const EdgeInsets.fromLTRB(9, 9, 9, 11),
                   child: Column(
                     children: [
                       // =================================================
@@ -1524,37 +1513,33 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                       // =================================================
                       // CUADRÍCULA
                       // =================================================
-
                       GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: personas.length,
                         gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 7,
-                          mainAxisSpacing: 7,
-                          childAspectRatio: .90,
-                        ),
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 7,
+                              mainAxisSpacing: 7,
+                              childAspectRatio: .90,
+                            ),
                         itemBuilder: (BuildContext context, int index) {
-                          final DataConsultaPersona data =
-                          personas[index];
+                          final DataConsultaPersona data = personas[index];
 
                           return _asientoPersonaVehiculo(
                             titulo: titulos[index],
                             data: data,
                             conductor: esConductor[index],
                             seleccionado:
-                            _detalleVisibleId ==
-                                data.idHdrEventoResum,
+                                _detalleVisibleId == data.idHdrEventoResum,
                             onTap: () {
                               setState(() {
                                 if (_detalleVisibleId ==
                                     data.idHdrEventoResum) {
                                   _detalleVisibleId = null;
                                 } else {
-                                  _detalleVisibleId =
-                                      data.idHdrEventoResum;
+                                  _detalleVisibleId = data.idHdrEventoResum;
                                 }
                               });
                             },
@@ -1819,32 +1804,23 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
     dynamic fotoDinardap;
 
     if (data.dataSiipne.success) {
-      final String nombreSiipne =
-      data.dataSiipne.datosSiipne.apenom.trim();
+      final String nombreSiipne = data.dataSiipne.datosSiipne.apenom.trim();
 
       if (nombreSiipne.isNotEmpty) {
         nombre = nombreSiipne;
       }
 
-      fotoSiipne =
-          data.dataSiipne.datosSiipne.foto64.trim();
+      fotoSiipne = data.dataSiipne.datosSiipne.foto64.trim();
     }
 
-    final dynamic dinardap =
-        data.dataDinardap.datosDinardap;
+    final dynamic dinardap = data.dataDinardap.datosDinardap;
 
     if (dinardap != null) {
       try {
-        final String nombreDinardap =
-        (dinardap.nombre ?? '')
-            .toString()
-            .trim();
+        final String nombreDinardap = (dinardap.nombre ?? '').toString().trim();
 
-        if (
-        (nombre.trim().isEmpty ||
-            nombre == "SIN DATOS") &&
-            nombreDinardap.isNotEmpty
-        ) {
+        if ((nombre.trim().isEmpty || nombre == "SIN DATOS") &&
+            nombreDinardap.isNotEmpty) {
           nombre = nombreDinardap;
         }
       } catch (_) {}
@@ -1862,12 +1838,11 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
     );
 
     return <String, String>{
-      "nombre": nombre.trim().isEmpty
-          ? "SIN DATOS"
-          : nombre,
+      "nombre": nombre.trim().isEmpty ? "SIN DATOS" : nombre,
       "foto": foto,
     };
   }
+
   String obtenerFotoPersona({
     required String? fotoSiipne,
     required dynamic fotoDinardap,
@@ -1903,10 +1878,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
       final int resto = limpio.length % 4;
 
       if (resto != 0) {
-        limpio = limpio.padRight(
-          limpio.length + (4 - resto),
-          '=',
-        );
+        limpio = limpio.padRight(limpio.length + (4 - resto), '=');
       }
 
       final Uint8List bytes = base64Decode(limpio);
@@ -1915,16 +1887,14 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
         return false;
       }
 
-      final bool jpg =
-          bytes[0] == 0xFF &&
-              bytes[1] == 0xD8;
+      final bool jpg = bytes[0] == 0xFF && bytes[1] == 0xD8;
 
       final bool png =
           bytes.length >= 8 &&
-              bytes[0] == 0x89 &&
-              bytes[1] == 0x50 &&
-              bytes[2] == 0x4E &&
-              bytes[3] == 0x47;
+          bytes[0] == 0x89 &&
+          bytes[1] == 0x50 &&
+          bytes[2] == 0x4E &&
+          bytes[3] == 0x47;
 
       return jpg || png;
     } catch (_) {

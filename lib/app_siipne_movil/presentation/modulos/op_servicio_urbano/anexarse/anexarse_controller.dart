@@ -44,64 +44,44 @@ class AnexarseController extends GetxController {
   // ============================================================
   // CONSULTAR OPERATIVO
   // ============================================================
-  Future<bool> consultarOperativo({
-    required GlobalKey<FormState> key,
-  }) async {
+  Future<bool> consultarOperativo({required GlobalKey<FormState> key}) async {
     debugPrint('==========================================');
     debugPrint('ENTRÓ A consultarOperativo()');
-    debugPrint(
-      'CAMPO: "${controllerOperativo.text}"',
-    );
+    debugPrint('CAMPO: "${controllerOperativo.text}"');
     debugPrint('==========================================');
 
     if (peticionServerState.value) {
-      debugPrint(
-        'ANEXARSE -> CONSULTA BLOQUEADA: YA EXISTE PETICIÓN',
-      );
+      debugPrint('ANEXARSE -> CONSULTA BLOQUEADA: YA EXISTE PETICIÓN');
       return false;
     }
 
     mensajeValidacion.value = '';
 
-    final bool formularioValido =
-        key.currentState?.validate() ?? false;
+    final bool formularioValido = key.currentState?.validate() ?? false;
 
-    debugPrint(
-      'ANEXARSE -> FORMULARIO VÁLIDO: $formularioValido',
-    );
+    debugPrint('ANEXARSE -> FORMULARIO VÁLIDO: $formularioValido');
 
     if (!formularioValido) {
       return false;
     }
 
-    final String numeroTexto =
-    controllerOperativo.text.trim();
+    final String numeroTexto = controllerOperativo.text.trim();
 
-    debugPrint(
-      'ANEXARSE -> TEXTO OPERATIVO: $numeroTexto',
-    );
+    debugPrint('ANEXARSE -> TEXTO OPERATIVO: $numeroTexto');
 
-    final int idHdrEvento =
-        int.tryParse(numeroTexto) ?? 0;
+    final int idHdrEvento = int.tryParse(numeroTexto) ?? 0;
 
-    debugPrint(
-      'ANEXARSE -> ID CONVERTIDO: $idHdrEvento',
-    );
+    debugPrint('ANEXARSE -> ID CONVERTIDO: $idHdrEvento');
 
     if (idHdrEvento <= 0) {
-      _limpiarResultado(
-        limpiarCampo: false,
-      );
+      _limpiarResultado(limpiarCampo: false);
 
-      mensajeValidacion.value =
-      'Ingrese un número de operativo válido.';
+      mensajeValidacion.value = 'Ingrese un número de operativo válido.';
 
       return false;
     }
 
-    _limpiarResultado(
-      limpiarCampo: false,
-    );
+    _limpiarResultado(limpiarCampo: false);
 
     peticionServerState.value = true;
 
@@ -110,11 +90,9 @@ class AnexarseController extends GetxController {
     try {
       await ExceptionDialogos.manejarErroresShowDialogo(
         showMsjNodata: false,
-            () async {
+        () async {
           final GetDatosAnexarseOperativoRequest request =
-          GetDatosAnexarseOperativoRequest(
-            idHdrEvento: idHdrEvento,
-          );
+              GetDatosAnexarseOperativoRequest(idHdrEvento: idHdrEvento);
 
           debugPrint('==========================================');
           debugPrint('ANEXARSE -> ENVIANDO REQUEST');
@@ -126,52 +104,33 @@ class AnexarseController extends GetxController {
          * qué se está enviando.
          */
           try {
-            debugPrint(
-              'REQUEST: ${request.toJson()}',
-            );
+            debugPrint('REQUEST: ${request.toJson()}');
           } catch (_) {}
 
           debugPrint('==========================================');
 
-          final Anexarse respuesta =
-          await siipneMovilUseCase.consultarAnexarse(
+          final Anexarse respuesta = await siipneMovilUseCase.consultarAnexarse(
             request: request,
           );
 
           debugPrint('==========================================');
           debugPrint('ANEXARSE -> RESPUESTA RECIBIDA');
-          debugPrint(
-            'ID HDR EVENTO: ${respuesta.idHdrEvento}',
-          );
-          debugPrint(
-            'ID TIPO OPERATIVO: ${respuesta.idTipoOperativo}',
-          );
-          debugPrint(
-            'DESCRIPCIÓN: ${respuesta.descripcion}',
-          );
-          debugPrint(
-            'ESTADO OPERATIVO: ${respuesta.estadoOperativo}',
-          );
-          debugPrint(
-            'ESTADO POLICÍA: ${respuesta.estadoPolicia}',
-          );
-          debugPrint(
-            'POLICÍA: ${respuesta.policia}',
-          );
+          debugPrint('ID HDR EVENTO: ${respuesta.idHdrEvento}');
+          debugPrint('ID TIPO OPERATIVO: ${respuesta.idTipoOperativo}');
+          debugPrint('DESCRIPCIÓN: ${respuesta.descripcion}');
+          debugPrint('ESTADO OPERATIVO: ${respuesta.estadoOperativo}');
+          debugPrint('ESTADO POLICÍA: ${respuesta.estadoPolicia}');
+          debugPrint('POLICÍA: ${respuesta.policia}');
           debugPrint('==========================================');
 
           datosAnexarse.value = respuesta;
           operativoConsultado.value = true;
 
-          resultado = _validarOperativo(
-            respuesta,
-          );
+          resultado = _validarOperativo(respuesta);
 
           operativoValido.value = resultado;
 
-          debugPrint(
-            'ANEXARSE -> OPERATIVO VÁLIDO: $resultado',
-          );
+          debugPrint('ANEXARSE -> OPERATIVO VÁLIDO: $resultado');
         },
       );
 
@@ -180,13 +139,10 @@ class AnexarseController extends GetxController {
         operativoValido.value = false;
 
         if (mensajeValidacion.value.isEmpty) {
-          mensajeValidacion.value =
-          'No fue posible verificar el operativo.';
+          mensajeValidacion.value = 'No fue posible verificar el operativo.';
         }
 
-        debugPrint(
-          'ANEXARSE -> NO SE OBTUVO RESPUESTA DE OPERATIVO',
-        );
+        debugPrint('ANEXARSE -> NO SE OBTUVO RESPUESTA DE OPERATIVO');
 
         return false;
       }
@@ -199,32 +155,24 @@ class AnexarseController extends GetxController {
       debugPrint('$stackTrace');
       debugPrint('==========================================');
 
-      _limpiarResultado(
-        limpiarCampo: false,
-      );
+      _limpiarResultado(limpiarCampo: false);
 
-      mensajeValidacion.value =
-      'No fue posible verificar el operativo.';
+      mensajeValidacion.value = 'No fue posible verificar el operativo.';
 
       return false;
     } finally {
       peticionServerState.value = false;
 
-      debugPrint(
-        'ANEXARSE -> FIN consultarOperativo()',
-      );
+      debugPrint('ANEXARSE -> FIN consultarOperativo()');
     }
   }
   // ============================================================
   // VALIDAR OPERATIVO
   // ============================================================
 
-  bool _validarOperativo(
-      Anexarse data,
-      ) {
+  bool _validarOperativo(Anexarse data) {
     if (data.idHdrEvento <= 0) {
-      mensajeValidacion.value =
-      'El operativo consultado no es válido.';
+      mensajeValidacion.value = 'El operativo consultado no es válido.';
 
       return false;
     }
@@ -236,35 +184,29 @@ class AnexarseController extends GetxController {
      */
     if (data.idTipoOperativo <= 0) {
       mensajeValidacion.value =
-      'El operativo no posee una configuración válida.';
+          'El operativo no posee una configuración válida.';
 
       return false;
     }
 
-    final String estadoOperativo =
-    data.estadoOperativo
-        .trim()
-        .toUpperCase();
+    final String estadoOperativo = data.estadoOperativo.trim().toUpperCase();
 
     /*
      * Bloqueamos únicamente estados claramente
      * cerrados/finalizados.
      */
-    if (
-    estadoOperativo.contains('FINALIZ') ||
+    if (estadoOperativo.contains('FINALIZ') ||
         estadoOperativo.contains('CERRAD') ||
         estadoOperativo.contains('INACTIV') ||
         estadoOperativo.contains('CANCELAD')) {
-      mensajeValidacion.value =
-      data.estadoOperativo.trim().isEmpty
+      mensajeValidacion.value = data.estadoOperativo.trim().isEmpty
           ? 'El operativo no se encuentra disponible.'
           : 'El operativo se encuentra ${data.estadoOperativo}.';
 
       return false;
     }
 
-    mensajeValidacion.value =
-    'Operativo verificado correctamente.';
+    mensajeValidacion.value = 'Operativo verificado correctamente.';
 
     return true;
   }
@@ -274,8 +216,7 @@ class AnexarseController extends GetxController {
   // ============================================================
 
   bool puedeAnexarse() {
-    final Anexarse? data =
-        datosAnexarse.value;
+    final Anexarse? data = datosAnexarse.value;
 
     if (!operativoConsultado.value) {
       return false;
@@ -309,15 +250,12 @@ class AnexarseController extends GetxController {
       return;
     }
 
-    final Anexarse? data =
-        datosAnexarse.value;
+    final Anexarse? data = datosAnexarse.value;
 
-    if (!puedeAnexarse() ||
-        data == null) {
+    if (!puedeAnexarse() || data == null) {
       DialogosAwesome.getWarning(
         title: 'OPERATIVO NO DISPONIBLE',
-        descripcion:
-        mensajeValidacion.value.isEmpty
+        descripcion: mensajeValidacion.value.isEmpty
             ? 'Primero verifique un operativo válido.'
             : mensajeValidacion.value,
       );
@@ -325,27 +263,14 @@ class AnexarseController extends GetxController {
       return;
     }
 
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
 
-    debugPrint(
-      '==========================================',
-    );
-    debugPrint(
-      'ANEXARSE - CONTINUAR',
-    );
-    debugPrint(
-      'ID HDR EVENTO: ${data.idHdrEvento}',
-    );
-    debugPrint(
-      'ID TIPO OPERATIVO: ${data.idTipoOperativo}',
-    );
-    debugPrint(
-      'DESCRIPCIÓN: ${data.descripcion}',
-    );
-    debugPrint(
-      '==========================================',
-    );
+    debugPrint('==========================================');
+    debugPrint('ANEXARSE - CONTINUAR');
+    debugPrint('ID HDR EVENTO: ${data.idHdrEvento}');
+    debugPrint('ID TIPO OPERATIVO: ${data.idTipoOperativo}');
+    debugPrint('DESCRIPCIÓN: ${data.descripcion}');
+    debugPrint('==========================================');
 
     /*
      * AQUÍ ESTÁ LA PARTE FUNDAMENTAL.
@@ -363,11 +288,9 @@ class AnexarseController extends GetxController {
 
         'anexarse': data,
 
-        'idHdrEvento':
-        data.idHdrEvento,
+        'idHdrEvento': data.idHdrEvento,
 
-        'idOperativo':
-        data.idTipoOperativo,
+        'idOperativo': data.idTipoOperativo,
       },
     );
   }
@@ -381,21 +304,16 @@ class AnexarseController extends GetxController {
       return;
     }
 
-    FocusManager.instance.primaryFocus
-        ?.unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
 
-    _limpiarResultado(
-      limpiarCampo: true,
-    );
+    _limpiarResultado(limpiarCampo: true);
   }
 
   // ============================================================
   // LIMPIAR RESULTADO
   // ============================================================
 
-  void _limpiarResultado({
-    bool limpiarCampo = false,
-  }) {
+  void _limpiarResultado({bool limpiarCampo = false}) {
     if (limpiarCampo) {
       controllerOperativo.clear();
     }

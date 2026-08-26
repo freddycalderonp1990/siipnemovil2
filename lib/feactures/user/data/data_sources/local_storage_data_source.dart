@@ -3,15 +3,12 @@ import 'dart:typed_data';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../app/core/utils/photo_helper.dart';
 
-
 import '../../../../app/domain/enums/enums.dart';
 import '../../domain/entities/user.dart';
 
 abstract class LocalStorageDataSource {
-
   Future<UserEntities> getUserModel();
   Future<void> setUserModel(UserEntities user);
-
 
   Future<int> getContadorFallido();
   Future<void> setContadorFallido(int value);
@@ -22,12 +19,8 @@ abstract class LocalStorageDataSource {
   Future<bool> getLoginInit();
   Future<void> setLoginInit(bool value);
 
-
-
-  Future<bool> getConfigHuella() ;
-  Future<void> setConfigHuella(bool value) ;
-
-
+  Future<bool> getConfigHuella();
+  Future<void> setConfigHuella(bool value);
 
   Future<void> setUser(String user);
   Future<String> getUser();
@@ -35,36 +28,25 @@ abstract class LocalStorageDataSource {
   Future<void> setPass(String pass);
   Future<String> getPass();
 
-
-
-
   Future<void> setPinCode(String value);
   Future<String> getPinCode();
 
-
-
-  Future<void> setPassCodeTemSiipne(String userName,String passCode);
+  Future<void> setPassCodeTemSiipne(String userName, String passCode);
   Future<String> getPassCodeTemSiipne(String userName);
 
   //Para que el usario acepte y ya no le muetre el mensaje de que existe un codigo teporal guardado
 
-  Future<bool> getAceptacionUserCodeTemporal() ;
-  Future<void> setAceptacionUserCodeTemporal(bool value) ;
+  Future<bool> getAceptacionUserCodeTemporal();
+  Future<void> setAceptacionUserCodeTemporal(bool value);
 
   Future<void> setAppPageSelect(String value);
   Future<String> getAppPagePublic();
 
-
-
-  Future<bool> getShowDataUser() ;
-  Future<void> setShowDataUser(bool value) ;
+  Future<bool> getShowDataUser();
+  Future<void> setShowDataUser(bool value);
 
   Future<void> clearAllData();
-
-
-
 }
-
 
 const _PREF_USER = 'USER';
 const _PREF_PASS = 'PASS';
@@ -86,14 +68,10 @@ const _PREF_APP_PAGE_SELECT = 'APP_PAGE_SELECT';
 
 const _PREF_ACEPTACIONUSER_CODE_TOTP = 'ACEPTACIONUSER_CODE_TOTP';
 
-
-
 const _PREF_SHOW_DATA_USER = 'SHOW_DATA_USUARIO';
 const _PREF_FECHA_SERVER = 'PREF_FECHA_SERVER';
 
 const _PREF_LAST_ID_GENUSUARIO = '_PREF_LAST_ID_GENUSUARIO';
-
-
 
 class LocalStorageDataSourceImpl implements LocalStorageDataSource {
   @override
@@ -152,9 +130,6 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
     prefs.setString(_PREF_USER, user);
   }
 
-
-
-
   @override
   Future<String> getPass() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -166,8 +141,6 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(_PREF_PASS, pass);
   }
-
-
 
   @override
   Future<bool> getLoginInit() async {
@@ -256,8 +229,6 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
     prefs.setBool(_PREF_ACEPTACIONUSER_CODE_TOTP, value);
   }
 
-
-
   @override
   Future<bool> getShowDataUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -288,15 +259,9 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
     return prefs.getInt(_PREF_LAST_ID_GENUSUARIO) ?? 0;
   }
 
-
   @override
-  Future<void> setLastIdGenUsuario(int value)  async {
+  Future<void> setLastIdGenUsuario(int value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setInt(_PREF_LAST_ID_GENUSUARIO, value);
   }
-
-
-
-
-
 }

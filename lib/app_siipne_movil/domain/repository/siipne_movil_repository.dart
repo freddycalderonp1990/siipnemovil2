@@ -1,6 +1,6 @@
 part of 'repository_siipne_movil.dart';
 
-abstract class SiipneMovilRepository{
+abstract class SiipneMovilRepository {
   Future<List<DataModulo>> getPermisosModulos({
     required GetPermisosModulosRequest request,
   });
@@ -17,9 +17,7 @@ abstract class SiipneMovilRepository{
     required ConsultarPersonaRequest request,
   });
 
-  Future<Acuerdo> insertaAcuerdo({
-    required InsertAcuerdoSiipneRequest request,
-  });
+  Future<Acuerdo> insertaAcuerdo({required InsertAcuerdoSiipneRequest request});
 
   Future<Pendiente> consultaPendiente({
     required GetOperativosPendientesRequest request,
@@ -51,7 +49,7 @@ abstract class SiipneMovilRepository{
 
   Future<String> downloadPdfOperativo({
     required int idGenUsuario,
-    required int idHdrEvento
+    required int idHdrEvento,
   });
   Future<ActualizaResultado> actualizaResultado({
     required ActualizarResultadoRequest request,
@@ -59,7 +57,7 @@ abstract class SiipneMovilRepository{
   Future<ResultadosOperativo> getDatosResultadosOperativo({
     required ResultadosOperativoRequest request,
   });
-  Future<DataAntecedentes>getDatosAntecedentes({
+  Future<DataAntecedentes> getDatosAntecedentes({
     required AntecedentesRequest request,
   });
 }

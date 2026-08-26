@@ -1,6 +1,4 @@
-
-class AppMocks{
-
+class AppMocks {
   static const _ruta = "assets/mocks/";
 
   static const auth = _ruta + "auth.json";

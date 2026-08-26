@@ -1,7 +1,12 @@
-part of  'custom_app_widgets.dart';
+part of 'custom_app_widgets.dart';
 
 class OnlyIconWidget extends StatelessWidget {
-  const OnlyIconWidget({Key? key, this.size = 2.5, required this.nameStringImg, this.onTap}) : super(key: key);
+  const OnlyIconWidget({
+    Key? key,
+    this.size = 2.5,
+    required this.nameStringImg,
+    this.onTap,
+  }) : super(key: key);
   final double size;
   final String nameStringImg;
   final GestureTapCallback? onTap;
@@ -9,9 +14,9 @@ class OnlyIconWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final responsive = ResponsiveUtil();
-    return InkWell(child: Image.asset(
-      nameStringImg,
-      height: responsive.diagonalP(size),
-    ),onTap:onTap,);
+    return InkWell(
+      child: Image.asset(nameStringImg, height: responsive.diagonalP(size)),
+      onTap: onTap,
+    );
   }
 }

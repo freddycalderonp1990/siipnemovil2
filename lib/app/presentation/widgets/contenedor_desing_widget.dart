@@ -10,45 +10,36 @@ class ContenedorDesingWidget extends StatelessWidget {
   const ContenedorDesingWidget({
     super.key,
     required this.child,
-    this.anchoPorce=97.0,
+    this.anchoPorce = 97.0,
     this.altoPorce,
     this.margin,
     this.paddin,
   });
 
   @override
-  Widget build(BuildContext context){
-    final responsive=ResponsiveUtil();
+  Widget build(BuildContext context) {
+    final responsive = ResponsiveUtil();
 
-    final Widget contenido=Container(
-      width:responsive.anchoP(anchoPorce),
-      height:altoPorce!=null
-          ?responsive.altoP(altoPorce!)
-          :null,
-      padding:paddin,
-      margin:margin,
-      decoration:BoxDecoration(
-        color:Colors.white.withOpacity(.90),
-        borderRadius:BorderRadius.circular(
-          AppConfig.radioBordecajas,
-        ),
-        border:Border.all(
-          color:AppColors.colorBordecajas,
-          width:2,
-        ),
+    final Widget contenido = Container(
+      width: responsive.anchoP(anchoPorce),
+      height: altoPorce != null ? responsive.altoP(altoPorce!) : null,
+      padding: paddin,
+      margin: margin,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(.90),
+        borderRadius: BorderRadius.circular(AppConfig.radioBordecajas),
+        border: Border.all(color: AppColors.colorBordecajas, width: 2),
       ),
-      child:child,
+      child: child,
     );
 
-    if(altoPorce!=null){
+    if (altoPorce != null) {
       return contenido;
     }
 
     return Align(
-      alignment:Alignment.topCenter,
-      child:IntrinsicHeight(
-        child:contenido,
-      ),
+      alignment: Alignment.topCenter,
+      child: IntrinsicHeight(child: contenido),
     );
   }
 }

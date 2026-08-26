@@ -1,8 +1,6 @@
-
 import 'package:shared_preferences/shared_preferences.dart';
+
 abstract class LocalStorageCensoDataSource {
-
-
   Future<void> clearAllData();
 
   Future<void> setFechaServer(String value);
@@ -11,11 +9,8 @@ abstract class LocalStorageCensoDataSource {
   Future<void> setFechaCellPauseCenso(String value);
   Future<String> getFechaCellPauseCenso();
 
-  Future<void> setCodeUnicoCenso(String userName,String passCode);
+  Future<void> setCodeUnicoCenso(String userName, String passCode);
   Future<String> getCodeUnicoCenso(String userName);
-
-
-
 }
 
 const _APP = 'CENSO';
@@ -25,16 +20,9 @@ const _PREF_FECHA_CELL_PAUSE = '${_APP}PREF_FECHA_CELL_PAUSE';
 
 const _PREF_CODIGO_CENSO = '${_APP}_PREF_CODIGO_CENSO';
 
-
-
-
 class LocalStorageCensoDataSourceImpl implements LocalStorageCensoDataSource {
   @override
-  Future<void> clearAllData() async {
-
-
-  }
-
+  Future<void> clearAllData() async {}
 
   @override
   Future<String> getFechaServer() async {
@@ -63,17 +51,12 @@ class LocalStorageCensoDataSourceImpl implements LocalStorageCensoDataSource {
   @override
   Future<String> getCodeUnicoCenso(String userName) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_PREF_CODIGO_CENSO+userName) ?? '';
+    return prefs.getString(_PREF_CODIGO_CENSO + userName) ?? '';
   }
 
   @override
   Future<void> setCodeUnicoCenso(String userName, String passCode) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString(_PREF_CODIGO_CENSO+userName, passCode);
+    prefs.setString(_PREF_CODIGO_CENSO + userName, passCode);
   }
-
-
-
-
-
 }

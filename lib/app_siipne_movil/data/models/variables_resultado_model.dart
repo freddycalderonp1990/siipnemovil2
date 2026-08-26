@@ -1,6 +1,10 @@
 part of 'models_siipne_movil.dart';
-VariablesResultadoModel variablesResultadoModelFromJson(String str) => VariablesResultadoModel.fromJson(json.decode(str));
-String variablesResultadoModelToJson(VariablesResultadoModel data) => json.encode(data.toJson());
+
+VariablesResultadoModel variablesResultadoModelFromJson(String str) =>
+    VariablesResultadoModel.fromJson(json.decode(str));
+String variablesResultadoModelToJson(VariablesResultadoModel data) =>
+    json.encode(data.toJson());
+
 class VariablesResultadoModel {
   int statusCode;
   String message;
@@ -12,11 +16,14 @@ class VariablesResultadoModel {
     required this.variablesResultado,
   });
 
-  factory VariablesResultadoModel.fromJson(Map<String, dynamic> json) => VariablesResultadoModel(
-    statusCode: json["status_code"],
-    message: json["message"],
-    variablesResultado: List<VariablesResultado>.from(json["data"].map((x) => VariablesResultado.fromJson(x))),
-  );
+  factory VariablesResultadoModel.fromJson(Map<String, dynamic> json) =>
+      VariablesResultadoModel(
+        statusCode: json["status_code"],
+        message: json["message"],
+        variablesResultado: List<VariablesResultado>.from(
+          json["data"].map((x) => VariablesResultado.fromJson(x)),
+        ),
+      );
 
   Map<String, dynamic> toJson() => {
     "status_code": statusCode,
@@ -46,16 +53,17 @@ class VariablesResultado {
     required this.tipoConsulta,
   });
 
-  factory VariablesResultado.fromJson(Map<String, dynamic> json) => VariablesResultado(
-    idOperativo: ParseModel.parseToInt(json["idOperativo"]),
-    nombreOperativo: ParseModel.parseToString(json["nombreOperativo"]),
-    horaInicio: ParseModel.parseToString(json["horaInicio"]),
-    horaFin: ParseModel.parseToString(json["horaFin"]),
-    subzonas: ParseModel.parseToString(json["subzonas"]),
-    idVariable: ParseModel.parseToInt(json["idVariable"]),
-    desHdrTipoResum:ParseModel.parseToString( json["desHdrTipoResum"]),
-    tipoConsulta: ParseModel.parseToString(json["tipoConsulta"]),
-  );
+  factory VariablesResultado.fromJson(Map<String, dynamic> json) =>
+      VariablesResultado(
+        idOperativo: ParseModel.parseToInt(json["idOperativo"]),
+        nombreOperativo: ParseModel.parseToString(json["nombreOperativo"]),
+        horaInicio: ParseModel.parseToString(json["horaInicio"]),
+        horaFin: ParseModel.parseToString(json["horaFin"]),
+        subzonas: ParseModel.parseToString(json["subzonas"]),
+        idVariable: ParseModel.parseToInt(json["idVariable"]),
+        desHdrTipoResum: ParseModel.parseToString(json["desHdrTipoResum"]),
+        tipoConsulta: ParseModel.parseToString(json["tipoConsulta"]),
+      );
 
   Map<String, dynamic> toJson() => {
     "idOperativo": idOperativo,

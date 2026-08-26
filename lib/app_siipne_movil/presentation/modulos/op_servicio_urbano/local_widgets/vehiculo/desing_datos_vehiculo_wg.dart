@@ -39,10 +39,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
               ? ColorsLocal.colorTitulosOrdenCaptura
               : ColorsLocal.colorTitulosNormal,
         ),
-        if (!onlyDataCar) ...[
-          const SizedBox(height: 8),
-          _acciones(),
-        ],
+        if (!onlyDataCar) ...[const SizedBox(height: 8), _acciones()],
       ],
     );
   }
@@ -62,21 +59,13 @@ class DesingDatosVehiculoWg extends StatelessWidget {
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
           colors: robado
-              ? const [
-            Color(0xFFB42318),
-            Color(0xFF78170F),
-          ]
-              : const [
-            Color(0xFF195BA6),
-            Color(0xFF0A3D7E),
-          ],
+              ? const [Color(0xFFB42318), Color(0xFF78170F)]
+              : const [Color(0xFF195BA6), Color(0xFF0A3D7E)],
         ),
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: (robado
-                ? const Color(0xFFB42318)
-                : const Color(0xFF195BA6))
+            color: (robado ? const Color(0xFFB42318) : const Color(0xFF195BA6))
                 .withOpacity(.15),
             blurRadius: 9,
             offset: const Offset(0, 3),
@@ -218,11 +207,10 @@ class DesingDatosVehiculoWg extends StatelessWidget {
               icono: Icons.speed_rounded,
               titulo: "CILINDRAJE",
               valor: v.cilindraje,
-            )
+            ),
           ),
           const SizedBox(height: 4),
           _fila2(
-
             _miniDatoCompacto(
               icono: Icons.settings_outlined,
               titulo: "MOTOR",
@@ -233,23 +221,20 @@ class DesingDatosVehiculoWg extends StatelessWidget {
               titulo: "CHASIS",
               valor: v.chasis,
             ),
-    ),
-    const SizedBox(height: 4),
-            _fila2(
-              _miniDatoCompacto(
-                icono: Icons.calendar_month_outlined,
-                titulo: "AÑO",
-                valor: v.anoFabricacion > 0
-                    ? v.anoFabricacion.toString()
-                    : "",
-              ),
-              _miniDatoCompacto(
-                icono: Icons.palette_outlined,
-                titulo: "COLOR",
-                valor: v.color,
-              ),
-            )
-
+          ),
+          const SizedBox(height: 4),
+          _fila2(
+            _miniDatoCompacto(
+              icono: Icons.calendar_month_outlined,
+              titulo: "AÑO",
+              valor: v.anoFabricacion > 0 ? v.anoFabricacion.toString() : "",
+            ),
+            _miniDatoCompacto(
+              icono: Icons.palette_outlined,
+              titulo: "COLOR",
+              valor: v.color,
+            ),
+          ),
         ],
       ),
     );
@@ -270,9 +255,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: const Color(0xFFD6E1EB),
-        ),
+        border: Border.all(color: const Color(0xFFD6E1EB)),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF0D4C9C).withOpacity(.045),
@@ -322,9 +305,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _fotoPropietarioGrande(
-                p.fototo64,
-              ),
+              _fotoPropietarioGrande(p.fototo64),
 
               const SizedBox(width: 8),
 
@@ -343,14 +324,10 @@ class DesingDatosVehiculoWg extends StatelessWidget {
                         valor: p.docPropietario,
                       ),
                     ),
-                    if (_tieneFechaDefuncionPropietario(
-                      p.fechaDefuncion,
-                    )) ...[
+                    if (_tieneFechaDefuncionPropietario(p.fechaDefuncion)) ...[
                       const SizedBox(height: 6),
 
-                      _fechaDefuncionPropietario(
-                        p.fechaDefuncion,
-                      ),
+                      _fechaDefuncionPropietario(p.fechaDefuncion),
 
                       const SizedBox(height: 4),
                     ] else
@@ -371,12 +348,10 @@ class DesingDatosVehiculoWg extends StatelessWidget {
 
                     const SizedBox(height: 4),
 
-
-                      _miniDatoPropietario(
-                        icono: Icons.alternate_email_rounded,
-                        titulo: "CORREO",
-                        valor: p.correo,
-
+                    _miniDatoPropietario(
+                      icono: Icons.alternate_email_rounded,
+                      titulo: "CORREO",
+                      valor: p.correo,
                     ),
                   ],
                 ),
@@ -387,22 +362,19 @@ class DesingDatosVehiculoWg extends StatelessWidget {
       ),
     );
   }
-  bool _tieneFechaDefuncionPropietario(
-      String? fecha,
-      ) {
+
+  bool _tieneFechaDefuncionPropietario(String? fecha) {
     if (fecha == null) {
       return false;
     }
 
-    final String valor =
-    fecha.trim();
+    final String valor = fecha.trim();
 
     if (valor.isEmpty) {
       return false;
     }
 
-    final String normalizado =
-    valor.toUpperCase();
+    final String normalizado = valor.toUpperCase();
 
     const List<String> noValidos = [
       'N/D',
@@ -419,28 +391,19 @@ class DesingDatosVehiculoWg extends StatelessWidget {
       '0000-00-00 00:00:00',
     ];
 
-    return !noValidos.contains(
-      normalizado,
-    );
+    return !noValidos.contains(normalizado);
   }
-  Widget _fechaDefuncionPropietario(
-      String fecha,
-      ) {
-    final String valor =
-    fecha.trim();
+
+  Widget _fechaDefuncionPropietario(String fecha) {
+    final String valor = fecha.trim();
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 7,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
       decoration: BoxDecoration(
         color: const Color(0xFFFFF0EE),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: const Color(0xFFE5AAA5),
-        ),
+        border: Border.all(color: const Color(0xFFE5AAA5)),
       ),
       child: Row(
         children: [
@@ -462,8 +425,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
 
           Expanded(
             child: Column(
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
                   "FECHA DE DEFUNCIÓN",
@@ -490,11 +452,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
             ),
           ),
 
-          const Icon(
-            Icons.error_rounded,
-            color: Color(0xFFB42318),
-            size: 17,
-          ),
+          const Icon(Icons.error_rounded, color: Color(0xFFB42318), size: 17),
         ],
       ),
     );
@@ -509,20 +467,12 @@ class DesingDatosVehiculoWg extends StatelessWidget {
     required String valor,
   }) {
     return Container(
-      constraints: const BoxConstraints(
-        minHeight: 40,
-        maxHeight: 52,
-      ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 5,
-        vertical: 4,
-      ),
+      constraints: const BoxConstraints(minHeight: 40, maxHeight: 52),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 4),
       decoration: BoxDecoration(
         color: const Color(0xFFF7F9FC),
         borderRadius: BorderRadius.circular(9),
-        border: Border.all(
-          color: const Color(0xFFE0E7EE),
-        ),
+        border: Border.all(color: const Color(0xFFE0E7EE)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -534,11 +484,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
               color: const Color(0xFFE8F1FA),
               borderRadius: BorderRadius.circular(6),
             ),
-            child: Icon(
-              icono,
-              size: 16,
-              color: const Color(0xFF195BA6),
-            ),
+            child: Icon(icono, size: 16, color: const Color(0xFF195BA6)),
           ),
 
           const SizedBox(width: 5),
@@ -595,16 +541,11 @@ class DesingDatosVehiculoWg extends StatelessWidget {
   }) {
     return Container(
       height: 45,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 5,
-        vertical: 5,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
       decoration: BoxDecoration(
         color: const Color(0xFFF7F9FC),
         borderRadius: BorderRadius.circular(9),
-        border: Border.all(
-          color: const Color(0xFFE0E7EE),
-        ),
+        border: Border.all(color: const Color(0xFFE0E7EE)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -616,11 +557,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
               color: const Color(0xFFE8F1FA),
               borderRadius: BorderRadius.circular(6),
             ),
-            child: Icon(
-              icono,
-              size: 14,
-              color: const Color(0xFF195BA6),
-            ),
+            child: Icon(icono, size: 14, color: const Color(0xFF195BA6)),
           ),
 
           const SizedBox(width: 5),
@@ -664,11 +601,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
   // FILAS
   // ============================================================
 
-  Widget _fila3(
-      Widget primero,
-      Widget segundo,
-      Widget tercero,
-      ) {
+  Widget _fila3(Widget primero, Widget segundo, Widget tercero) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -681,10 +614,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
     );
   }
 
-  Widget _fila2(
-      Widget primero,
-      Widget segundo,
-      ) {
+  Widget _fila2(Widget primero, Widget segundo) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -699,20 +629,14 @@ class DesingDatosVehiculoWg extends StatelessWidget {
   // FOTO PROPIETARIO BASE64
   // ============================================================
 
-  Widget _fotoPropietarioGrande(
-      String fotoBase64,
-      ) {
+  Widget _fotoPropietarioGrande(String fotoBase64) {
     final String foto = fotoBase64.trim();
 
     Widget placeholder() {
       return Container(
         color: const Color(0xFFEAF2FA),
         child: const Center(
-          child: Icon(
-            Icons.person_rounded,
-            color: Color(0xFF7796B3),
-            size: 40,
-          ),
+          child: Icon(Icons.person_rounded, color: Color(0xFF7796B3), size: 40),
         ),
       );
     }
@@ -725,9 +649,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFFEAF2FA),
           borderRadius: BorderRadius.circular(13),
-          border: Border.all(
-            color: const Color(0xFFABC7DF),
-          ),
+          border: Border.all(color: const Color(0xFFABC7DF)),
           boxShadow: [
             BoxShadow(
               color: const Color(0xFF195BA6).withOpacity(.08),
@@ -741,9 +663,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
     }
 
     if (foto.isEmpty) {
-      return contenedor(
-        placeholder(),
-      );
+      return contenedor(placeholder());
     }
 
     try {
@@ -773,9 +693,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
         ),
       );
     } catch (_) {
-      return contenedor(
-        placeholder(),
-      );
+      return contenedor(placeholder());
     }
   }
 
@@ -795,9 +713,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: const Color(0xFFD6E1EB),
-        ),
+        border: Border.all(color: const Color(0xFFD6E1EB)),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF0D4C9C).withOpacity(.045),
@@ -817,11 +733,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
                   color: const Color(0xFFEAF3FC),
                   borderRadius: BorderRadius.circular(9),
                 ),
-                child: Icon(
-                  icono,
-                  color: const Color(0xFF195BA6),
-                  size: 17,
-                ),
+                child: Icon(icono, color: const Color(0xFF195BA6), size: 17),
               ),
 
               const SizedBox(width: 7),
@@ -864,69 +776,55 @@ class DesingDatosVehiculoWg extends StatelessWidget {
   // ACCIONES
   // ============================================================
 
-  Widget _acciones(){
+  Widget _acciones() {
     return Row(
-      children:[
+      children: [
         Expanded(
-          child:OutlinedButton.icon(
-            onPressed:onPressedNewConsulta,
-            icon:const Icon(
-              Icons.refresh_rounded,
-              size:16,
-            ),
-            label:const FittedBox(
-              fit:BoxFit.scaleDown,
-              child:Text(
+          child: OutlinedButton.icon(
+            onPressed: onPressedNewConsulta,
+            icon: const Icon(Icons.refresh_rounded, size: 16),
+            label: const FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
                 "NUEVA CONSULTA",
-                maxLines:1,
-                style:TextStyle(
-                  fontSize:12,
-                  fontWeight:FontWeight.w900,
-                ),
+                maxLines: 1,
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900),
               ),
             ),
-            style:OutlinedButton.styleFrom(
-              foregroundColor:const Color(0xFF195BA6),
-              minimumSize:const Size(0,43),
-              padding:const EdgeInsets.symmetric(horizontal:7),
-              side:const BorderSide(
-                color:Color(0xFFAFC9E1),
-              ),
-              shape:RoundedRectangleBorder(
-                borderRadius:BorderRadius.circular(11),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF195BA6),
+              minimumSize: const Size(0, 43),
+              padding: const EdgeInsets.symmetric(horizontal: 7),
+              side: const BorderSide(color: Color(0xFFAFC9E1)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(11),
               ),
             ),
           ),
         ),
 
-        const SizedBox(width:6),
+        const SizedBox(width: 6),
 
         Expanded(
-          child:ElevatedButton.icon(
-            onPressed:onPressedOcupantes,
-            icon:const Icon(
-              Icons.groups_2_rounded,
-              size:17,
-            ),
-            label:const FittedBox(
-              fit:BoxFit.scaleDown,
-              child:Text(
+          child: ElevatedButton.icon(
+            onPressed: onPressedOcupantes,
+            icon: const Icon(Icons.groups_2_rounded, size: 17),
+            label: const FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
                 "CONDUCTOR / OCUPANTES",
-                maxLines:1,
-                style:TextStyle(
-                  fontSize:10,
-                  fontWeight:FontWeight.w900,
-                ),
+                maxLines: 1,
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900),
               ),
             ),
-            style:ElevatedButton.styleFrom(
-              minimumSize:const Size(0,43),
-              padding:const EdgeInsets.symmetric(horizontal:7),
-              backgroundColor:const Color(0xFF195BA6),
-              foregroundColor:Colors.white,
-              elevation:0,
-              shape:RoundedRectangleBorder(
-                borderRadius:BorderRadius.circular(11),
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(0, 43),
+              padding: const EdgeInsets.symmetric(horizontal: 7),
+              backgroundColor: const Color(0xFF195BA6),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(11),
               ),
             ),
           ),
@@ -942,8 +840,6 @@ class DesingDatosVehiculoWg extends StatelessWidget {
   String _valor(String valor) {
     final String dato = valor.trim();
 
-    return dato.isEmpty
-        ? "NO DISPONIBLE"
-        : dato;
+    return dato.isEmpty ? "NO DISPONIBLE" : dato;
   }
 }

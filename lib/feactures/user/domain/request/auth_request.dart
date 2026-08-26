@@ -1,4 +1,5 @@
 part of 'request_user.dart';
+
 class AuthRequest {
   final String user;
   final String pass;
@@ -7,9 +8,13 @@ class AuthRequest {
 
   final int versionCodeApp;
 
-
-  AuthRequest({required this.user, required this.pass, required this.isAndroid, required this.versionCodeApp,
-  required this.ip});
+  AuthRequest({
+    required this.user,
+    required this.pass,
+    required this.isAndroid,
+    required this.versionCodeApp,
+    required this.ip,
+  });
 
   /// Método para convertir el objeto a JSON
   Map<String, dynamic> toJson() {
@@ -19,9 +24,6 @@ class AuthRequest {
       "isAndroid": isAndroid,
       "versionCodeApp": versionCodeApp,
       "ip": ip,
-
     };
-
-
   }
 }

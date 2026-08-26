@@ -26,7 +26,6 @@ import '../../domain/request/request_siipne_movil.dart';
 import '../../domain/use_cases/siipne_movil_use_case.dart';
 import '../routes/siipne_movil_routes.dart';
 
-
 part 'menu/menu_siipne_movil_controller.dart';
 part 'op_servicio_urbano/op_servicio_urbano_controller.dart';
 part 'op_servicio_urbano/tipo_operativo/tipo_operativo_controller.dart';

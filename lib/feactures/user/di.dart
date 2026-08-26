@@ -1,4 +1,3 @@
-
 import 'package:get/get.dart';
 
 import 'data/data_sources/local_storage_data_source.dart';
@@ -13,37 +12,41 @@ import 'domain/use_cases/get_data_user.dart';
 import 'domain/use_cases/local_store.dart';
 import 'presentation/modules/controllers.dart';
 
-
-class DependencyInjectionUser  {
-
+class DependencyInjectionUser {
   static init() async {
     // Use cases
-    Get.lazyPut<LocalStoreUseCase>(()=>LocalStoreUseCase(repository: Get.find()),fenix: true);
+    Get.lazyPut<LocalStoreUseCase>(
+      () => LocalStoreUseCase(repository: Get.find()),
+      fenix: true,
+    );
 
-    Get.lazyPut<GetDataUserUseCase>(() => GetDataUserUseCase(repository: Get.find()),
-        fenix: true);
-    Get.lazyPut<AuthUseCase>(()=>AuthUseCase(repository: Get.find()));
-
+    Get.lazyPut<GetDataUserUseCase>(
+      () => GetDataUserUseCase(repository: Get.find()),
+      fenix: true,
+    );
+    Get.lazyPut<AuthUseCase>(() => AuthUseCase(repository: Get.find()));
 
     // Repository
-    Get.lazyPut<UserRepository>(() =>
-        UserRepositoryImpl(userRemoteDataSource: Get.find()), fenix: true);
-    Get.lazyPut<LocalStorageRepository>(() =>
-        LocalStorageRepositoryImpl(localStorageDataSource: Get.find()), fenix: true);
-
-
-
+    Get.lazyPut<UserRepository>(
+      () => UserRepositoryImpl(userRemoteDataSource: Get.find()),
+      fenix: true,
+    );
+    Get.lazyPut<LocalStorageRepository>(
+      () => LocalStorageRepositoryImpl(localStorageDataSource: Get.find()),
+      fenix: true,
+    );
 
     // Data sources
-    Get.lazyPut<UserRemoteDataSource>(() => UserRemoteDataSourceImpl(),
-        fenix: true);
+    Get.lazyPut<UserRemoteDataSource>(
+      () => UserRemoteDataSourceImpl(),
+      fenix: true,
+    );
 
-    Get.lazyPut<LocalStorageDataSource>(() => LocalStorageDataSourceImpl(),
-        fenix: true);
+    Get.lazyPut<LocalStorageDataSource>(
+      () => LocalStorageDataSourceImpl(),
+      fenix: true,
+    );
 
     Get.put(LoginController());
   }
 }
-
-
-

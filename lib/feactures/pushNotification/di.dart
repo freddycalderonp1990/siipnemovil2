@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 
-
 import 'data/data_sources/push_notification_local_data_source.dart';
 import 'data/data_sources/push_notification_remote_data_source.dart';
 
@@ -16,15 +15,12 @@ import 'services/notification_service.dart';
 
 class DependencyInjectionPushNotification {
   static init() async {
-
     /// ============================
     /// USE CASES REMOTOS
     /// ============================
 
     Get.lazyPut<InsertTokenFcmUseCase>(
-          () => InsertTokenFcmUseCase(
-        repository: Get.find(),
-      ),
+      () => InsertTokenFcmUseCase(repository: Get.find()),
       fenix: true,
     );
 
@@ -32,53 +28,38 @@ class DependencyInjectionPushNotification {
     /// USE CASES LOCALES
     /// ============================
 
-
     Get.lazyPut<GuardarNotificacionRemotaUseCase>(
-          () => GuardarNotificacionRemotaUseCase(
-        repository: Get.find(),
-      ),
+      () => GuardarNotificacionRemotaUseCase(repository: Get.find()),
       fenix: true,
     );
 
     Get.lazyPut<GuardarNotificacionUseCase>(
-          () => GuardarNotificacionUseCase(
-        repository: Get.find(),
-      ),
+      () => GuardarNotificacionUseCase(repository: Get.find()),
       fenix: true,
     );
 
     Get.lazyPut<ObtenerNotificacionesUseCase>(
-          () => ObtenerNotificacionesUseCase(
-        repository: Get.find(),
-      ),
+      () => ObtenerNotificacionesUseCase(repository: Get.find()),
       fenix: true,
     );
 
     Get.lazyPut<MarcarNotificacionLeidaUseCase>(
-          () => MarcarNotificacionLeidaUseCase(
-        repository: Get.find(),
-      ),
+      () => MarcarNotificacionLeidaUseCase(repository: Get.find()),
       fenix: true,
     );
 
     Get.lazyPut<ObtenerCantidadNoLeidasUseCase>(
-          () => ObtenerCantidadNoLeidasUseCase(
-        repository: Get.find(),
-      ),
+      () => ObtenerCantidadNoLeidasUseCase(repository: Get.find()),
       fenix: true,
     );
 
     Get.lazyPut<EliminarNotificacionUseCase>(
-          () => EliminarNotificacionUseCase(
-        repository: Get.find(),
-      ),
+      () => EliminarNotificacionUseCase(repository: Get.find()),
       fenix: true,
     );
 
     Get.lazyPut<EliminarTodasNotificacionesUseCase>(
-          () => EliminarTodasNotificacionesUseCase(
-        repository: Get.find(),
-      ),
+      () => EliminarTodasNotificacionesUseCase(repository: Get.find()),
       fenix: true,
     );
 
@@ -87,7 +68,7 @@ class DependencyInjectionPushNotification {
     /// ============================
 
     Get.lazyPut<PushNotificationRepository>(
-          () => PushNotificationRepositoryImpl(
+      () => PushNotificationRepositoryImpl(
         pushNotificationRemoteDataSource: Get.find(),
       ),
       fenix: true,
@@ -98,7 +79,7 @@ class DependencyInjectionPushNotification {
     /// ============================
 
     Get.lazyPut<PushNotificationLocalRepository>(
-          () => PushNotificationLocalRepositoryImpl(
+      () => PushNotificationLocalRepositoryImpl(
         pushNotificationLocalDataSource: Get.find(),
       ),
       fenix: true,
@@ -109,7 +90,7 @@ class DependencyInjectionPushNotification {
     /// ============================
 
     Get.lazyPut<PushNotificationRemoteDataSource>(
-          () => PusNotificationFirebaseRemoteDataSourceImpl(),
+      () => PusNotificationFirebaseRemoteDataSourceImpl(),
       fenix: true,
     );
 
@@ -118,15 +99,11 @@ class DependencyInjectionPushNotification {
     /// ============================
 
     Get.lazyPut<PushNotificationLocalDataSource>(
-          () => PushNotificationLocalDataSourceImpl(),
+      () => PushNotificationLocalDataSourceImpl(),
       fenix: true,
     );
 
-
-//Registro el Servicio
-    Get.put<NotificationService>(
-      NotificationService(),
-      permanent: true,
-    );
+    //Registro el Servicio
+    Get.put<NotificationService>(NotificationService(), permanent: true);
   }
 }

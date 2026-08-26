@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'dart:math';
 import 'dart:ui';
 
-
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
@@ -18,15 +17,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 
-
-
-
-
 import '../../../app/core/utils/responsiveUtil.dart';
-
-
-
-
 
 import '../../../feactures/gps/presentation/widgets/gps_access_screen.dart';
 import '../../../feactures/pushNotification/services/notification_service.dart';
@@ -34,11 +25,8 @@ import '../../../feactures/user/presentation/modules/controllers.dart';
 import '../../core/app_config.dart';
 import '../../core/utils/device_info_app.dart';
 
-
-
 import '../../core/values/app_colors.dart';
 import '../../core/values/app_images.dart';
-
 
 import '../../domain/enums/enums.dart';
 import '../routes/app_routes.dart';
@@ -66,8 +54,6 @@ part 'text_sobras_widget.dart';
 
 part 'workAreaPageWidget.dart';
 
-
-
 part 'combos/combo_busqueda.dart';
 part 'combos/combo_con_busqueda.dart';
 
@@ -78,4 +64,3 @@ part 'btn_icon_widget.dart';
 part 'desing_foto_name_widget.dart';
 part 'my_text_area_widget.dart';
 part 'loadingWidget.dart';
-

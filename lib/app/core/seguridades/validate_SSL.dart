@@ -1,26 +1,23 @@
-
 import 'package:api_provider/api_provider.dart';
 import 'package:api_provider/data/data_source/remote/apis/host/host_app.dart';
 import 'package:crypto/crypto.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 
-
-
-
-class ValidateSSL{
+class ValidateSSL {
   /// Realiza la conexión inicial al servidor y guarda el hash localmente
   Future<void> storePublicKeyHash(Uri url) async {
-
     final client = CustomHttpClient();
     try {
-      final certificate = await client.getServerCertificate(url).timeout(
-         Duration(seconds: ApiConfig.secondsTimeout),
-        onTimeout: () {
-          print("Tiempo de espera agotado al obtener el certificado.");
-          return null; // Retorna null en caso de timeout
-        },
-      );
+      final certificate = await client
+          .getServerCertificate(url)
+          .timeout(
+            Duration(seconds: ApiConfig.secondsTimeout),
+            onTimeout: () {
+              print("Tiempo de espera agotado al obtener el certificado.");
+              return null; // Retorna null en caso de timeout
+            },
+          );
 
       if (certificate != null) {
         final publicKeyHash = sha256.convert(certificate).toString();
@@ -35,17 +32,18 @@ class ValidateSSL{
     }
   }
 
-
   Future<bool> validatePublicKeyHash(Uri url) async {
     final client = CustomHttpClient();
     // Obtén el certificado del servidor
-    final certificate = await client.getServerCertificate(url).timeout(
-      Duration(seconds: ApiConfig.secondsTimeout),
-      onTimeout: () {
-        print("Tiempo de espera agotado al obtener el certificado.");
-        return null; // Retorna null en caso de timeout
-      },
-    );
+    final certificate = await client
+        .getServerCertificate(url)
+        .timeout(
+          Duration(seconds: ApiConfig.secondsTimeout),
+          onTimeout: () {
+            print("Tiempo de espera agotado al obtener el certificado.");
+            return null; // Retorna null en caso de timeout
+          },
+        );
     if (certificate != null) {
       // Calcula el hash del certificado actual
       final publicKeyHash = sha256.convert(certificate).toString();
@@ -69,7 +67,7 @@ class ValidateSSL{
   Future<bool> validarSSl() async {
     String url = HostApp.gethost(segmento: '');
     final uri = Uri.parse(url);
-    ValidateSSL validateSSL=ValidateSSL();
+    ValidateSSL validateSSL = ValidateSSL();
     // Guarda el hash en la primera conexión
     await validateSSL.storePublicKeyHash(uri);
     // En conexiones futuras, valida el hash
@@ -80,13 +78,7 @@ class ValidateSSL{
       return false;
     }
   }
-
-
-
 }
-
-
-
 
 /// Cliente HTTPS personalizado para obtener certificados del servidor
 class CustomHttpClient {
@@ -107,7 +99,7 @@ class CustomHttpClient {
 
       // Obtiene los certificados del servidor
       final X509Certificate? certificates = response.certificate;
-      if (certificates != null ) {
+      if (certificates != null) {
         // Devuelve el certificado en formato DER
         return certificates.der;
       }

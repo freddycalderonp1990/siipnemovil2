@@ -44,9 +44,16 @@ class DataTipoOperativo {
     required this.idOperativo,
     required this.idGenTipoTipificacion,
     required this.descripcion,
-    required this.nivel, required this.idPadre,
+    required this.nivel,
+    required this.idPadre,
   });
-  factory DataTipoOperativo.empty()=>DataTipoOperativo(idOperativo: 0, idGenTipoTipificacion: 0, descripcion: '', nivel: 0, idPadre: 0);
+  factory DataTipoOperativo.empty() => DataTipoOperativo(
+    idOperativo: 0,
+    idGenTipoTipificacion: 0,
+    descripcion: '',
+    nivel: 0,
+    idPadre: 0,
+  );
 
   factory DataTipoOperativo.fromJson(Map<String, dynamic> json) =>
       DataTipoOperativo(

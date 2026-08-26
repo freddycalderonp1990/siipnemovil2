@@ -1,4 +1,4 @@
-class AppStrings{
+class AppStrings {
   static const POLICIANACIONAL = "POLICÍA NACIONAL DEL ECUADOR";
 
   static const OPERATIVOS = "OPERATIVOS";
@@ -8,12 +8,10 @@ class AppStrings{
   static const UnidadPolicial = "Unidad Policial";
   static const Instalacion = "Instalación";
 
-
   static const DIRECCION = "";
   static const DIRECCIONDNSP = "";
   static const Usuario = "Usuario";
   static const Clave = "Clave";
-
 
   static const MENU = "MENU";
   static const GUARDAR = "GUARDAR";
@@ -34,6 +32,4 @@ class AppStrings{
 
   static const CREARCODIGO = "CREAR CÓDIGO";
   static const ANEXARSE = "ANEXARSE";
-
-
 }

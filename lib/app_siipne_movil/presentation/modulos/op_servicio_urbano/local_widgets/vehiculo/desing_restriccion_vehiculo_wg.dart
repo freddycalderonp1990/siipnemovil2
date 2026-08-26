@@ -30,8 +30,8 @@ class DesingRestriccionVehiculoWg extends StatelessWidget {
 
     final String detalle = data.data.detBusqueda.trim().isEmpty
         ? robado
-        ? "VEHÍCULO CON RESTRICCIÓN"
-        : "NO EXISTE RESTRICCIÓN"
+              ? "VEHÍCULO CON RESTRICCIÓN"
+              : "NO EXISTE RESTRICCIÓN"
         : data.data.detBusqueda.trim();
 
     return Container(
@@ -40,9 +40,7 @@ class DesingRestriccionVehiculoWg extends StatelessWidget {
       decoration: BoxDecoration(
         color: fondo,
         borderRadius: BorderRadius.circular(17),
-        border: Border.all(
-          color: borde,
-        ),
+        border: Border.all(color: borde),
         boxShadow: [
           BoxShadow(
             color: principal.withOpacity(.06),
@@ -95,10 +93,7 @@ class DesingRestriccionVehiculoWg extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 5,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                 decoration: BoxDecoration(
                   color: principal,
                   borderRadius: BorderRadius.circular(20),
@@ -121,9 +116,7 @@ class DesingRestriccionVehiculoWg extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(.80),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: principal.withOpacity(.16),
-              ),
+              border: Border.all(color: principal.withOpacity(.16)),
             ),
             child: Row(
               children: [

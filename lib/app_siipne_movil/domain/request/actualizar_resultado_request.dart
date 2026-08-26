@@ -13,8 +13,7 @@ class ActualizarResultadoRequest {
   Map<String, dynamic> toJson() {
     return {
       "idHdrEventoResum": idHdrEventoResum,
-      "idHdrTipoResum":idHdrTipoResum
-
+      "idHdrTipoResum": idHdrTipoResum,
     };
   }
 }

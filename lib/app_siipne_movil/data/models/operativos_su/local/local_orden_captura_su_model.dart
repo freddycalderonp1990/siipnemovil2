@@ -5,8 +5,9 @@ class LocalOrdenCapturaSuModel {
   final String documento;
   final String oficio;
 
-  LocalOrdenCapturaSuModel(
-      {required this.juzgado,
-      required this.documento,
-      required this.oficio});
+  LocalOrdenCapturaSuModel({
+    required this.juzgado,
+    required this.documento,
+    required this.oficio,
+  });
 }

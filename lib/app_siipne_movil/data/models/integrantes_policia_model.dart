@@ -1,8 +1,10 @@
 part of 'models_siipne_movil.dart';
 
-IntegrantesPoliciaModel integrantesPoliciaModelFromJson(String str) => IntegrantesPoliciaModel.fromJson(json.decode(str));
+IntegrantesPoliciaModel integrantesPoliciaModelFromJson(String str) =>
+    IntegrantesPoliciaModel.fromJson(json.decode(str));
 
-String integrantesPoliciaModelToJson(IntegrantesPoliciaModel data) => json.encode(data.toJson());
+String integrantesPoliciaModelToJson(IntegrantesPoliciaModel data) =>
+    json.encode(data.toJson());
 
 class IntegrantesPoliciaModel {
   int statusCode;
@@ -15,11 +17,14 @@ class IntegrantesPoliciaModel {
     required this.integrantes,
   });
 
-  factory IntegrantesPoliciaModel.fromJson(Map<String, dynamic> json) => IntegrantesPoliciaModel(
-    statusCode: json["status_code"],
-    message: json["message"],
-    integrantes: List<Integrante>.from(json["data"].map((x) => Integrante.fromJson(x))),
-  );
+  factory IntegrantesPoliciaModel.fromJson(Map<String, dynamic> json) =>
+      IntegrantesPoliciaModel(
+        statusCode: json["status_code"],
+        message: json["message"],
+        integrantes: List<Integrante>.from(
+          json["data"].map((x) => Integrante.fromJson(x)),
+        ),
+      );
 
   Map<String, dynamic> toJson() => {
     "status_code": statusCode,
@@ -50,7 +55,7 @@ class Integrante {
   });
 
   factory Integrante.fromJson(Map<String, dynamic> json) => Integrante(
-    idHdrEvento:ParseModel.parseToInt(json["idHdrEvento"]),
+    idHdrEvento: ParseModel.parseToInt(json["idHdrEvento"]),
     fechaEvento: ParseModel.parseToString(json["fechaEvento"]),
     idUsuario: ParseModel.parseToInt(json["idUsuario"]),
     jefe: ParseModel.parseToString(json["jefe"]),

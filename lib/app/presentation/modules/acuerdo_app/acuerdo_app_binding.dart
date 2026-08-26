@@ -5,7 +5,5 @@ class AcuerdoAppBinding extends Bindings {
   void dependencies() {
     //Inyeccion de dependencias
     Get.lazyPut(() => AcuerdoAppController(), fenix: true);
-
-
   }
 }

@@ -9,69 +9,68 @@ import '../modules/pages.dart';
 import 'app_routes.dart';
 
 class AppPages {
-
-
   static List<GetPage> _pages = [];
 
-  static GetPage getPageConfig(
-      {
-        required String name,
-      required GetPageBuilder page,
-      required Bindings binding,
+  static GetPage getPageConfig({
+    required String name,
+    required GetPageBuilder page,
+    required Bindings binding,
 
-        Transition transition = Transition.rightToLeft,
-        Duration transitionDuration = const Duration(milliseconds: 400),
-        Curve curve = Curves.fastOutSlowIn,
-
-      }) {
+    Transition transition = Transition.rightToLeft,
+    Duration transitionDuration = const Duration(milliseconds: 400),
+    Curve curve = Curves.fastOutSlowIn,
+  }) {
     return GetPage(
-        transition: transition,
-        transitionDuration: transitionDuration,
-        curve: curve,
-        name: name,
-        page: page,
-        binding: binding);
+      transition: transition,
+      transitionDuration: transitionDuration,
+      curve: curve,
+      name: name,
+      page: page,
+      binding: binding,
+    );
   }
 
   static List<GetPage> getPages() {
     _pages = [
+      getPageConfig(
+        name: AppRoutes.SPLASH_APP,
+        page: () => SplashPage(),
+        binding: SplashBinding(),
+      ),
 
       getPageConfig(
-          name: AppRoutes.SPLASH_APP,
-          page: () => SplashPage(),
-          binding: SplashBinding()),
-
-      getPageConfig(
-          name: AppRoutes.BIENVENIDO,
-          page: () => BienvenidoPage(),
-          binding: BienvenidoBinding()),
+        name: AppRoutes.BIENVENIDO,
+        page: () => BienvenidoPage(),
+        binding: BienvenidoBinding(),
+      ),
 
       AppPages.getPageConfig(
-          name: AppRoutes.ACUERDO_APP,
-          page: () => AcuerdoAppPage(),
-          binding: AcuerdoAppBinding()),
+        name: AppRoutes.ACUERDO_APP,
+        page: () => AcuerdoAppPage(),
+        binding: AcuerdoAppBinding(),
+      ),
 
       AppPages.getPageConfig(
-          name: AppRoutes.MENU_APP,
-          page: () => MenuAppPage(),
-          binding: MenuAppBinding()),
+        name: AppRoutes.MENU_APP,
+        page: () => MenuAppPage(),
+        binding: MenuAppBinding(),
+      ),
 
       getPageConfig(
-          name: AppRoutes.HOME_APP_PUBLIC,
-          page: () => HomePage(),
-          binding: HomeBinding()),
+        name: AppRoutes.HOME_APP_PUBLIC,
+        page: () => HomePage(),
+        binding: HomeBinding(),
+      ),
 
       getPageConfig(
-          name: AppRoutes.PDFVIEW,
-          page: () => PdfViewPage(),
-          binding: PdfViewBinding()),
-
-
-
+        name: AppRoutes.PDFVIEW,
+        page: () => PdfViewPage(),
+        binding: PdfViewBinding(),
+      ),
     ];
 
     //agregamos las paguinas de cada app
-   _pages.addAll(UserPages.pages);
+    _pages.addAll(UserPages.pages);
     _pages.addAll(MiUpc.getPages);
 
     _pages.addAll(SiipneMovilPages.pages);

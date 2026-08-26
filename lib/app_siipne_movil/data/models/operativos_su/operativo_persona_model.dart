@@ -171,7 +171,7 @@ class DatosSiipne {
     "sigla": sigla,
     "pais": pais,
     "edad": edad.toJson(),
-    "fechaDefuncion":fechaDefuncion,
+    "fechaDefuncion": fechaDefuncion,
     "foto64": foto64,
   };
 }
