@@ -134,69 +134,74 @@ class UrlApiProviderAppCenso {
     required String metodo,
     String segmento = '',
     Object? body,
+    Duration? timeout,
   }) async {
     final UrlApiProviderApp urlApiProviderApp = UrlApiProviderApp();
-
     final http.Client client = http.Client();
+
+    final Duration tiempoEspera =
+        timeout ?? Duration(seconds: ApiConfig.secondsTimeout);
 
     try {
       final String url = HostAppSiipneMovil.gethost();
-
       Uri uri = Uri.parse(url);
 
       if (segmento.trim().isNotEmpty) {
         uri = Uri.parse(url + segmento);
       }
 
-      final Map<String, String> headers = await urlApiProviderApp.getheaders();
+      final Map<String, String> headers =
+      await urlApiProviderApp.getheaders();
 
       final String metodoHttp = metodo.trim().toUpperCase();
-
-      debugPrint('==========================================');
-      debugPrint('$metodoHttp -> REQUEST');
-      debugPrint('URL: $uri');
-
-      /*
-       * IMPORTANTE:
-       * No imprimir Authorization.
-       */
-      if (body != null) {
-        debugPrint('BODY: $body');
-      }
-
-      debugPrint('==========================================');
 
       late http.Response response;
 
       switch (metodoHttp) {
         case 'POST':
           response = await client
-              .post(uri, headers: headers, body: jsonEncode(body))
-              .timeout(Duration(seconds: ApiConfig.secondsTimeout));
+              .post(
+            uri,
+            headers: headers,
+            body: jsonEncode(body),
+          )
+              .timeout(tiempoEspera);
           break;
 
         case 'PUT':
           response = await client
-              .put(uri, headers: headers, body: jsonEncode(body))
-              .timeout(Duration(seconds: ApiConfig.secondsTimeout));
+              .put(
+            uri,
+            headers: headers,
+            body: jsonEncode(body),
+          )
+              .timeout(tiempoEspera);
           break;
 
         case 'PATCH':
           response = await client
-              .patch(uri, headers: headers, body: jsonEncode(body))
-              .timeout(Duration(seconds: ApiConfig.secondsTimeout));
+              .patch(
+            uri,
+            headers: headers,
+            body: jsonEncode(body),
+          )
+              .timeout(tiempoEspera);
           break;
 
         case 'DELETE':
           response = await client
-              .delete(uri, headers: headers, body: jsonEncode(body))
-              .timeout(Duration(seconds: ApiConfig.secondsTimeout));
+              .delete(
+            uri,
+            headers: headers,
+            body: jsonEncode(body),
+          )
+              .timeout(tiempoEspera);
           break;
 
         case 'GET':
           response = await client
               .get(uri, headers: headers)
-              .timeout(Duration(seconds: ApiConfig.secondsTimeout));
+              .timeout(tiempoEspera);
           break;
 
         default:
@@ -208,60 +213,24 @@ class UrlApiProviderAppCenso {
         allowMalformed: true,
       );
 
-      debugPrint('==========================================');
-      debugPrint('$metodoHttp -> RESPONSE');
-      debugPrint('STATUS: ${response.statusCode}');
-      debugPrint('BODY: $responseBody');
-      debugPrint('==========================================');
-
-      // ========================================================
-      // RESPUESTA EXITOSA
-      // ========================================================
-
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return responseBody;
       }
-
-      // ========================================================
-      // RESPUESTA ERROR BACKEND
-      // ========================================================
 
       final String mensajeBackend = _extraerMensajeBackend(
         responseBody,
         fallback: 'Error HTTP ${response.statusCode}',
       );
 
-      debugPrint('==========================================');
-      debugPrint('ERROR BACKEND');
-      debugPrint('STATUS: ${response.statusCode}');
-      debugPrint('MENSAJE: $mensajeBackend');
-      debugPrint('==========================================');
-
-      /*
-       * MUY IMPORTANTE:
-       *
-       * Aquí conservamos EXACTAMENTE el message
-       * que envía la API.
-       */
       throw Exception(mensajeBackend);
     } on TimeoutException {
       throw Exception(
-        'Tiempo de espera agotado. Verifique su conexión e intente nuevamente.',
+        'El servicio tardó demasiado en responder. Intente nuevamente.',
       );
     } on SocketException {
       throw Exception(
-        'No fue posible conectarse con el servidor. Verifique su conexión a internet.',
+        'No fue posible conectarse con el servidor.',
       );
-    } catch (e) {
-      /*
-       * Si ya viene nuestro BadRequest:
-       *
-       * Exception:
-       * BadRequest: Operativo cerrado
-       *
-       * NO lo reemplazamos.
-       */
-      rethrow;
     } finally {
       client.close();
     }
@@ -276,14 +245,10 @@ class UrlApiProviderAppCenso {
     Object? body,
     bool isLogin = false,
     bool onlyUrl = false,
+    Duration? timeout,
   }) async {
-    /*
-     * Mantengo LOGIN con el provider original
-     * para no alterar el flujo de autenticación.
-     */
     if (isLogin) {
       final UrlApiProviderApp provider = UrlApiProviderApp();
-
       final String url = HostAppSiipneMovil.gethost();
 
       return provider.post(
@@ -294,7 +259,12 @@ class UrlApiProviderAppCenso {
       );
     }
 
-    return _request(metodo: 'POST', segmento: segmento, body: body);
+    return _request(
+      metodo: 'POST',
+      segmento: segmento,
+      body: body,
+      timeout: timeout,
+    );
   }
 
   // ============================================================
