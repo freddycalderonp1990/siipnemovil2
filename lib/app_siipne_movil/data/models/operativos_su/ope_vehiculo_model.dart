@@ -329,7 +329,7 @@ class DatospropietarioData {
   String institucionRenova;
   String telefono;
   String correo;
-  String fototo64;
+  String foto64;
   String fechaDefuncion;
 
   DatospropietarioData({
@@ -339,7 +339,7 @@ class DatospropietarioData {
     required this.institucionRenova,
     required this.telefono,
     required this.correo,
-    required this.fototo64,
+    required this.foto64,
     required this.fechaDefuncion,
   });
 
@@ -351,7 +351,7 @@ class DatospropietarioData {
       institucionRenova: ParseModel.parseToString(json["institucionRenova"]),
       telefono: ParseModel.parseToString(json["telefono"]),
       correo: ParseModel.parseToString(json["correo"]),
-      fototo64: ParseModel.parseToString(json["fototo64"]),
+      foto64: ParseModel.parseToString(json["foto64"]),
       fechaDefuncion: ParseModel.parseToString(json["fechaDefuncion"]),
     );
   }
@@ -364,7 +364,7 @@ class DatospropietarioData {
       institucionRenova: '',
       telefono: '',
       correo: '',
-      fototo64: '',
+      foto64: '',
       fechaDefuncion: '',
     );
   }
@@ -376,7 +376,7 @@ class DatospropietarioData {
     "institucionRenova": institucionRenova,
     "telefono": telefono,
     "correo": correo,
-    "fototo64": fototo64,
+    "foto64": foto64,
     "fechaDefuncion": fechaDefuncion,
   };
 }

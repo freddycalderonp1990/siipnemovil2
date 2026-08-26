@@ -49,7 +49,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
   // ============================================================
 
   Widget _resumenPrincipal(bool robado) {
-    final DatosVehiculoSiipneData v = data.datosVehiculoSiipne.data;
+    final DatosVehiculoSiipneData v = data.datosVehiculo.data;
 
     return Container(
       width: double.infinity,
@@ -176,7 +176,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
   // ============================================================
 
   Widget _datosVehiculo() {
-    final DatosVehiculoSiipneData v = data.datosVehiculoSiipne.data;
+    final DatosVehiculoSiipneData v = data.datosVehiculo.data;
 
     return _cardSeccion(
       icono: Icons.directions_car_outlined,
@@ -305,7 +305,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _fotoPropietarioGrande(p.fototo64),
+              _fotoPropietarioGrande(p.foto64),
 
               const SizedBox(width: 8),
 

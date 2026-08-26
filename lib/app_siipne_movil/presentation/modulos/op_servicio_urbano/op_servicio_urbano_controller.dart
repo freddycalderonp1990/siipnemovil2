@@ -1093,6 +1093,7 @@ class OpServicioUrbanoController extends GetxController {
         longitud: pos.longitude,
         ip: ip,
         idGenUsuario: user.idGenUsuario,
+        userName: user.nombreUsuario,
         idVariableResultado: idVariable,
       );
 
@@ -1115,7 +1116,7 @@ class OpServicioUrbanoController extends GetxController {
         request: request,
       );
 
-      if (!data.datosVehiculoSiipne.success) {
+      if (!data.datosVehiculo.success) {
         mensajeErrorConsulta =
             'No se obtuvieron datos válidos para el vehículo consultado.';
 

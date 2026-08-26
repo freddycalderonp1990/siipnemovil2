@@ -85,7 +85,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
         final bool cargando = controller.consultandoPersonaVehiculo.value;
 
         final DatosVehiculoSiipneData vehiculo =
-            controller.dataVehiculo.first.datosVehiculoSiipne.data;
+            controller.dataVehiculo.first.datosVehiculo.data;
 
         return ListView(
           controller: _scrollController,

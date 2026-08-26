@@ -300,7 +300,7 @@ mixin VehiculoResultadoViewMixin on OpServicioUrbanoPageBase {
                           ? controller
                                 .dataVehiculo
                                 .first
-                                .datosVehiculoSiipne
+                                .datosVehiculo
                                 .data
                                 .placa
                           : '',
