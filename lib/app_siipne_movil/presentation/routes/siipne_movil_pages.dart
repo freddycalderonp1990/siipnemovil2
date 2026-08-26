@@ -27,5 +27,10 @@ class SiipneMovilPages {
       page: () => OpServicioUrbanoPage(),
       binding: OpServicioUrbanoBinding(),
     ),
+    AppPages.getPageConfig(
+      name: SiipneMovilRoutes.OPERATIVOS_MIGRACION,
+      page: () => OpMigracionPage(),
+      binding: OpMigracionBinding(),
+    ),
   ];
 }

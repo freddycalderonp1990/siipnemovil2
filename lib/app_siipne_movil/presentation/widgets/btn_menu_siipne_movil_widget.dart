@@ -80,7 +80,9 @@ class _BtnMenuSiipneMovilWidgetState extends State<BtnMenuSiipneMovilWidget> {
     if (titulo.contains('MOVILES METRO') || titulo.contains('MOVIL METRO')) {
       return AppSiipneMovilImages.img_modulos_metro;
     }
-
+    if (titulo.contains('MÓVIL MIGRACIÓN') || titulo.contains('MOVIL MIGRACION')) {
+      return AppSiipneMovilImages.icon_Migracion;
+    }
     final String? imagen = widget.img;
 
     if (imagen != null && imagen.trim().isNotEmpty) {
@@ -217,8 +219,8 @@ class _BtnMenuSiipneMovilWidgetState extends State<BtnMenuSiipneMovilWidget> {
 
     return Center(
       child: Container(
-        width: 110,
-        height: 82,
+        width: 90,
+        height: 90,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
@@ -245,7 +247,7 @@ class _BtnMenuSiipneMovilWidgetState extends State<BtnMenuSiipneMovilWidget> {
                 _getImagenModulo(),
                 width: double.infinity,
                 height: double.infinity,
-                fit: BoxFit.contain,
+                fit: BoxFit.fill,
                 alignment: Alignment.center,
                 errorBuilder: (context, error, stackTrace) {
                   return Padding(
