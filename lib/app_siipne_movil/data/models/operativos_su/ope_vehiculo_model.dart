@@ -79,13 +79,13 @@ class OpeVehiculoModel {
 }
 
 class DataVehiculo {
-  DatosVehiculoSiipne datosVehiculoSiipne;
+  DatosVehiculo datosVehiculo;
   Datospropietario datospropietario;
   RestriccionPj restriccionPj;
   int idHdrEventoResum;
 
   DataVehiculo({
-    required this.datosVehiculoSiipne,
+    required this.datosVehiculo,
     required this.datospropietario,
     required this.restriccionPj,
     required this.idHdrEventoResum,
@@ -93,8 +93,8 @@ class DataVehiculo {
 
   factory DataVehiculo.fromJson(Map<String, dynamic> json) {
     return DataVehiculo(
-      datosVehiculoSiipne: DatosVehiculoSiipne.fromJson(
-        _mapVehiculo(json["datosVehiculoSiipne"]),
+      datosVehiculo: DatosVehiculo.fromJson(
+        _mapVehiculo(json["datosVehiculo"]),
       ),
       datospropietario: Datospropietario.fromJson(
         _mapVehiculo(json["datospropietario"] ?? json["datosPropietario"]),
@@ -108,7 +108,7 @@ class DataVehiculo {
 
   factory DataVehiculo.empty() {
     return DataVehiculo(
-      datosVehiculoSiipne: DatosVehiculoSiipne.empty(),
+      datosVehiculo: DatosVehiculo.empty(),
       datospropietario: Datospropietario.empty(),
       restriccionPj: RestriccionPj.empty(),
       idHdrEventoResum: 0,
@@ -116,34 +116,34 @@ class DataVehiculo {
   }
 
   Map<String, dynamic> toJson() => {
-    "datosVehiculoSiipne": datosVehiculoSiipne.toJson(),
+    "datosVehiculoSiipne": datosVehiculo.toJson(),
     "datospropietario": datospropietario.toJson(),
     "restriccionPJ": restriccionPj.toJson(),
     "idHdrEventoResum": idHdrEventoResum,
   };
 }
 
-class DatosVehiculoSiipne {
+class DatosVehiculo {
   bool success;
   String message;
   DatosVehiculoSiipneData data;
 
-  DatosVehiculoSiipne({
+  DatosVehiculo({
     required this.success,
     required this.message,
     required this.data,
   });
 
-  factory DatosVehiculoSiipne.fromJson(Map<String, dynamic> json) {
-    return DatosVehiculoSiipne(
+  factory DatosVehiculo.fromJson(Map<String, dynamic> json) {
+    return DatosVehiculo(
       success: _boolVehiculo(json["success"]),
       message: ParseModel.parseToString(json["message"]),
       data: DatosVehiculoSiipneData.fromJson(_mapVehiculo(json["data"])),
     );
   }
 
-  factory DatosVehiculoSiipne.empty() {
-    return DatosVehiculoSiipne(
+  factory DatosVehiculo.empty() {
+    return DatosVehiculo(
       success: false,
       message: '',
       data: DatosVehiculoSiipneData.empty(),
@@ -179,6 +179,12 @@ class DatosVehiculoSiipneData {
   int idGenServicio;
   String descServicio;
 
+  String fuente;
+  String msjSwAnt;
+
+
+
+
   DatosVehiculoSiipneData({
     required this.idGenVehiculo,
     required this.idGenMarca,
@@ -200,6 +206,8 @@ class DatosVehiculoSiipneData {
     required this.tipoVehiculo,
     required this.idGenServicio,
     required this.descServicio,
+    required this.fuente,
+    required this.msjSwAnt
   });
 
   factory DatosVehiculoSiipneData.fromJson(Map<String, dynamic> json) {
@@ -224,6 +232,8 @@ class DatosVehiculoSiipneData {
       tipoVehiculo: ParseModel.parseToString(json["tipoVehiculo"]),
       idGenServicio: ParseModel.parseToInt(json["idGenServicio"]),
       descServicio: ParseModel.parseToString(json["descServicio"]),
+      fuente: ParseModel.parseToString(json["fuente"]),
+      msjSwAnt: ParseModel.parseToString(json["msjSwAnt"]),
     );
   }
 
@@ -249,6 +259,8 @@ class DatosVehiculoSiipneData {
       tipoVehiculo: '',
       idGenServicio: 0,
       descServicio: '',
+      fuente: '',
+      msjSwAnt: ''
     );
   }
 
