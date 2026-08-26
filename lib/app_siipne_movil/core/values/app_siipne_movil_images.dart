@@ -31,6 +31,7 @@ class AppSiipneMovilImages {
   static const icon_ANT = _rutaIcon + "ant.png";
   static const icon_Dinased = _rutaIcon + "dinased.png";
   static const icon_Dna = _rutaIcon + "dna.png";
+  static const icon_Migracion = _rutaIcon + "dnm.png";
   static const icon_Dnpj = _rutaIcon + "dnpj.png";
   static const icon_Polco = _rutaIcon + "polco.png";
   static const icon_Grafo = _rutaIcon + "icon_grafo.png";

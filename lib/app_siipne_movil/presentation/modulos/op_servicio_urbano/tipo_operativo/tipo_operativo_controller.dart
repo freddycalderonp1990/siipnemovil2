@@ -19,7 +19,7 @@ class TipoOperativoController extends GetxController {
   RxBool showContinuar = false.obs;
 
   final TextEditingController numeroOperativoController =
-      TextEditingController();
+  TextEditingController();
 
   final Rxn<Anexarse> datosAnexarse = Rxn<Anexarse>();
   final RxBool consultandoAnexarse = false.obs;
@@ -76,7 +76,7 @@ class TipoOperativoController extends GetxController {
     try {
       await ExceptionDialogos.manejarErroresShowDialogo(
         showMsjNodata: false,
-        () async {
+            () async {
           GetTipoOperativosRequest request = GetTipoOperativosRequest(
             idGenModulo: dataModuloResponse.idGenModulo,
           );
@@ -150,7 +150,7 @@ class TipoOperativoController extends GetxController {
     print('Descripción: ${padre.descripcion}');
     print(
       'idGenTipoTipificacion: '
-      '${padre.idGenTipoTipificacion}',
+          '${padre.idGenTipoTipificacion}',
     );
     print('Tiene hijos: ${tieneHijos(padre.idGenTipoTipificacion)}');
     print('======================================');
@@ -165,7 +165,7 @@ class TipoOperativoController extends GetxController {
       DialogosAwesome.getInformation(
         title: "Operativo requerido",
         descripcion:
-            "Seleccione completamente el tipo de operativo antes de continuar.",
+        "Seleccione completamente el tipo de operativo antes de continuar.",
         titleBtn: "Entendido",
       );
       return;
@@ -176,7 +176,7 @@ class TipoOperativoController extends GetxController {
     try {
       await ExceptionDialogos.manejarErroresShowDialogo(
         showMsjNodata: false,
-        () async {
+            () async {
           final locationBloc = BlocProvider.of<LocationBloc>(Get.context!);
 
           LatLng pos = await locationBloc.getCurrentPosition();
@@ -189,7 +189,7 @@ class TipoOperativoController extends GetxController {
             latitud: pos.latitude,
             longitud: pos.longitude,
             dataModuloIdGenTipoTipificacionEcu:
-                dataModuloResponse.idGenTipoTipificacionEcu,
+            dataModuloResponse.idGenTipoTipificacionEcu,
             dataModuloIdTipoServicio: dataModuloResponse.idHdrTipoServicio,
             idTipoOperativo: selectTipoOperativo.value.idOperativo,
             ip: ip,
@@ -252,7 +252,7 @@ class TipoOperativoController extends GetxController {
       debugPrint('==========================================');
 
       final GetDatosAnexarseOperativoRequest request =
-          GetDatosAnexarseOperativoRequest(idHdrEvento: numeroOperativo);
+      GetDatosAnexarseOperativoRequest(idHdrEvento: numeroOperativo);
 
       final Anexarse respuesta = await siipneMovilUseCase.consultarAnexarse(
         request: request,
@@ -275,7 +275,7 @@ class TipoOperativoController extends GetxController {
 
       if (respuesta.idTipoOperativo <= 0) {
         mensajeErrorAnexarse =
-            'El operativo no posee una configuración válida.';
+        'El operativo no posee una configuración válida.';
         return null;
       }
 
@@ -357,6 +357,40 @@ class TipoOperativoController extends GetxController {
   // ANEXARSE - INGRESAR AL OPERATIVO
   // =========================================================
 
+  // =========================================================
+  // RESOLVER MÓDULO Y RUTA
+  // =========================================================
+
+  String _normalizarTipoOperativo(String value) {
+    return value
+        .trim()
+        .toUpperCase()
+        .replaceAll('Á', 'A')
+        .replaceAll('É', 'E')
+        .replaceAll('Í', 'I')
+        .replaceAll('Ó', 'O')
+        .replaceAll('Ú', 'U')
+        .replaceAll('Ü', 'U')
+        .replaceAll(RegExp(r'\s+'), ' ');
+  }
+
+  bool _esModuloMovilMigracion([String descripcionOperativo = '']) {
+    final String modulo = _normalizarTipoOperativo(
+      dataModuloResponse.descripcion,
+    );
+    final String operativo = _normalizarTipoOperativo(descripcionOperativo);
+
+    return modulo.contains('MOVIL MIGRACION') ||
+        operativo == 'MOVIL MIGRACION' ||
+        operativo == 'OPERATIVO MOVIL MIGRACION';
+  }
+
+  String _rutaPorModulo([String descripcionOperativo = '']) {
+    return _esModuloMovilMigracion(descripcionOperativo)
+        ? SiipneMovilRoutes.OPERATIVOS_MIGRACION
+        : SiipneMovilRoutes.OPERATIVOS_SERVICIO_URBANO;
+  }
+
   void anexarseOperativo(Anexarse data) {
     if (data.idHdrEvento <= 0) {
       DialogosAwesome.getInformation(
@@ -376,21 +410,28 @@ class TipoOperativoController extends GetxController {
       return;
     }
 
+    final String nombreModulo = dataModuloResponse.descripcion.trim();
+    final String nombreOperativo = data.descripcion.trim();
+    final String ruta = _rutaPorModulo(nombreOperativo);
+
     debugPrint('==========================================');
     debugPrint('CONFIRMANDO ANEXARSE');
     debugPrint('ID HDR EVENTO: ${data.idHdrEvento}');
     debugPrint('ID TIPO OPERATIVO: ${data.idTipoOperativo}');
-    debugPrint('DESCRIPCIÓN: ${data.descripcion}');
-    debugPrint('ESTADO: ${data.estadoOperativo}');
+    debugPrint('MÓDULO: $nombreModulo');
+    debugPrint('DESCRIPCIÓN: $nombreOperativo');
+    debugPrint('RUTA: $ruta');
     debugPrint('==========================================');
 
     Get.offNamed(
-      SiipneMovilRoutes.OPERATIVOS_SERVICIO_URBANO,
-      arguments: {
+      ruta,
+      arguments: <String, dynamic>{
         'tipoAcceso': 'ANEXARSE',
         'anexarse': data,
         'idHdrEvento': data.idHdrEvento,
         'idOperativo': data.idTipoOperativo,
+        'nombreModulo': nombreModulo,
+        'nombreOperativo': nombreOperativo,
       },
     );
   }
@@ -404,28 +445,34 @@ class TipoOperativoController extends GetxController {
   // =========================================================
 
   void goToPageOperativo(DataCreateOp dataCreateOp) {
-    final String nombreOperativo = selectTipoOperativo.value.descripcion.trim();
+    final String nombreModulo = dataModuloResponse.descripcion.trim();
+    final String nombreOperativo =
+    selectTipoOperativo.value.descripcion.trim();
+    final String ruta = _rutaPorModulo(nombreOperativo);
 
     debugPrint('==========================================');
     debugPrint('ABRIENDO OPERATIVO CREADO');
     debugPrint('ID HDR EVENTO: ${dataCreateOp.idHdrEvento}');
     debugPrint('ID TIPO: ${dataCreateOp.idTipoOperativo}');
+    debugPrint('MÓDULO: $nombreModulo');
     debugPrint('NOMBRE: $nombreOperativo');
+    debugPrint('RUTA: $ruta');
     debugPrint('==========================================');
 
     Get.offAndToNamed(
-      SiipneMovilRoutes.OPERATIVOS_SERVICIO_URBANO,
-      arguments: {
+      ruta,
+      arguments: <String, dynamic>{
         'tipoAcceso': 'NUEVO',
         'dataCreateOp': dataCreateOp,
         'idHdrEvento': dataCreateOp.idHdrEvento,
         'idGenGeoSenplades': dataCreateOp.idGenGeoSenplades,
         'idOperativo': dataCreateOp.idTipoOperativo,
-        // IMPORTANTE
+        'nombreModulo': nombreModulo,
         'nombreOperativo': nombreOperativo,
       },
     );
   }
+
   // =========================================================
   // OBTENER RAÍCES
   // =========================================================
@@ -464,7 +511,7 @@ class TipoOperativoController extends GetxController {
 
   bool tieneHijos(int idGenTipoTipificacion) {
     return listTipoOperativos.any(
-      (item) => item.idPadre == idGenTipoTipificacion,
+          (item) => item.idPadre == idGenTipoTipificacion,
     );
   }
 
@@ -541,7 +588,7 @@ class TipoOperativoController extends GetxController {
     print('Descripción: ${item.descripcion}');
     print(
       'idGenTipoTipificacion: '
-      '${item.idGenTipoTipificacion}',
+          '${item.idGenTipoTipificacion}',
     );
     print('idPadre: ${item.idPadre}');
 
@@ -553,12 +600,12 @@ class TipoOperativoController extends GetxController {
       print('No tiene hijos -> selección final');
       print(
         'idOperativo final: '
-        '${item.idOperativo}',
+            '${item.idOperativo}',
       );
 
       print(
         'select idOperativo: '
-        '${selectTipoOperativo.value.idOperativo}',
+            '${selectTipoOperativo.value.idOperativo}',
       );
 
       showContinuar.value = true;
@@ -672,7 +719,7 @@ class TipoOperativoController extends GetxController {
 
       showContinuar.value =
           rutaSeleccionada.length > 1 &&
-          !tieneHijos(ultimo.idGenTipoTipificacion);
+              !tieneHijos(ultimo.idGenTipoTipificacion);
     } else {
       /*
        * Seguridad adicional.
@@ -688,10 +735,20 @@ class TipoOperativoController extends GetxController {
   // IR SIGUIENTE
   // =========================================================
 
-  gotToNextPage() {
+  void gotToNextPage() {
+    final DataTipoOperativo operativo = selectTipoOperativo.value;
+    final String nombreModulo = dataModuloResponse.descripcion.trim();
+    final String nombreOperativo = operativo.descripcion.trim();
+
     Get.toNamed(
-      SiipneMovilRoutes.OPERATIVOS_SERVICIO_URBANO,
-      arguments: {"tipoOperativo": selectTipoOperativo},
+      _rutaPorModulo(nombreOperativo),
+      arguments: <String, dynamic>{
+        'tipoOperativo': operativo,
+        'idOperativo': operativo.idOperativo,
+        'nombreModulo': nombreModulo,
+        'nombreOperativo': nombreOperativo,
+      },
     );
   }
 }
+

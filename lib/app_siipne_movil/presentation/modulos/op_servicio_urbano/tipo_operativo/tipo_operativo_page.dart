@@ -2533,10 +2533,11 @@ class TipoOperativoPage extends GetView<TipoOperativoController> {
   // ============================================================
 
   String _getImagenModulo() {
+
     final String titulo = _normalizarTexto(
       controller.dataModuloResponse.descripcion,
     );
-
+    print("titolooooo---"+titulo);
     if (titulo.contains('MOVILES OPERATIVOS PREVENTIVOS')) {
       return AppSiipneMovilImages.img_modulos_dgo;
     }
@@ -2545,10 +2546,13 @@ class TipoOperativoPage extends GetView<TipoOperativoController> {
       return AppSiipneMovilImages.img_modulos_transito;
     }
 
-    if (titulo.contains('MOVILES METRO')) {
+    if (titulo.contains('MOVIL METRO')) {
       return AppSiipneMovilImages.img_modulos_metro;
     }
 
+    if (titulo.contains('MOVIL MIGRACION')) {
+      return AppSiipneMovilImages.icon_Migracion;
+    }
     return AppImages.iconNoImg;
   }
 
