@@ -5,7 +5,5 @@ class MenuAppBinding extends Bindings {
   void dependencies() {
     //Inyeccion de dependencias
     Get.lazyPut(() => MenuAppController(), fenix: true);
-
-
   }
 }

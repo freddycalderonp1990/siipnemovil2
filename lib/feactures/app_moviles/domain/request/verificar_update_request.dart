@@ -1,5 +1,3 @@
-
-
 class VerificarUpdateRequest {
   final String nemonico;
   final int versionCodeApp;

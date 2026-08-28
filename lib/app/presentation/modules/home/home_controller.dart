@@ -3,7 +3,6 @@ part of '../controllers.dart';
 class HomeController extends GetxController {
   final LocalStoreUseCase _localStoreImpl = Get.find<LocalStoreUseCase>();
 
-
   var controllerAppName = new TextEditingController();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -28,15 +27,11 @@ class HomeController extends GetxController {
     super.onClose();
   }
 
-  _init() async {
-
-  }
+  _init() async {}
 
   setAppPageSelect(PageAppsSelect value) async {
     await _localStoreImpl.setAppPageSelect(value.toString());
     print("holalalalalala");
     Get.offAllNamed(AppRoutes.SPLASH_APP);
   }
-
-
 }

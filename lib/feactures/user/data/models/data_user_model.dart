@@ -1,7 +1,5 @@
 part of 'models_user.dart';
 
-
-
 DataUser dataUserFromJson(String str) => DataUser.fromJson(json.decode(str));
 
 String dataUserToJson(DataUser data) => json.encode(data.toJson());
@@ -27,7 +25,6 @@ class DataUser {
     "status_code": statusCode,
     "message": message,
     "data": user.toJson(),
-
   };
 }
 

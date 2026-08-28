@@ -99,8 +99,7 @@ class LocalStoreUseCase {
   }
 
   Future<int> getLastIdGenUsuario() async {
-
-    int idGenUsuario=await repository.getLastIdGenUsuario();
+    int idGenUsuario = await repository.getLastIdGenUsuario();
 
     print("getLastIdGenUsuario ${idGenUsuario}");
     return idGenUsuario;

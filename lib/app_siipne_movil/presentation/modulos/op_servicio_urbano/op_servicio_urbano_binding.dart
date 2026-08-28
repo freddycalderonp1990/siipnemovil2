@@ -5,6 +5,5 @@ class OpServicioUrbanoBinding extends Bindings {
   void dependencies() {
     //Inyeccion de dependencias
     Get.lazyPut(() => OpServicioUrbanoController(), fenix: true);
-
   }
 }

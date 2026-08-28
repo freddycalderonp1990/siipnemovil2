@@ -1,30 +1,71 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
-
-
-import '../../../app/core/app_config.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:get/get.dart' hide Transition;
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../../../app/core/utils/responsiveUtil.dart';
-
+import 'package:country_utils/country_utils.dart';
 
 import '../../../app/core/values/app_colors.dart';
+import '../../../app/core/values/app_images.dart';
 import '../../../app/domain/enums/enums.dart';
 import '../../../app/presentation/widgets/custom_app_widgets.dart';
+import '../../../app/presentation/widgets/img_perfil_redonda.dart';
 import '../../../feactures/pushNotification/services/bloc/notifications_bloc.dart';
 
+import '../../core/utils/operativo_qr_util.dart';
 import '../../core/values/app_siipne_movil_images.dart';
-import '../routes/siipne_movil_routes.dart';
+import '../../data/models/models_siipne_movil.dart';
 import '../widgets/custom_siipne_movil_widgets.dart';
 import 'controllers.dart';
 import 'menu/widgets/indicador_scroll.dart';
-import 'op_servicio_urbano/local_widgets/btnIconOperativoWidget.dart';
-import 'op_servicio_urbano/local_widgets/colors_local.dart';
 import 'op_servicio_urbano/local_widgets/desing_busqueda_por_cedula_widget.dart';
 import 'op_servicio_urbano/local_widgets/operativo_polco_local_widgets.dart';
-
 
 part 'menu/menu_siipne_movil_page.dart';
 part 'op_servicio_urbano/op_servicio_urbano_page.dart';
 part 'op_servicio_urbano/tipo_operativo/tipo_operativo_page.dart';
+part 'op_servicio_urbano/anexarse/anexarse_page.dart';
+part 'op_servicio_urbano/ocupantes/op_Vehiculo_Personas_Page.dart';
+
+part 'op_servicio_urbano/local_widgets/op_servicio_urbano_view_contract.dart';
+part 'op_servicio_urbano/local_widgets/variable_resultado_wg.dart';
+part 'op_servicio_urbano/local_widgets/cabecera_operativo_wg.dart';
+part 'op_servicio_urbano/local_widgets/resumen_operativo_wg.dart';
+part 'op_servicio_urbano/local_widgets/estadisticas_operativo_wg.dart';
+part 'op_servicio_urbano/local_widgets/finalizar_operativo_wg.dart';
+part 'op_servicio_urbano/local_widgets/personal_operativo_wg.dart';
+part 'op_servicio_urbano/local_widgets/qr_operativo_wg.dart';
+part 'op_servicio_urbano/local_widgets/tipo_consulta_wg.dart';
+part 'op_servicio_urbano/local_widgets/consulta_operativa_wg.dart';
+part 'op_servicio_urbano/local_widgets/confirmacion_busqueda_wg.dart';
+part 'op_servicio_urbano/local_widgets/persona_resultado_wg.dart';
+part 'op_servicio_urbano/local_widgets/vehiculo_resultado_wg.dart';
+part 'op_servicio_urbano/local_widgets/estados_operativo_wg.dart';
+part 'op_migracion/op_migracion_page.dart';
+part 'op_migracion/local_widgets/op_migracion_view_contract.dart';
+part 'op_migracion/local_widgets/migracion_theme.dart';
+part 'op_migracion/local_widgets/cabecera_migracion_wg.dart';
+part 'op_migracion/local_widgets/busqueda_migracion_wg.dart';
+part 'op_migracion/local_widgets/identidad_migratoria_wg.dart';
+part 'op_migracion/local_widgets/documentos_migracion_wg.dart';
+part 'op_migracion/local_widgets/movimientos_migratorios_wg.dart';
+part 'op_migracion/local_widgets/visas_migracion_wg.dart';
+part 'op_migracion/local_widgets/registro_migracion_wg.dart';
+part 'op_migracion/local_widgets/estados_migracion_wg.dart';
+
+part 'op_migracion/local_widgets/acciones_operativo_migracion_wg.dart';
+part 'op_migracion/local_widgets/personal_operativo_migracion_wg.dart';
+part 'op_migracion/local_widgets/qr_operativo_migracion_wg.dart';
+part 'op_migracion/local_widgets/finalizar_operativo_migracion_wg.dart';
+
+part 'op_migracion/local_widgets/fuentes_persona_migracion_wg.dart';
+part 'op_migracion/local_widgets/acciones_migracion_wg.dart';
+
+part 'op_migracion/local_widgets/foto_visa_electronica_wg.dart';
+part 'op_migracion/local_widgets/selector_nacionalidad_migracion_wg.dart';

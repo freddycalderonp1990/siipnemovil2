@@ -19,29 +19,22 @@ class ExceptionDialogos {
   //y los mensjes van en manejarErroresShowDialogo
 
   static Future<bool> manejarErroresShowDialogo(
-    Future<void> Function() funcion,
-  {String? msjNoData, bool showMsjNodata=true}
-  ) async {
+    Future<void> Function() funcion, {
+    String? msjNoData,
+    bool showMsjNodata = true,
+  }) async {
     try {
       await funcion();
       return true; // Operación exitosa
     } on AuthLoginException catch (e) {
       _verificarIntentosFallidosClave();
-      DialogosAwesome.getError(
-        descripcion: "Usuario / Clave incorrecta",
-      );
+      DialogosAwesome.getError(descripcion: "Usuario / Clave incorrecta");
     } on TokenException catch (e) {
-      DialogosAwesome.getWarning(
-        descripcion: e.msj,
-
-      );
+      DialogosAwesome.getWarning(descripcion: e.msj);
     } on UpdateAppException catch (e) {
       mensajeActualizarApp();
     } on ServerException catch (e) {
-      DialogosAwesome.getError(
-        descripcion: e.message,
-
-      );
+      DialogosAwesome.getError(descripcion: e.message);
     } on CloseRecintoException catch (e) {
       DialogosAwesome.getWarning(
         descripcion: e.msj,
@@ -50,13 +43,11 @@ class ExceptionDialogos {
         },
       );
     } on ParseJsonException catch (e) {
-      DialogosAwesome.getError(
-        descripcion: e.msj,
-      );
+      DialogosAwesome.getError(descripcion: e.msj);
     } on NoDataException catch (e) {
-      if(showMsjNodata){
+      if (showMsjNodata) {
         DialogosAwesome.getInformation(
-          descripcion:msjNoData==null? e.msj:msjNoData,
+          descripcion: msjNoData == null ? e.msj : msjNoData,
           title: 'SIN DATOS',
         );
       }
@@ -72,9 +63,7 @@ class ExceptionDialogos {
         msjException: "Error: ${e} - Linea: ${t}",
       );
 
-      DialogosAwesome.getError(
-        descripcion: msj,
-      );
+      DialogosAwesome.getError(descripcion: msj);
     }
     return false; // Hubo un error
   }

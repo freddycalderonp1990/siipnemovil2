@@ -1,96 +1,150 @@
 part of '../../pages.dart';
 
 class InicioRapidoPage extends GetView<InicioRapidoController> {
+  const InicioRapidoPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    /*
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<NotificationsBloc>().requestPermission(
-        appName: NamApps.todas,
-        idGenUsuario: controller.user.value.idGenUsuario,
-      );
-    });
-    */
-
     final responsive = ResponsiveUtil();
 
-    Widget wg = Obx(()=>WorkAreaPageLoginWidget(
-      imgFondo: AppImages.imgFondoLogin,
-      imgPerfil: controller.user.value.foto,
-      mostrarBtnHome: controller.mostrarBtnHome.value,
+    return Obx(
+      () => Scaffold(
+        backgroundColor: const Color(0xFF0D315A),
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.asset(
+                AppImages.imgFondoLogin,
+                fit: BoxFit.cover,
+                alignment: Alignment.center,
+              ),
+            ),
 
-      onPressedBtnHome: () {
-        // controller.setAppPageSelect(PageAppsSelect.Bienvenida);
-      },
+            Positioned.fill(
+              child: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0xB30A2A4A),
+                      Color(0x990D315A),
+                      Color(0xE60A2542),
+                    ],
+                    stops: [0, .48, 1],
+                  ),
+                ),
+              ),
+            ),
 
+            WorkAreaPageLoginWidget(
+              imgFondo: null,
+              imgPerfil: _getFotoPerfil(),
+              nombresServidor: controller.user.value.nombres,
+              gradoServidor: '',
+              mostrarBtnHome: controller.mostrarBtnHome.value,
+              onPressedBtnHome: () {},
+              peticionServer: controller.peticionServerState,
+              contenido: getContenido(responsive),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-      peticionServer: controller.peticionServerState,
+  dynamic _getFotoPerfil() {
+    final foto = controller.user.value.foto;
 
-      contenido: getContenido(responsive),
-    ));
+    if (foto == null) return null;
+    if (foto is String && foto.trim().isEmpty) return null;
 
-    return GetBuilder<LoginController>(builder: (_c) => wg);
+    return foto;
   }
 
   Widget getContenido(ResponsiveUtil responsive) {
-    return SingleChildScrollView(
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: responsive.anchoP(5)),
       child: Column(
         children: [
-          Obx(
-            () => DesingTextNameUser(
-              sizeText: responsive.diagonalP(AppConfig.tamTextoTitulo - 0.4),
-              sexo: controller.user.value.sexo,
-              text: controller.user.value.nombres,
-            ),
-          ),
+          _tituloAcceso(responsive),
 
-          SizedBox(height: responsive.altoP(2)),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: responsive.anchoP(10)),
+          SizedBox(height: responsive.altoP(1)),
 
-            child: Column(
-              children: [
-                wgHuella(),
-                SizedBox(height: responsive.altoP(2)),
-                wgOtroUsuario(),
-              ],
-            ),
-          ),
+          _gridAccesos(responsive),
+
+          SizedBox(height: responsive.altoP(1)),
         ],
       ),
     );
   }
 
-  Widget wgHuella() {
-    Widget wg = DesignBtnLoginRapidoWidget(
-      icon: Icons.fingerprint_rounded,
-
-      titulo: "Huella / Face ID",
-      descripcion: "Ingresar con biometría",
-      onTap: () => controller.loginConBiometrico(),
+  Widget _tituloAcceso(ResponsiveUtil responsive) {
+    return Text(
+      "Seleccione el método de autenticación",
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        color: Colors.grey.shade600,
+        fontSize: responsive.diagonalP(1),
+        fontWeight: FontWeight.w500,
+      ),
     );
-
-    return wg;
   }
 
-  Widget wgOtroUsuario() {
-    Widget wg = BtnMenuWidget(
-      img: AppImages.icon_clave,
-      title: "Ingresa con Usuario y Clave",
-      horizontal: false,
-      onTap: () => controller.ingresoConOtroUsuario(),
-      colorFondo: AppColors.colorIcons,
-      colorTexto: Colors.white,
-    );
+  Widget _gridAccesos(ResponsiveUtil responsive) {
+    final List<Widget> botones = [
+      DesignBtnLoginRapidoWidget(
+        icon: Icons.fingerprint_rounded,
+        titulo: "Huella / Face ID",
+        descripcion: "Acceso biométrico seguro",
+        onTap: () => controller.loginConBiometrico(),
+      ),
 
-    wg = DesignBtnLoginRapidoWidget(
-      icon: Icons.lock_person_rounded,
+      DesignBtnLoginRapidoWidget(
+        icon: Icons.lock_person_rounded,
+        titulo: "Usuario y contraseña",
+        descripcion: "Acceso con credenciales",
+        onTap: () => controller.ingresoConOtroUsuario(),
+      ),
+    ];
 
-      titulo: "Usuario y contraseña",
-      descripcion: "Ingresar de forma tradicional",
-      onTap: () => controller.ingresoConOtroUsuario(),
-    );
+    return _gridBotones(responsive: responsive, botones: botones);
+  }
 
-    return wg;
+  Widget _gridBotones({
+    required ResponsiveUtil responsive,
+    required List<Widget> botones,
+  }) {
+    final List<Widget> filas = [];
+
+    for (int i = 0; i < botones.length; i += 2) {
+      if (i + 1 < botones.length) {
+        filas.add(
+          Row(
+            children: [
+              Expanded(child: botones[i]),
+              SizedBox(width: responsive.anchoP(3)),
+              Expanded(child: botones[i + 1]),
+            ],
+          ),
+        );
+      } else {
+        filas.add(
+          Row(
+            children: [
+              const Spacer(),
+              Expanded(flex: 2, child: botones[i]),
+              const Spacer(),
+            ],
+          ),
+        );
+      }
+
+      if (i + 2 < botones.length) {
+        filas.add(SizedBox(height: responsive.altoP(1.5)));
+      }
+    }
+
+    return Column(children: filas);
   }
 }

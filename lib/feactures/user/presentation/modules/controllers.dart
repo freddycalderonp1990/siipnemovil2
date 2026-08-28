@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
-
 import 'package:api_provider/api_provider.dart';
 import 'package:api_provider/domain/enums/enums.dart';
 
@@ -13,7 +12,6 @@ import 'package:get/get.dart';
 import 'package:get/get_rx/get_rx.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/state_manager.dart';
-
 
 import '../../../../app/core/app_config.dart';
 
@@ -36,9 +34,5 @@ import '../../domain/use_cases/auth.dart';
 import '../../domain/use_cases/get_data_user.dart';
 import '../../domain/use_cases/local_store.dart';
 
-
-
-
 part 'login/login_controller.dart';
 part 'login/inicio_rapido/inicio_rapido_controller.dart';
-

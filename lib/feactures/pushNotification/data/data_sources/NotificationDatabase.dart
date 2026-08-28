@@ -22,11 +22,7 @@ class NotificationDatabase {
   }
 
   Future<Database> _initDB() async {
-
-    final path = join(
-      await getDatabasesPath(),
-      databaseName,
-    );
+    final path = join(await getDatabasesPath(), databaseName);
 
     return await openDatabase(
       path,
@@ -36,10 +32,7 @@ class NotificationDatabase {
     );
   }
 
-  Future<void> _onCreate(
-      Database db,
-      int version,
-      ) async {
+  Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE $tableNotifications (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -56,24 +49,17 @@ class NotificationDatabase {
     ''');
   }
 
-  Future<void> _onUpgrade(
-      Database db,
-      int oldVersion,
-      int newVersion,
-      ) async {
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     switch (oldVersion) {
       case 1:
-      // Aquí irán futuras migraciones cuando aumentes la versión.
+        // Aquí irán futuras migraciones cuando aumentes la versión.
         break;
     }
   }
 
   /// Elimina completamente la base de datos (solo para pruebas)
   Future<void> deleteDatabaseFile() async {
-    final path = join(
-      await getDatabasesPath(),
-      databaseName,
-    );
+    final path = join(await getDatabasesPath(), databaseName);
 
     await deleteDatabase(path);
 

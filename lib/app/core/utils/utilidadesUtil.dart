@@ -1,7 +1,5 @@
-
 import 'dart:typed_data';
 import 'dart:ui';
-
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
@@ -12,16 +10,12 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:audioplayers/audioplayers.dart';
 
-
-
 import 'package:flutter/material.dart';
 import 'package:vibration/vibration.dart';
-
 
 import '../../presentation/widgets/custom_app_widgets.dart';
 
 class UtilidadesUtil {
-
   static compartirPdf(String archivo) async {
     try {
       await Share.shareXFiles([XFile(archivo)], text: "PDF's");
@@ -31,19 +25,20 @@ class UtilidadesUtil {
     }
   }
 
-  static Future<Uint8List>  captureToImg(GlobalKey keyWidgetShared) async {
+  static Future<Uint8List> captureToImg(GlobalKey keyWidgetShared) async {
+    Uint8List data = await Future.delayed(
+      const Duration(milliseconds: 40),
+      () async {
+        RenderRepaintBoundary boundary =
+            keyWidgetShared.currentContext!.findRenderObject()
+                as RenderRepaintBoundary;
 
-    Uint8List data=await Future.delayed(const Duration(milliseconds: 40), () async {
-      RenderRepaintBoundary boundary =
-      keyWidgetShared.currentContext!.findRenderObject() as RenderRepaintBoundary;
+        var image = await boundary.toImage(pixelRatio: 2.0);
+        var byteData = await image.toByteData(format: ImageByteFormat.png);
 
-      var image = await boundary.toImage(pixelRatio: 2.0);
-      var byteData = await image.toByteData(format: ImageByteFormat.png);
-
-      return byteData!.buffer.asUint8List();
-
-    });
-
+        return byteData!.buffer.asUint8List();
+      },
+    );
 
     return data;
   }
@@ -56,10 +51,9 @@ class UtilidadesUtil {
       await launchUrl(url);
     } catch (e) {
       DialogosAwesome.getWarning(
-          descripcion: "No se completo la operación de cargar la ruta" );
+        descripcion: "No se completo la operación de cargar la ruta",
+      );
     }
-
-
   }
 
   //esta arreglado para que funcione en Android e Ios
@@ -82,6 +76,7 @@ class UtilidadesUtil {
       );
     }
   }
+
   static Future<void> lanzarLlamada(String num) async {
     try {
       String url =
@@ -90,36 +85,29 @@ class UtilidadesUtil {
       abrirUrl(url);
     } catch (e) {
       DialogosAwesome.getWarning(
-          descripcion: "No se pudo realizar la llamada al número:" + num);
+        descripcion: "No se pudo realizar la llamada al número:" + num,
+      );
     }
   }
-  static compartirImgCapture(GlobalKey keyWidgetShared) async{
+
+  static compartirImgCapture(GlobalKey keyWidgetShared) async {
     //se comparte
     var pngBytes = await captureToImg(keyWidgetShared);
 
-    final shareResult = await Share.shareXFiles(
-      [
-        XFile.fromData(
-          pngBytes,
-          name: 'img_pagme.png',
-          mimeType: 'image/png',
-        ),
-      ],
-
-    );
-
+    final shareResult = await Share.shareXFiles([
+      XFile.fromData(pngBytes, name: 'img_pagme.png', mimeType: 'image/png'),
+    ]);
   }
-  static  bool get plataformaIsAndroid {
-    return GetPlatform.isAndroid;
 
+  static bool get plataformaIsAndroid {
+    return GetPlatform.isAndroid;
   }
 
   static bool get plataformaIsIos {
-    bool activarIos = bool.tryParse(
-      dotenv.env['ACTIVAR_IOS'] ?? 'false',
-    ) ?? false;
+    bool activarIos =
+        bool.tryParse(dotenv.env['ACTIVAR_IOS'] ?? 'false') ?? false;
 
-    if(activarIos){
+    if (activarIos) {
       return true;
     }
     return GetPlatform.isIOS;
@@ -147,16 +135,9 @@ class UtilidadesUtil {
     });
   }
 
-
-
   static void ocultarTeclado(BuildContext context) {
     FocusScope.of(context).requestFocus(new FocusNode());
   }
-
-
-
-
-
 
   static abrirUrl(String url) async {
     try {
@@ -168,22 +149,63 @@ class UtilidadesUtil {
     }
   }
 
-  static void playAudio({required String nameAudio}) async {
-    // or as a local variable
-    // final player = AudioCache();
-    final player = AudioPlayer();
-    // call this method when desired
-    print("play audio");
+  static Future<void> playAudio({required String nameAudio}) async {
+    try {
+      final AudioPlayer player = AudioPlayer();
 
-    Vibration.vibrate(
-      pattern: [500, 1000, 500, 900, 500, 800, 500, 500],
-      intensities: [0, 128, 0, 255, 0, 64, 0, 255],
-    );
+      print("play audio");
 
-    // await player.play(UrlSource('https://example.com/my-audio.wav'));
+      /// ==========================================================
+      /// VIBRACIÓN
+      /// ==========================================================
+      try {
+        final bool? tieneVibrador = await Vibration.hasVibrator();
 
-    await player.play(AssetSource(nameAudio));
+        if (tieneVibrador == true) {
+          await Vibration.vibrate(
+            pattern: [500, 1000, 500, 900, 500, 800, 500, 500],
+            intensities: [0, 128, 0, 255, 0, 64, 0, 255],
+          );
+        }
+      } catch (e) {
+        debugPrint("ERROR VIBRACIÓN: $e");
+      }
+
+      /// ==========================================================
+      /// AUDIO
+      ///
+      /// AssetSource YA trabaja dentro de assets/.
+      ///
+      /// Si recibimos:
+      /// assets/siipne_movil/audio/alerta.mp3
+      ///
+      /// lo transformamos en:
+      /// siipne_movil/audio/alerta.mp3
+      /// ==========================================================
+
+      String ruta = nameAudio.trim();
+
+      if (ruta.startsWith("assets/")) {
+        ruta = ruta.substring("assets/".length);
+      }
+
+      debugPrint("AUDIO ORIGINAL: $nameAudio");
+
+      debugPrint("AUDIO ASSETSOURCE: $ruta");
+
+      if (ruta.isEmpty) {
+        debugPrint("AUDIO -> RUTA VACÍA");
+        return;
+      }
+
+      await player.play(AssetSource(ruta));
+    } catch (e, stackTrace) {
+      /// MUY IMPORTANTE:
+      /// un problema de audio nunca debe romper
+      /// una consulta operativa.
+      debugPrint("ERROR REPRODUCIENDO AUDIO: $e");
+
+      debugPrint("$stackTrace");
+    }
   }
-
-
 }

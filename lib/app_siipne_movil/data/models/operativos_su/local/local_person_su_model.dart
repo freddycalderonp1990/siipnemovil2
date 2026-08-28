@@ -12,20 +12,22 @@ class LocalPersonSuModel {
   final String? madre;
   final String? padre;
   final String? conyugue;
+  final String? fechaDefuncion;
   final String? foto;
 
-  LocalPersonSuModel(
-
-  {required this.documento,
-        required this.nombres,
-      required this.sexo,
-      required this.fechaNcaimiento,
-      required this.edad,
+  LocalPersonSuModel({
+    required this.documento,
+    required this.nombres,
+    required this.sexo,
+    required this.fechaNcaimiento,
+    required this.edad,
     this.pais,
-      this.domicilio,
-      this.estadoCivil,
-      this.madre,
-      this.padre,
-      this.conyugue,
-      this.foto});
+    this.domicilio,
+    this.estadoCivil,
+    this.madre,
+    this.padre,
+    this.conyugue,
+    this.fechaDefuncion,
+    this.foto,
+  });
 }

@@ -37,19 +37,18 @@ class NotificationLocalModel {
     String? clickAction,
     bool? leida,
     String? fecha,
-  }) =>
-      NotificationLocalModel(
-        id: id ?? this.id,
-        idGenUsuario: idGenUsuario??this.idGenUsuario,
-        accion: accion ?? this.accion,
-        appName: appName ?? this.appName,
-        idAccion: idAccion ?? this.idAccion,
-        body: body ?? this.body,
-        title: title ?? this.title,
-        clickAction: clickAction ?? this.clickAction,
-        leida: leida ?? this.leida,
-        fecha: fecha ?? this.fecha,
-      );
+  }) => NotificationLocalModel(
+    id: id ?? this.id,
+    idGenUsuario: idGenUsuario ?? this.idGenUsuario,
+    accion: accion ?? this.accion,
+    appName: appName ?? this.appName,
+    idAccion: idAccion ?? this.idAccion,
+    body: body ?? this.body,
+    title: title ?? this.title,
+    clickAction: clickAction ?? this.clickAction,
+    leida: leida ?? this.leida,
+    fecha: fecha ?? this.fecha,
+  );
 
   factory NotificationLocalModel.fromMap(Map<String, dynamic> map) {
     return NotificationLocalModel(
@@ -77,15 +76,15 @@ class NotificationLocalModel {
       "clickAction": clickAction,
       "leida": leida ? 1 : 0,
       "fecha": fecha,
-      "idGenUsuario":idGenUsuario
+      "idGenUsuario": idGenUsuario,
     };
   }
 
   /// Convierte una notificación remota en una local
   factory NotificationLocalModel.fromRemote(
-      NotificationModel notification,
-  {required int idGenUsuario}
-      ) {
+    NotificationModel notification, {
+    required int idGenUsuario,
+  }) {
     return NotificationLocalModel(
       accion: notification.accion,
       appName: notification.appName,
@@ -95,7 +94,7 @@ class NotificationLocalModel {
       clickAction: notification.clickAction,
       leida: false,
       fecha: DateTime.now().toIso8601String(),
-      idGenUsuario: idGenUsuario
+      idGenUsuario: idGenUsuario,
     );
   }
 }

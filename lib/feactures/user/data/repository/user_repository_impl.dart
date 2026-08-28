@@ -1,5 +1,3 @@
-
-
 import '../../domain/entities/user.dart';
 import '../../domain/mappers/mappers.dart';
 import '../../domain/repository/user_repository.dart';
@@ -11,19 +9,22 @@ import '../models/models_user.dart';
 class UserRepositoryImpl implements UserRepository {
   final UserRemoteDataSource userRemoteDataSource;
 
-
   UserRepositoryImpl({required this.userRemoteDataSource});
 
-
   @override
-  Future<UserEntities> getDataUser({required int idGenUsuario,required String token}) async {
-    UserModel dataUser = await userRemoteDataSource.getDataUser(idGenUsuario: idGenUsuario,token: token);
+  Future<UserEntities> getDataUser({
+    required int idGenUsuario,
+    required String token,
+  }) async {
+    UserModel dataUser = await userRemoteDataSource.getDataUser(
+      idGenUsuario: idGenUsuario,
+      token: token,
+    );
     return Mappers.fromDataUserToUserEntities(dataUser);
   }
 
   @override
   Future<DataAuth> auth({required AuthRequest request}) async {
-   return userRemoteDataSource.auth(request: request);
+    return userRemoteDataSource.auth(request: request);
   }
-
 }

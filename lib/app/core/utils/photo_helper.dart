@@ -18,7 +18,6 @@ import '../../../../../app/core/utils/my_date.dart';
 import '../../../../../app/core/utils/responsiveUtil.dart';
 import '../../../../../app/core/utils/utilidadesUtil.dart';
 
-
 import '../../presentation/widgets/custom_app_widgets.dart';
 import '../app_config.dart';
 import '../values/app_colors.dart';
@@ -28,14 +27,13 @@ class PhotoHelper {
   static Future<GaleryCameraModel?> getDesingPictureGaleryOrCamera({
     required String titleImg,
     required ValueChanged<bool> initPeticion,
-    bool onlyCamera=false,
-
+    bool onlyCamera = false,
   }) async {
     final Completer<GaleryCameraModel?> completer = Completer();
 
-    String msj="Seleccione una Imagen o Tome una Fotografía";
-    if(onlyCamera){
-      msj="Tome una Fotografía";
+    String msj = "Seleccione una Imagen o Tome una Fotografía";
+    if (onlyCamera) {
+      msj = "Tome una Fotografía";
     }
 
     AwesomeDialog(
@@ -62,17 +60,19 @@ class PhotoHelper {
       ),
       animType: AnimType.scale,
       title: "Registre una Fotografia",
-      btnCancel:onlyCamera?null: BtnIconWidget(
-        onPressed: () async {
-          Get.back();
-          initPeticion(true);
-          GaleryCameraModel? data = await getImageGallery(titleImg);
-          initPeticion(false);
-          completer.complete(data); // Retorna la data al completar
-          // Cierra el diálogo
-        },
-        titulo: "Galería",
-      ),
+      btnCancel: onlyCamera
+          ? null
+          : BtnIconWidget(
+              onPressed: () async {
+                Get.back();
+                initPeticion(true);
+                GaleryCameraModel? data = await getImageGallery(titleImg);
+                initPeticion(false);
+                completer.complete(data); // Retorna la data al completar
+                // Cierra el diálogo
+              },
+              titulo: "Galería",
+            ),
       btnOk: BtnIconWidget(
         onPressed: () async {
           initPeticion(true);
@@ -235,12 +235,12 @@ class PhotoHelper {
 
     String nameImg =
         "image_" +
-            title +
-            "_" +
-            rand.toString() +
-            "_" +
-            MyDate.getFechaActual.replaceAll(" ", "_") +
-            ".jpg";
+        title +
+        "_" +
+        rand.toString() +
+        "_" +
+        MyDate.getFechaActual.replaceAll(" ", "_") +
+        ".jpg";
     File compressImg = new File("$path/$nameImg")
       ..writeAsBytesSync(Img.encodeJpg(smallerImg, quality: 100));
 

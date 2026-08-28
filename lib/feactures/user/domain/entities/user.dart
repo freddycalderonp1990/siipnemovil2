@@ -1,11 +1,9 @@
-
 import 'dart:convert';
 
 UserEntities userEntitiesFromJson(String str) =>
     UserEntities.fromJson(json.decode(str));
 
-String userEntitiesToJson(UserEntities data) =>
-    json.encode(data.toJson());
+String userEntitiesToJson(UserEntities data) => json.encode(data.toJson());
 
 class UserEntities {
   final int idGenUsuario;
@@ -65,7 +63,7 @@ class UserEntities {
       unidad: unidad ?? this.unidad,
       funcion: funcion ?? this.funcion,
       grado: grado ?? this.grado,
-      foto:foto ?? this.foto,
+      foto: foto ?? this.foto,
       token: token ?? this.token,
     );
   }
@@ -86,10 +84,7 @@ class UserEntities {
     token: "",
   );
 
-
   factory UserEntities.fromJson(Map<String, dynamic> json) {
-
-
     return UserEntities(
       idGenUsuario: json['idGenUsuario'] ?? 0,
       idGenPersona: json['idGenPersona'] ?? 0,

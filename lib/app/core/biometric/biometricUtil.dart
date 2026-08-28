@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:local_auth_android/src/auth_messages_android.dart';
 
-
 class BiometricUtil {
   static Future<bool> checkAccesoBiometrico() async {
     bool accesoBiometrico = false;
@@ -18,31 +17,32 @@ class BiometricUtil {
 
       _canCheckBiometrics = await auth.canCheckBiometrics;
       //Para obtener una lista de datos biométricos inscritos, llame a getAvailableBiometrics:
-      List<BiometricType> availableBiometrics =
-      await auth.getAvailableBiometrics();
+      List<BiometricType> availableBiometrics = await auth
+          .getAvailableBiometrics();
 
+      availableBiometrics.forEach(
+        (BiometricType age) => print("PERMISOS BIOMETRICOS = ${age}"),
+      );
 
-      availableBiometrics.forEach((BiometricType age) => print("PERMISOS BIOMETRICOS = ${age}"));
-
-      if (GetPlatform.isAndroid ) {
+      if (GetPlatform.isAndroid) {
         if (availableBiometrics.contains(BiometricType.face)) {
           // Face ID.
           print('Face ID');
         }
-        if (availableBiometrics.contains(BiometricType.strong) || availableBiometrics.contains(BiometricType.weak )) {
+        if (availableBiometrics.contains(BiometricType.strong) ||
+            availableBiometrics.contains(BiometricType.weak)) {
           print('fingerprint');
           accesoBiometrico = true;
         }
-      }else   if ( GetPlatform.isIOS) {
+      } else if (GetPlatform.isIOS) {
         if (availableBiometrics.contains(BiometricType.face)) {
           // Face ID.
           print('Face ID IOS');
           accesoBiometrico = true;
         }
-        if (availableBiometrics.contains(BiometricType.strong) || availableBiometrics.contains(BiometricType.weak )) {
-
+        if (availableBiometrics.contains(BiometricType.strong) ||
+            availableBiometrics.contains(BiometricType.weak)) {
           accesoBiometrico = true;
-
         }
       }
 
@@ -66,8 +66,8 @@ class BiometricUtil {
       //Para verificar si hay autenticación local disponible en este dispositivo
       await auth.canCheckBiometrics;
       //Para obtener una lista de datos biométricos inscritos, llame a getAvailableBiometrics:
-      List<BiometricType> availableBiometrics =
-      await auth.getAvailableBiometrics();
+      List<BiometricType> availableBiometrics = await auth
+          .getAvailableBiometrics();
 
       if (GetPlatform.isAndroid || GetPlatform.isIOS) {
         if (availableBiometrics.contains(BiometricType.face)) {
@@ -77,19 +77,17 @@ class BiometricUtil {
         // Touch ID.
         print('Touch ID');
 
-
         const androidString = const AndroidAuthMessages(
-            cancelButton: "Cancelar",
+          cancelButton: "Cancelar",
 
-            signInTitle: "Acceso con Huella",
-            signInHint: "Pon tu dedo en el sensor para acceder.",
+          signInTitle: "Acceso con Huella",
+          signInHint: "Pon tu dedo en el sensor para acceder.",
 
-            /*biometricRequiredTitle:'biometricRequiredTitle',
+          /*biometricRequiredTitle:'biometricRequiredTitle',
               deviceCredentialsRequiredTitle:'deviceCredentialsRequiredTitle',
               deviceCredentialsSetupDescription:'deviceCredentialsSetupDescription',*/
-
-            );
-/*
+        );
+        /*
         const iosStrings = const IOSAuthMessages(
             cancelButton: 'Cancelar',
             goToSettingsButton: 'Ajustes',
@@ -103,17 +101,11 @@ class BiometricUtil {
               androidAuthStrings: androidString,
               iOSAuthStrings: iosStrings);*/
 
-
         autenticar = await auth.authenticate(
-          authMessages:[
-            androidString,
-
-          ] ,
+          authMessages: [androidString],
           localizedReason: "Autentiquese para acceder",
-
         );
       }
-
 
       if (!autenticar) {
         print(' eror No se autentico');
@@ -139,8 +131,4 @@ class BiometricUtil {
       return false;
     }
   }
-
-
-
-
 }

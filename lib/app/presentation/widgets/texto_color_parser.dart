@@ -2,14 +2,12 @@ import 'package:api_provider/core/values/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class TextoColorParser {
-
   static Widget textoConColores(
-      String texto, {
-        double fontSize = 15,
-        TextAlign textAlign = TextAlign.center,
-        FontWeight fontWeight = FontWeight.normal,
-      }) {
-
+    String texto, {
+    double fontSize = 15,
+    TextAlign textAlign = TextAlign.center,
+    FontWeight fontWeight = FontWeight.normal,
+  }) {
     final RegExp regex = RegExp(
       r'\[(rojo|azul|verde|negro|amarillo|gris)\](.*?)\[\/\1\]',
       caseSensitive: false,
@@ -20,7 +18,6 @@ class TextoColorParser {
     int lastIndex = 0;
 
     for (final match in regex.allMatches(texto)) {
-
       // Texto normal
       if (match.start > lastIndex) {
         spans.add(
@@ -75,9 +72,7 @@ class TextoColorParser {
   }
 
   static Color _obtenerColor(String color) {
-
     switch (color) {
-
       case 'rojo':
         return Colors.red;
 

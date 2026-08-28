@@ -10,16 +10,10 @@ import '../repository/push_notification_local_repository.dart';
 class GuardarNotificacionUseCase {
   final PushNotificationLocalRepository repository;
 
-  GuardarNotificacionUseCase({
-    required this.repository,
-  });
+  GuardarNotificacionUseCase({required this.repository});
 
-  Future<int> call({
-    required NotificationLocalModel notification,
-  }) {
-    return repository.guardarNotificacion(
-      notification: notification,
-    );
+  Future<int> call({required NotificationLocalModel notification}) {
+    return repository.guardarNotificacion(notification: notification);
   }
 }
 
@@ -30,20 +24,14 @@ class GuardarNotificacionUseCase {
 class ObtenerNotificacionesUseCase {
   final PushNotificationLocalRepository repository;
 
-  ObtenerNotificacionesUseCase({
-    required this.repository,
-  });
+  ObtenerNotificacionesUseCase({required this.repository});
 
   Future<List<NotificationLocalModel>> call() async {
+    final LocalStorageDataSource localStorage = LocalStorageDataSourceImpl();
 
-    final LocalStorageDataSource localStorage =
-    LocalStorageDataSourceImpl();
-
-    final idGenUsuario =
-        await localStorage.getLastIdGenUsuario();
+    final idGenUsuario = await localStorage.getLastIdGenUsuario();
 
     return repository.obtenerNotificaciones(idGenUsuario: idGenUsuario);
-
   }
 }
 
@@ -54,16 +42,10 @@ class ObtenerNotificacionesUseCase {
 class MarcarNotificacionLeidaUseCase {
   final PushNotificationLocalRepository repository;
 
-  MarcarNotificacionLeidaUseCase({
-    required this.repository,
-  });
+  MarcarNotificacionLeidaUseCase({required this.repository});
 
-  Future<int> call({
-    required int id,
-  }) {
-    return repository.marcarComoLeida(
-      id: id,
-    );
+  Future<int> call({required int id}) {
+    return repository.marcarComoLeida(id: id);
   }
 }
 
@@ -74,18 +56,12 @@ class MarcarNotificacionLeidaUseCase {
 class ObtenerCantidadNoLeidasUseCase {
   final PushNotificationLocalRepository repository;
 
-  ObtenerCantidadNoLeidasUseCase({
-    required this.repository,
-  });
+  ObtenerCantidadNoLeidasUseCase({required this.repository});
 
   Future<int> call() async {
+    final LocalStorageDataSource localStorage = LocalStorageDataSourceImpl();
 
-    final LocalStorageDataSource localStorage =
-    LocalStorageDataSourceImpl();
-
-    final idGenUsuario =
-        await localStorage.getLastIdGenUsuario();
-
+    final idGenUsuario = await localStorage.getLastIdGenUsuario();
 
     return repository.obtenerCantidadNoLeidas(idGenUsuario: idGenUsuario);
   }
@@ -98,16 +74,10 @@ class ObtenerCantidadNoLeidasUseCase {
 class EliminarNotificacionUseCase {
   final PushNotificationLocalRepository repository;
 
-  EliminarNotificacionUseCase({
-    required this.repository,
-  });
+  EliminarNotificacionUseCase({required this.repository});
 
-  Future<int> call({
-    required int id,
-  }) {
-    return repository.eliminarNotificacion(
-      id: id,
-    );
+  Future<int> call({required int id}) {
+    return repository.eliminarNotificacion(id: id);
   }
 }
 
@@ -118,20 +88,15 @@ class EliminarNotificacionUseCase {
 class EliminarTodasNotificacionesUseCase {
   final PushNotificationLocalRepository repository;
 
-  EliminarTodasNotificacionesUseCase({
-    required this.repository,
-  });
+  EliminarTodasNotificacionesUseCase({required this.repository});
 
   Future<int> call() async {
-    final LocalStorageDataSource localStorage =
-    LocalStorageDataSourceImpl();
+    final LocalStorageDataSource localStorage = LocalStorageDataSourceImpl();
 
-    final idGenUsuario =
-        await localStorage.getLastIdGenUsuario();
+    final idGenUsuario = await localStorage.getLastIdGenUsuario();
     return repository.eliminarTodas(idGenUsuario: idGenUsuario);
   }
 }
-
 
 /// =======================================================
 /// Guardar una notificación recibida desde Firebase
@@ -140,18 +105,17 @@ class EliminarTodasNotificacionesUseCase {
 class GuardarNotificacionRemotaUseCase {
   final PushNotificationLocalRepository repository;
 
-  GuardarNotificacionRemotaUseCase({
-    required this.repository,
-  });
+  GuardarNotificacionRemotaUseCase({required this.repository});
 
   Future<int> call({
     required NotificationModel notification,
-    required int idGenUsuario
+    required int idGenUsuario,
   }) {
-    final local = NotificationLocalModel.fromRemote(notification,idGenUsuario: idGenUsuario);
-
-    return repository.guardarNotificacion(
-      notification: local,
+    final local = NotificationLocalModel.fromRemote(
+      notification,
+      idGenUsuario: idGenUsuario,
     );
+
+    return repository.guardarNotificacion(notification: local);
   }
 }

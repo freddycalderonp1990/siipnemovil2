@@ -1,12 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-
 import '../../core/utils/photo_helper.dart';
 import '../../core/utils/responsiveUtil.dart';
 import '../../core/values/app_colors.dart';
 import '../../core/values/app_images.dart';
-
 
 class ImgPerfilRedonda extends StatefulWidget {
   final double size;
@@ -64,12 +62,12 @@ class _ImgPerfilRedondaState extends State<ImgPerfilRedonda>
             ),
             boxShadow: widget.mostrarSombra
                 ? [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.25),
-                blurRadius: 2,
-                offset: const Offset(0, 5),
-              ),
-            ]
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.25),
+                      blurRadius: 2,
+                      offset: const Offset(0, 5),
+                    ),
+                  ]
                 : [],
           ),
           padding: const EdgeInsets.all(3),
@@ -77,10 +75,7 @@ class _ImgPerfilRedondaState extends State<ImgPerfilRedonda>
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: widget.mostrarBorde
-                  ? Border.all(
-                color: Colors.white,
-                width: 1,
-              )
+                  ? Border.all(color: Colors.white, width: 1)
                   : null,
               image: DecorationImage(
                 image: imgMemory != null

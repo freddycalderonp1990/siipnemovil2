@@ -9,16 +9,16 @@ class DesingRegistroCivilWg extends StatelessWidget {
   final double sizeImg;
   final String? imgBase64;
 
-  const DesingRegistroCivilWg(
-      {Key? key,
-      required this.title,
-      required this.dato1,
-      required this.dato2,
-      required this.dato3,
-      required this.stringImg,
-      this.sizeImg = 45,
-      this.imgBase64 = null})
-      : super(key: key);
+  const DesingRegistroCivilWg({
+    Key? key,
+    required this.title,
+    required this.dato1,
+    required this.dato2,
+    required this.dato3,
+    required this.stringImg,
+    this.sizeImg = 45,
+    this.imgBase64 = null,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +41,10 @@ class DesingRegistroCivilWg extends StatelessWidget {
             title,
             textAlign: TextAlign.center,
             style: TextStyle(
-                color: Colors.blueAccent.withOpacity(0.9),
-                fontWeight: FontWeight.bold,
-                fontSize: responsive.diagonalP(2.3)),
+              color: Colors.blueAccent.withOpacity(0.9),
+              fontWeight: FontWeight.bold,
+              fontSize: responsive.diagonalP(2.3),
+            ),
           ),
           Container(
             child: Row(
@@ -55,64 +56,63 @@ class DesingRegistroCivilWg extends StatelessWidget {
                     height: sizeImg,
                     child: imgMemory != null
                         ? Material(
-                      color: Colors.transparent,
+                            color: Colors.transparent,
                             child: InkWell(
                               onTap: () {
-                                DialogosDesingWidget.getDialogoXImgMemory(title: 'FOTO',imgMemory:imgMemory );
+                                DialogosDesingWidget.getDialogoXImgMemory(
+                                  title: 'FOTO',
+                                  imgMemory: imgMemory,
+                                );
                               },
                               child: Container(
-
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   image: DecorationImage(
-                                      image: Image.memory(imgMemory).image,
-                                      fit: BoxFit.fill),
+                                    image: Image.memory(imgMemory).image,
+                                    fit: BoxFit.fill,
+                                  ),
                                 ),
                               ),
                             ),
                           )
-                        : Image.asset(
-                            stringImg,
-                          ),
+                        : Image.asset(stringImg),
                   ),
                 ),
                 Expanded(
-                    flex: 3,
-                    child: Container(
-                      child: Column(
-                        children: [
-                          Text(
-                            dato1,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.black.withOpacity(0.9),
-                                fontSize: responsive.diagonalP(1.5)),
+                  flex: 3,
+                  child: Container(
+                    child: Column(
+                      children: [
+                        Text(
+                          dato1,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.black.withOpacity(0.9),
+                            fontSize: responsive.diagonalP(1.5),
                           ),
-                          Row(
-                            children: [
-                              Expanded(
-                                  flex: 2,
-                                  child: Row(
-                                    children: [
-                                      Flexible(child: Text(dato2)),
-                                    ],
-                                  )),
-                              SizedBox(
-                                width: 1,
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: Row(
+                                children: [Flexible(child: Text(dato2))],
                               ),
-                              Expanded(
-                                  flex: 1,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Flexible(child: Text(dato3)),
-                                    ],
-                                  ))
-                            ],
-                          )
-                        ],
-                      ),
-                    ))
+                            ),
+                            SizedBox(width: 1),
+                            Expanded(
+                              flex: 1,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [Flexible(child: Text(dato3))],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -120,7 +120,4 @@ class DesingRegistroCivilWg extends StatelessWidget {
       ),
     );
   }
-
-
-
 }

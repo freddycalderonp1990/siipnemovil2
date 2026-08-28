@@ -1,13 +1,9 @@
-
 import 'dart:convert';
 
 import 'package:api_provider/core/utils/parse_model.dart';
-class TokenUtil{
 
-
-
-
- static int extractIdGenUsuario(String token) {
+class TokenUtil {
+  static int extractIdGenUsuario(String token) {
     try {
       final parts = token.split('.');
       if (parts.length != 3) return 0;
@@ -26,5 +22,4 @@ class TokenUtil{
       return 0;
     }
   }
-
 }

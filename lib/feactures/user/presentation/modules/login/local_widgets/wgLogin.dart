@@ -4,8 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-
-
 import '../../../../../../app/core/app_config.dart';
 import '../../../../../../app/core/utils/responsiveUtil.dart';
 import '../../../../../../app/core/utils/utilidadesUtil.dart';
@@ -25,16 +23,16 @@ class WgLogin extends StatefulWidget {
   final double ancho;
   final bool mostrarFondo;
 
-  const WgLogin(
-      {Key? key,
-      this.controllerUser,
-      this.controllerPass,
-      this.onPressed,
+  const WgLogin({
+    Key? key,
+    this.controllerUser,
+    this.controllerPass,
+    this.onPressed,
 
-      this.formKey,
-      this.ancho = 50.0,
-      this.mostrarFondo = false})
-      : super(key: key);
+    this.formKey,
+    this.ancho = 50.0,
+    this.mostrarFondo = false,
+  }) : super(key: key);
 
   @override
   _WgLoginState createState() => _WgLoginState();
@@ -43,12 +41,10 @@ class WgLogin extends StatefulWidget {
 class _WgLoginState extends State<WgLogin> {
   @override
   void initState() {
-   // createTutorial();
+    // createTutorial();
 
     super.initState();
   }
-
-
 
   GlobalKey keyAllLogin = GlobalKey();
 
@@ -75,10 +71,7 @@ class _WgLoginState extends State<WgLogin> {
     desing = Column(
       children: [
         desing,
-        SizedBox(
-          height: 0,
-          key: keyAllLogin,
-        ),
+        SizedBox(height: 0, key: keyAllLogin),
       ],
     );
 
@@ -93,18 +86,13 @@ class _WgLoginState extends State<WgLogin> {
                   fit: BoxFit.cover,
                 ),
               ),
-              desing
+              desing,
             ],
           )
         : desing;
 
-
     return GetBuilder<LoginController>(id: 'WgLogin', builder: (_) => wg);
   }
-
-
-
-
 }
 
 class OnlyDesingUserPass extends StatelessWidget {
@@ -116,16 +104,17 @@ class OnlyDesingUserPass extends StatelessWidget {
   final keyTextClave;
   final keyBtnLogin;
   final VoidCallback? onPressed;
-  const OnlyDesingUserPass(
-      {super.key,
-      this.formKey,
-      this.ancho = 50.0,
-      this.controllerUser,
-      this.controllerPass,
-      this.keyTextUsuario,
-      this.keyTextClave,
-      this.onPressed,
-      this.keyBtnLogin});
+  const OnlyDesingUserPass({
+    super.key,
+    this.formKey,
+    this.ancho = 50.0,
+    this.controllerUser,
+    this.controllerPass,
+    this.keyTextUsuario,
+    this.keyTextClave,
+    this.onPressed,
+    this.keyBtnLogin,
+  });
   @override
   Widget build(BuildContext context) {
     final responsive = ResponsiveUtil();
@@ -138,13 +127,13 @@ class OnlyDesingUserPass extends StatelessWidget {
             maxWidth: responsive.ancho! - ancho,
             minWidth: responsive.ancho! - ancho,
           ),
-          child: Column(children: [
-            Form(
+          child: Column(
+            children: [
+              Form(
                 key: formKey,
                 child: Column(
                   children: <Widget>[
                     Container(
-
                       key: keyTextUsuario,
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -162,23 +151,25 @@ class OnlyDesingUserPass extends StatelessWidget {
                         ],
                       ),
                       child: ImputTextWidget(
-                    icono: Icon(Icons.person_outline,color: AppColors.colorIcons, size:  34,),
+                        icono: Icon(
+                          Icons.person_outline,
+                          color: AppColors.colorIcons,
+                          size: 34,
+                        ),
                         controller: controllerUser,
                         elevation: 1,
                         label: "Usuario",
                         fonSize: sizeTxt,
                         hitText: "Ingrese el usuario",
                         validar: (text) {
-                          if (text!.length >= 10 ) {
+                          if (text!.length >= 10) {
                             return null;
                           }
                           return "Usuario no válido";
                         },
                       ),
                     ),
-                    SizedBox(
-                      height: responsive.altoP(2),
-                    ),
+                    SizedBox(height: responsive.altoP(2)),
                     Container(
                       padding: EdgeInsets.all(5),
                       decoration: BoxDecoration(
@@ -198,7 +189,11 @@ class OnlyDesingUserPass extends StatelessWidget {
                       ),
                       child: ImputTextWidget(
                         key: keyTextClave,
-                        icono: Icon(Icons.lock_outline,color: AppColors.colorIcons, size:  34,),
+                        icono: Icon(
+                          Icons.lock_outline,
+                          color: AppColors.colorIcons,
+                          size: 34,
+                        ),
                         elevation: 1,
                         isSegura: true,
                         controller: controllerPass,
@@ -212,20 +207,17 @@ class OnlyDesingUserPass extends StatelessWidget {
                           return "Clave no válida";
                         },
                       ),
-                    )
+                    ),
                   ],
-                )),
-            SizedBox(
-              height: responsive.altoP(1),
-            ),
-            desingOlvidoContrasena(),
-          ],),
+                ),
+              ),
+              SizedBox(height: responsive.altoP(1)),
+              desingOlvidoContrasena(),
+            ],
+          ),
         ),
 
-
-        SizedBox(
-          height: responsive.altoP(2),
-        ),
+        SizedBox(height: responsive.altoP(2)),
         ConstrainedBox(
           key: keyBtnLogin,
           constraints: BoxConstraints(
@@ -244,12 +236,10 @@ class OnlyDesingUserPass extends StatelessWidget {
     return desing;
   }
 
-
-  Widget desingOlvidoContrasena(){
+  Widget desingOlvidoContrasena() {
     return Row(
       children: [
-
-       Transform.translate(
+        Transform.translate(
           offset: const Offset(0, -2),
           child: Checkbox(
             value: true,

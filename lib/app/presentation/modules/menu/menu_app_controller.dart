@@ -3,21 +3,15 @@ part of '../controllers.dart';
 class MenuAppController extends GetxController {
   final loginController = Get.find<LoginController>();
 
-
-
-  late UserEntities  user;
-
-
+  late UserEntities user;
 
   RxBool showMenuCenso = false.obs;
   RxBool showMenuElecciones = false.obs;
 
-
   RxBool peticionServerState = false.obs;
   @override
   void onInit() async {
-    user=loginController.user.value;
-
+    user = loginController.user.value;
 
     super.onInit();
   }
@@ -38,19 +32,4 @@ class MenuAppController extends GetxController {
   cerrarSession() {
     Get.toNamed(AppRoutes.SPLASH_APP);
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

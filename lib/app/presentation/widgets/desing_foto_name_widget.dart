@@ -1,6 +1,5 @@
 part of 'custom_app_widgets.dart';
 
-
 class DesingFotoNameWidget extends StatefulWidget {
   final String img;
   final String sexo;
@@ -27,7 +26,7 @@ class _DesingFotoNameWidgetState extends State<DesingFotoNameWidget> {
     return Column(
       children: [
         SizedBox(height: responsive.altoP(1)),
-        ImgPerfilRedonda(size: 27, img:!showDatos?"": widget.img),
+        ImgPerfilRedonda(size: 27, img: !showDatos ? "" : widget.img),
 
         BtnIconWidget(
           colorBtn: Colors.transparent,
@@ -42,16 +41,16 @@ class _DesingFotoNameWidgetState extends State<DesingFotoNameWidget> {
           },
         ),
 
-
-
-          DesingTextoNameUser(sexo: widget.sexo, text:!showDatos?"XXXXXX XXXXXX XXXXX XXXXX": widget.nombres),
+        DesingTextoNameUser(
+          sexo: widget.sexo,
+          text: !showDatos ? "XXXXXX XXXXXX XXXXX XXXXX" : widget.nombres,
+        ),
 
         SizedBox(height: responsive.altoP(1)),
       ],
     );
   }
 }
-
 
 class DesingTextoNameUser extends StatelessWidget {
   const DesingTextoNameUser({

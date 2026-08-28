@@ -5,6 +5,5 @@ class TipoOperativoBinding extends Bindings {
   void dependencies() {
     //Inyeccion de dependencias
     Get.lazyPut(() => TipoOperativoController(), fenix: true);
-
   }
 }

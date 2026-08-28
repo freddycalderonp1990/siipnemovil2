@@ -9,7 +9,6 @@ import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:latlong2/latlong.dart';
 
-
 import '../../presentation/widgets/custom_app_widgets.dart';
 import '../app_config.dart';
 
@@ -17,14 +16,13 @@ class MyGps {
   static myGeolocator.LocationSettings get getConfig {
     final myGeolocator.LocationSettings locationSettings =
         myGeolocator.LocationSettings(
-      accuracy: myGeolocator.LocationAccuracy.high,
-      distanceFilter: 3,
-    );
+          accuracy: myGeolocator.LocationAccuracy.high,
+          distanceFilter: 3,
+        );
     return locationSettings;
   }
 
   static Future<bool> verificarGPS() async {
-
     final status = await Permission.location.request();
     if (status == PermissionStatus.permanentlyDenied) {
       //await  openAppSettings();
@@ -32,12 +30,12 @@ class MyGps {
       String msj =
           "\nPara que la aplicación pueda funcionar correctamente, necesitamos acceder a la ubicación de su dispositivo con la finalidad de mostrarle los beneficios cercanos a su ubicación.";
       DialogosAwesome.getWarningSiNo(
-          descripcion: msj + "\n\n ¿Desea activar la ubicación?",
-          title: "Permisos de Ubicación",
-          btnOkOnPress: () async {
-            await  openAppSettings();
-          },
-    );
+        descripcion: msj + "\n\n ¿Desea activar la ubicación?",
+        title: "Permisos de Ubicación",
+        btnOkOnPress: () async {
+          await openAppSettings();
+        },
+      );
       return false;
     }
 
@@ -52,12 +50,14 @@ class MyGps {
       String msj =
           "Necesitamos acceder a la ubicación del Dispositivo.\n\n ¿Desea activar los Permisos de la Ubicación?";
 
-      DialogosDesingWidget.getDialogo(contenido: DesingPermisosGps(
-        onPressed: () async {
-          permisoGPS = await _checkGpsPermisoStatus2();
-          Get.back();
-        },
-      ));
+      DialogosDesingWidget.getDialogo(
+        contenido: DesingPermisosGps(
+          onPressed: () async {
+            permisoGPS = await _checkGpsPermisoStatus2();
+            Get.back();
+          },
+        ),
+      );
 
       return false;
     }
@@ -67,9 +67,7 @@ class MyGps {
     if (!gpsActivo) {
       String msj =
           "Necesitamos acceder a la ubicación del Dispositivo.\n\n Por favor active el GPS - Ubicación  de su dispositivo";
-      DialogosAwesome.getWarning(
-          descripcion: msj,
-        );
+      DialogosAwesome.getWarning(descripcion: msj);
       return false;
     }
 
@@ -77,9 +75,10 @@ class MyGps {
       return true;
     } else {
       DialogosAwesome.getError(
-          descripcion:
-              "No se puede obtener información del GSP. Es necesario los permisos del Gps para continuar",
-          title: "Error Gps");
+        descripcion:
+            "No se puede obtener información del GSP. Es necesario los permisos del Gps para continuar",
+        title: "Error Gps",
+      );
       return false;
     }
   }
@@ -119,8 +118,6 @@ class MyGps {
 
     return result;
   }
-
-
 }
 
 class DesingPermisosGps extends StatefulWidget {
@@ -141,35 +138,29 @@ class _DesingPermisosGpsState extends State<DesingPermisosGps> {
   Widget desing() {
     final responsive = ResponsiveUtil();
     return Container(
-        margin: EdgeInsets.all(5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            getTitle(),
-            Icon(
-                size: responsive.diagonalP(4),
-                Icons.location_on,
-                color: Colors.red),
-            SizedBox(
-              height: 10,
-            ),
-            getDerscripcion(),
-            SizedBox(
-              height: 10,
-            ),
+      margin: EdgeInsets.all(5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          getTitle(),
+          Icon(
+            size: responsive.diagonalP(4),
+            Icons.location_on,
+            color: Colors.red,
+          ),
+          SizedBox(height: 10),
+          getDerscripcion(),
+          SizedBox(height: 10),
 
-            getIconText(
-                "Acceder a tu ubicación nos ayuda a mostrarte los beneficios cercanos a tu ubicación"),
-            SizedBox(
-              height: responsive.altoP(6),
-            ),
-            BotonesWidget(
-              title: 'Continuar',
-              onPressed: widget.onPressed,
-            )
-          ],
-        ));
+          getIconText(
+            "Acceder a tu ubicación nos ayuda a mostrarte los beneficios cercanos a tu ubicación",
+          ),
+          SizedBox(height: responsive.altoP(6)),
+          BotonesWidget(title: 'Continuar', onPressed: widget.onPressed),
+        ],
+      ),
+    );
   }
 
   Widget getTitle() {
@@ -182,9 +173,7 @@ class _DesingPermisosGpsState extends State<DesingPermisosGps> {
     return Text(
       "Necesitamos acceder a la ubicación del Dispositivo.",
       textAlign: TextAlign.justify,
-      style: TextStyle(
-        fontSize: responsive.diagonalP(1.5),
-      ),
+      style: TextStyle(fontSize: responsive.diagonalP(1.5)),
     );
   }
 
@@ -195,21 +184,14 @@ class _DesingPermisosGpsState extends State<DesingPermisosGps> {
     return Text(
       text,
       style: TextStyle(
-          color: colorTexto,
-          shadows: [
-            Shadow(
-              blurRadius: 10,
-              color: colorSombra,
-              offset: Offset(2, 2),
-            ),
-            Shadow(
-              blurRadius: 10,
-              color: colorSombra,
-              offset: Offset(-2, 2),
-            ),
-          ],
-          fontWeight: FontWeight.bold,
-          fontSize: size),
+        color: colorTexto,
+        shadows: [
+          Shadow(blurRadius: 10, color: colorSombra, offset: Offset(2, 2)),
+          Shadow(blurRadius: 10, color: colorSombra, offset: Offset(-2, 2)),
+        ],
+        fontWeight: FontWeight.bold,
+        fontSize: size,
+      ),
     );
   }
 
@@ -225,12 +207,7 @@ class _DesingPermisosGpsState extends State<DesingPermisosGps> {
             color: Color.fromRGBO(22, 73, 135, 1),
           ),
         ),
-        Expanded(
-            flex: 8,
-            child: Text(
-              text,
-              textAlign: TextAlign.justify,
-            ))
+        Expanded(flex: 8, child: Text(text, textAlign: TextAlign.justify)),
       ],
     );
   }

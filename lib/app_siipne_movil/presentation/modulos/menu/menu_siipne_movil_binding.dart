@@ -5,6 +5,5 @@ class MenuSiipneMovilBinding extends Bindings {
   void dependencies() {
     //Inyeccion de dependencias
     Get.lazyPut(() => MenuSiipneMovilController(), fenix: true);
-
   }
 }

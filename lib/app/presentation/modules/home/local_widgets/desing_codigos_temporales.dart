@@ -9,7 +9,6 @@ import '../../../../core/utils/responsiveUtil.dart';
 import '../../../../core/values/app_colors.dart';
 import '../../../widgets/custom_app_widgets.dart';
 
-
 class DesingCodigosTemporalesWidget extends StatefulWidget {
   final double valueRadio;
   final int seconds;
@@ -17,13 +16,14 @@ class DesingCodigosTemporalesWidget extends StatefulWidget {
   final String codigo;
   final GestureTapCallback? onTap;
 
-  const DesingCodigosTemporalesWidget(
-      {super.key,
-      required this.valueRadio,
-      required this.seconds,
-      required this.title,
-      required this.codigo,
-      this.onTap});
+  const DesingCodigosTemporalesWidget({
+    super.key,
+    required this.valueRadio,
+    required this.seconds,
+    required this.title,
+    required this.codigo,
+    this.onTap,
+  });
 
   @override
   State<DesingCodigosTemporalesWidget> createState() =>
@@ -42,18 +42,20 @@ class _DesingCodigosTemporalesWidgetState
   @override
   Widget build(BuildContext context) {
     return Material(
-        color: Colors.white,
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(20),
+      elevation: 2,
+      child: InkWell(
         borderRadius: BorderRadius.circular(20),
-        elevation: 2,
-        child: InkWell(
-            borderRadius: BorderRadius.circular(20),
-            onTap: widget.onTap,
-            // handle your onTap here
-            child: ContenedorDesingWidget(
-              anchoPorce: 90,
-              paddin: EdgeInsets.all(2),
-              child: desingCodigosTemporales(),
-            )));
+        onTap: widget.onTap,
+        // handle your onTap here
+        child: ContenedorDesingWidget(
+          anchoPorce: 90,
+          paddin: EdgeInsets.all(2),
+          child: desingCodigosTemporales(),
+        ),
+      ),
+    );
   }
 
   Widget desingCodigosTemporales() {
@@ -65,9 +67,7 @@ class _DesingCodigosTemporalesWidgetState
           color: AppColors.colorIcons,
           size: responsive.diagonalP(AppConfig.tamIcons),
         ),
-        SizedBox(
-          width: 20,
-        ),
+        SizedBox(width: 20),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,19 +76,20 @@ class _DesingCodigosTemporalesWidgetState
               Text(
                 widget.title,
                 style: TextStyle(
-                    color: Colors.black,
-                    fontSize: responsive.diagonalP(AppConfig.tamTexto)),
+                  color: Colors.black,
+                  fontSize: responsive.diagonalP(AppConfig.tamTexto),
+                ),
               ),
               Text(
                 widget.codigo,
                 style: TextStyle(
-                    color: Colors.black,
-                    fontSize: responsive.diagonalP(AppConfig.tamTextoTitulo)),
+                  color: Colors.black,
+                  fontSize: responsive.diagonalP(AppConfig.tamTextoTitulo),
+                ),
               ),
             ],
           ),
         ),
-
       ],
     );
   }

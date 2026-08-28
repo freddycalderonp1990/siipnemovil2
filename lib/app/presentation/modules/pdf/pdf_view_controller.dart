@@ -9,9 +9,6 @@ class PdfViewController extends GetxController {
   RxString errorMessage = ''.obs;
   RxString title = ''.obs;
 
-
-
-
   GlobalKey<ScaffoldState> key = GlobalKey<ScaffoldState>();
 
   var peticionServerState = false.obs;
@@ -22,23 +19,21 @@ class PdfViewController extends GetxController {
     super.onInit();
   }
 
-
   _loadDatos() async {
     var data = Get.arguments;
-    if (data != null  && data.containsKey('pathPdf') && data['pathPdf'] != null) {
-
+    if (data != null &&
+        data.containsKey('pathPdf') &&
+        data['pathPdf'] != null) {
       peticionServerState(true);
 
-
-      path.value=data['pathPdf'];
+      path.value = data['pathPdf'];
 
       peticionServerState(false);
     } else {
-      errorMessage.value = "No se recibió el parámetro 'pathPdf'. Por favor, verifique e intente nuevamente.";
-
+      errorMessage.value =
+          "No se recibió el parámetro 'pathPdf'. Por favor, verifique e intente nuevamente.";
     }
   }
-
 
   onRender(_pages) {
     pages.value = _pages;
@@ -46,20 +41,18 @@ class PdfViewController extends GetxController {
   }
 
   onError(error) {
-
-    if(ApiConfig.AmbienteUrl!=Ambiente.PROD){
+    if (ApiConfig.AmbienteUrl != Ambiente.PROD) {
       errorMessage.value = error.toString();
       print("Error Pdf: ${errorMessage.value}");
-    }{
-      errorMessage.value =
-      "No se pudo cargar el archivo contacte con el administrador. Es posible que el archivo no se encuentre cargado de manera correcta.";
-
     }
-
+    {
+      errorMessage.value =
+          "No se pudo cargar el archivo contacte con el administrador. Es posible que el archivo no se encuentre cargado de manera correcta.";
+    }
   }
 
   onPageError(page, error) {
-    if(ApiConfig.AmbienteUrl!=Ambiente.PROD){
+    if (ApiConfig.AmbienteUrl != Ambiente.PROD) {
       errorMessage.value = '$page: ${error.toString()}';
       print('$page: ${error.toString()}');
     } else {
@@ -107,14 +100,12 @@ class PdfViewController extends GetxController {
     return completer.future;
   }
 
-
-  Future<File> createFileFromBase64(String base64Pdf,String nameFile) async {
+  Future<File> createFileFromBase64(String base64Pdf, String nameFile) async {
     final decodedBytes = base64Decode(base64Pdf);
     final tempDir = await Directory.systemTemp.createTemp();
     final tempFile = File("${tempDir.path}/${nameFile}.pdf");
     return tempFile.writeAsBytes(decodedBytes);
   }
-
 
   @override
   void onReady() {

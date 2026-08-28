@@ -5,11 +5,7 @@ class MenuAppPage extends GetView<MenuAppController> {
 
   @override
   Widget build(BuildContext context) {
-
-
-
     return WorkAreaPageWidget(
-
       //showBtnNotificacione: true,
 
       title: "MENÚ PRINCIPAL ",
@@ -18,14 +14,12 @@ class MenuAppPage extends GetView<MenuAppController> {
     );
   }
 
-
-
   Widget _getContenidoConRefresh() {
     final responsive = ResponsiveUtil();
 
     return RefreshIndicator(
       onRefresh: () async {
-       // await controller.getDatosMenuApp();
+        // await controller.getDatosMenuApp();
       },
       child: SingleChildScrollView(
         physics:
@@ -58,23 +52,16 @@ class MenuAppPage extends GetView<MenuAppController> {
     double separacionBtnMenu = 1.5;
     return Column(
       children: [
-
         SizedBox(height: responsive.altoP(3)),
 
         BtnMenuWidget(
           img: AppImages.escudopolicia,
-            horizontal: true,
-            title: "OPERATIVOS POLCO",
-            onTap:
-                () {
-              // Get.toNamed(EleccionesRoutes.MENU_APP);
-            }
-
-
+          horizontal: true,
+          title: "OPERATIVOS POLCO",
+          onTap: () {
+            // Get.toNamed(EleccionesRoutes.MENU_APP);
+          },
         ),
-
-
-
 
         SizedBox(height: responsive.altoP(separacionBtnMenu)),
       ],

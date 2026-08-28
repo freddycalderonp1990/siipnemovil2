@@ -1,9 +1,8 @@
 part of '../../controllers.dart';
 
 class InicioRapidoController extends GetxController {
-
   final LocalStoreUseCase _localStoreUseCase = Get.find<LocalStoreUseCase>();
-  final loginController = Get.find<LoginController>();
+  final LoginController loginController = Get.find<LoginController>();
 
   final user = UserEntities.empty().obs;
 
@@ -11,13 +10,16 @@ class InicioRapidoController extends GetxController {
   GlobalKey<FormState> formKey2 = GlobalKey<FormState>();
   GlobalKey<FormState> formKeyPinCode = GlobalKey<FormState>();
 
-  var controllerUser = new TextEditingController();
-  var controllerPass = new TextEditingController();
+  var controllerUser = TextEditingController();
+  var controllerPass = TextEditingController();
+
   RxBool peticionServerState = false.obs;
   RxBool mostrarAccesoHuella = false.obs;
   RxString valueCode = "".obs;
   RxBool mostrarBtnGuardarPinCode = false.obs;
+
   int contadorLogin2 = 0;
+
   RxBool mostrarBtnHome = false.obs;
   RxString namePhone = "".obs;
   RxList<Widget> adWidget = <Widget>[].obs;
@@ -26,58 +28,65 @@ class InicioRapidoController extends GetxController {
   RxBool wgOcultarInicioRapidoUserPass = false.obs;
 
   static const maxSeconds = 30;
+
   RxInt seconds = maxSeconds.obs;
   RxInt seconds2 = 0.obs;
   RxDouble valueRadio = 100.0.obs;
+
   Timer? timer;
+
   RxString codigo = "000000".obs;
-
   var peticionServer = false.obs;
-
 
   @override
   void onInit() {
-    verificarSitieneBiometrico();
     super.onInit();
+    verificarSitieneBiometrico();
   }
 
   @override
   void onReady() {
-    _init();
-    verificarCredenciales();
     super.onReady();
+    _cargarInicio();
+  }
+
+  Future<void> _cargarInicio() async {
+    await _init();
+    await verificarCredenciales();
   }
 
   @override
   void onClose() {
+    timer?.cancel();
+    controllerUser.dispose();
+    controllerPass.dispose();
     super.onClose();
   }
 
-
-  void verificarSitieneBiometrico() async {
+  Future<void> verificarSitieneBiometrico() async {
     mostrarAccesoHuella.value = await BiometricUtil.checkAccesoBiometrico();
   }
 
-
-
   Future<void> login({required String user, required String pass}) async {
+    peticionServerState.value = true;
 
-    peticionServerState(true);
-    //TODO: Implementar cuando se lance a produccion
+    try {
+      await ExceptionDialogos.manejarErroresShowDialogo(() async {
+        UserEntities? userResponse = await loginController.authApp(
+          user: user,
+          pass: pass,
+          localStoreImpl: _localStoreUseCase,
+        );
 
-
-    await ExceptionDialogos.manejarErroresShowDialogo(() async {
-      UserEntities? userResponse = await loginController.authApp(
-          user: user, pass: pass, localStoreImpl: _localStoreUseCase);
-
-      if (userResponse != null) {
-        loginController.user.value=userResponse;
-        InciarPantalla();
-      }
-    });
-
-    controllerPass.clear();
-    peticionServerState(false);
+        if (userResponse != null) {
+          loginController.user.value = userResponse;
+          await InciarPantalla();
+        }
+      });
+    } finally {
+      controllerPass.clear();
+      peticionServerState.value = false;
+    }
   }
 
   Future<void> ingresoConUsuarioClave() async {
@@ -87,125 +96,114 @@ class InicioRapidoController extends GetxController {
 
   Future<void> ingresoConOtroUsuario() async {
     await _localStoreUseCase.clearAllData();
-
     Get.offAllNamed(AppRoutes.SPLASH_APP);
   }
 
   Future<bool> verificarCredenciales() async {
+    namePhone.value = await DeviceInfoApp.getDeviceMarca;
 
-    namePhone.value= await DeviceInfoApp.getDeviceMarca;
-
-    String user = await _localStoreUseCase.getUser();
-    String pass = await _localStoreUseCase.getPass();
-
-
+    String userLocal = await _localStoreUseCase.getUser();
+    String passLocal = await _localStoreUseCase.getPass();
 
     mostrarAccesoHuella.value = false;
 
-    if (user.length > 0 && pass.length > 0) {
-      print('mostrar huella');
+    if (userLocal.isNotEmpty && passLocal.isNotEmpty) {
+      print("INICIO RAPIDO: credenciales encontradas");
 
-      this.user.value = await _localStoreUseCase.getUserModel();
-      this.user.refresh();
+      user.value = await _localStoreUseCase.getUserModel();
+      user.refresh();
 
       bool configHuella = await _localStoreUseCase.getConfigHuella();
+
       if (configHuella) {
         mostrarAccesoHuella.value = true;
       }
 
       return true;
-    } else {
-      return false;
     }
+
+    print("INICIO RAPIDO: sin credenciales");
+    return false;
   }
 
-  _setBiometrico() async {
-    bool verificaCredecniales = false;
-    String user = await _localStoreUseCase.getUser();
-    String pass = await _localStoreUseCase.getPass();
-    print("la clave es **877faCsP@p5TsS1Yh*zVtCPz5crkCQQYEP    =======   ${pass}");
+  Future<void> _setBiometrico() async {
+    String userLocal = await _localStoreUseCase.getUser();
+    String passLocal = await _localStoreUseCase.getPass();
 
-    if (user.length > 0 && pass.length > 0) {
-      verificaCredecniales = true;
-    } else {
+    if (userLocal.isEmpty || passLocal.isEmpty) {
       Get.back();
       return;
     }
 
-    if (verificaCredecniales) {
-      bool resultHuella = await BiometricUtil.biometrico();
+    bool resultHuella = await BiometricUtil.biometrico();
 
-      if (resultHuella) {
-        DialogosAwesome.getSucess(
-            descripcion: "Ha configurado con éxito el acceso biométrico.",
-            btnOkOnPress: () async {
-              Get.back();
-              _localStoreUseCase.setLoginInit(true);
-              _localStoreUseCase.setConfigHuella(true);
+    if (resultHuella) {
+      DialogosAwesome.getSucess(
+        descripcion: "Ha configurado con éxito el acceso biométrico.",
+        btnOkOnPress: () async {
+          Get.back();
 
+          await _localStoreUseCase.setLoginInit(true);
+          await _localStoreUseCase.setConfigHuella(true);
 
-              await login(user: user, pass: pass);
-            });
-      } else {
-        DialogosAwesome.getError(
-            descripcion: "Error al configurar, su huella no coincide.",
-           );
-      }
+          await login(user: userLocal, pass: passLocal);
+        },
+      );
+    } else {
+      DialogosAwesome.getError(
+        descripcion: "Error al configurar, su huella no coincide.",
+      );
     }
   }
 
   Future<void> loginConBiometrico() async {
+    bool confHuella = await _localStoreUseCase.getConfigHuella();
 
-      bool confHuella = await _localStoreUseCase.getConfigHuella();
+    if (!confHuella) {
+      DialogosAwesome.getWarningSiNo(
+        descripcion: "¿Desea configurar el acceso biométrico?",
+        btnOkOnPress: () {
+          _setBiometrico();
+        },
+        btnCancelOnPress: () async {
+          await _localStoreUseCase.setLoginInit(false);
+          await _localStoreUseCase.setConfigHuella(false);
+          Get.back();
+        },
+      );
 
-      if (!confHuella) {
-        DialogosAwesome.getWarningSiNo(
-            descripcion: "¿Desea configurar el acceso biometrico.?",
-            btnOkOnPress: () {
-              _setBiometrico();
-            },
-            btnCancelOnPress: () async {
-              _localStoreUseCase.setLoginInit(false);
-              _localStoreUseCase.setConfigHuella(false);
+      return;
+    }
 
-              Get.back();
-            });
-      } else {
-        wgInicioRapidoUserPass.value = false;
-        wgOcultarInicioRapidoUserPass.value = false;
+    wgInicioRapidoUserPass.value = false;
+    wgOcultarInicioRapidoUserPass.value = false;
 
-        bool verificarCredenciales = await this.verificarCredenciales();
+    bool tieneCredenciales = await verificarCredenciales();
 
-        if (verificarCredenciales) {
-          wgInicioRapidoUserPass.value = false;
-          wgOcultarInicioRapidoUserPass.value = false;
+    if (tieneCredenciales) {
+      bool result = await BiometricUtil.biometrico();
 
-          bool result = await BiometricUtil.biometrico();
-          if (result) {
-            String user = await _localStoreUseCase.getUser();
-            String pass = await _localStoreUseCase.getPass();
-            await login(user: user, pass: pass);
+      if (result) {
+        String userLocal = await _localStoreUseCase.getUser();
+        String passLocal = await _localStoreUseCase.getPass();
 
-          }
-        } else {
-          DialogosAwesome.getWarning(
-              descripcion: "No existe biometrico");
-        }
+        await login(user: userLocal, pass: passLocal);
       }
-
+    } else {
+      DialogosAwesome.getWarning(descripcion: "No existe biométrico");
+    }
   }
 
-  InciarPantalla() async {
+  Future<void> InciarPantalla() async {
     await _localStoreUseCase.setContadorFallido(0);
+    await _localStoreUseCase.setLoginInit(true);
 
-    _localStoreUseCase.setLoginInit(true);
     Get.offAllNamed(AppConfig.showPageBeforeLogin);
-
   }
 
-
-  _init() async {
+  Future<void> _init() async {
     print("AppConfig.plataformIsIos2= ${AppConfig.plataformIsIos}");
+
     if (Platform.isIOS) {
       mostrarBtnHome.value = true;
     }
@@ -216,12 +214,9 @@ class InicioRapidoController extends GetxController {
     }
   }
 
-
-  getPantalla() async {
-    peticionServer(true);
+  Future<void> getPantalla() async {
+    peticionServer.value = true;
     Get.offAllNamed(AppRoutes.HOME_APP_PUBLIC);
-    peticionServer(false);
+    peticionServer.value = false;
   }
-
-
 }

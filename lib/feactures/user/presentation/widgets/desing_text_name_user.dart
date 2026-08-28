@@ -5,29 +5,28 @@ class DesingTextNameUser extends StatelessWidget {
     super.key,
 
     required this.sexo,
-    required this.text,  this.sizeText,
+    required this.text,
+    this.sizeText,
   });
 
   final String text;
   final String sexo;
   final double? sizeText;
 
-
   @override
   Widget build(BuildContext context) {
     String Bienvenido =
-    //sexo == 'HOMBRE' ? "BIENVENIDO: " : "BIENVENIDA: ";
-    sexo == 'HOMBRE' ? "" : " ";
+        //sexo == 'HOMBRE' ? "BIENVENIDO: " : "BIENVENIDA: ";
+        sexo == 'HOMBRE' ? "" : " ";
     final responsive = ResponsiveUtil();
 
-    double sizeT=responsive.diagonalP(AppConfig.tamTextoTitulo-0.1);
+    double sizeT = responsive.diagonalP(AppConfig.tamTextoTitulo - 0.1);
 
     return TextLineasWidget(
-
       colorTexto: Colors.black,
       grosorLinea: 3,
-      sizeTxt:sizeText==null?sizeT:sizeText!,
-      title: Bienvenido+ text,
+      sizeTxt: sizeText == null ? sizeT : sizeText!,
+      title: Bienvenido + text,
     );
   }
 }

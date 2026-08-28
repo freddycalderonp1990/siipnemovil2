@@ -28,7 +28,8 @@ class _ComboConBusquedaState extends State<ComboConBusqueda> {
   void initState() {
     super.initState();
     _filteredItems = widget.datos;
-    _selectedItem = widget.selectValue; // Inicializa con el valor preseleccionado
+    _selectedItem =
+        widget.selectValue; // Inicializa con el valor preseleccionado
   }
 
   void _showDropdownDialog() {
@@ -62,7 +63,11 @@ class _ComboConBusquedaState extends State<ComboConBusqueda> {
                       onChanged: (query) {
                         setStateDialog(() {
                           _filteredItems = widget.datos
-                              .where((item) => item.toLowerCase().contains(query.toLowerCase()))
+                              .where(
+                                (item) => item.toLowerCase().contains(
+                                  query.toLowerCase(),
+                                ),
+                              )
                               .toList();
                         });
                       },
@@ -85,7 +90,8 @@ class _ComboConBusquedaState extends State<ComboConBusqueda> {
                             children: [
                               ListTile(
                                 title: Text(_filteredItems[index]),
-                                selected: _filteredItems[index] == _selectedItem,
+                                selected:
+                                    _filteredItems[index] == _selectedItem,
                                 selectedTileColor: Colors.blueAccent,
                                 selectedColor: Colors.white,
                                 onTap: () {
@@ -116,22 +122,24 @@ class _ComboConBusquedaState extends State<ComboConBusqueda> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: _showDropdownDialog,
-      child: desing(Container(
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-        decoration: BoxDecoration(color: Colors.white),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Flexible(
-              child: Text(
-                widget.selectValue ?? _selectedItem ?? widget.searchHint,
-                style: TextStyle(color: Colors.black, fontSize: 16),
+      child: desing(
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+          decoration: BoxDecoration(color: Colors.white),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: Text(
+                  widget.selectValue ?? _selectedItem ?? widget.searchHint,
+                  style: TextStyle(color: Colors.black, fontSize: 16),
+                ),
               ),
-            ),
-            Icon(Icons.arrow_drop_down, color: Colors.black),
-          ],
+              Icon(Icons.arrow_drop_down, color: Colors.black),
+            ],
+          ),
         ),
-      )),
+      ),
     );
   }
 

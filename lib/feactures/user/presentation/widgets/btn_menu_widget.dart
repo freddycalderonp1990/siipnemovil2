@@ -67,8 +67,10 @@ class _BtnMenuWidgetState extends State<BtnMenuWidget>
             ],
           ),
           child: Padding(
-            padding:
-            const EdgeInsets.symmetric(vertical: 12.0, horizontal: 18.0),
+            padding: const EdgeInsets.symmetric(
+              vertical: 12.0,
+              horizontal: 18.0,
+            ),
             child: widget.horizontal
                 ? _buildHorizontal(fontSize, responsive)
                 : _buildVertical(fontSize, responsive),
@@ -77,7 +79,6 @@ class _BtnMenuWidgetState extends State<BtnMenuWidget>
       ),
     );
   }
-
 
   Widget _buildHorizontal(double fontSize, ResponsiveUtil responsive) {
     return Row(

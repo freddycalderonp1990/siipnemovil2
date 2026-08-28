@@ -5,7 +5,5 @@ class HomeBinding extends Bindings {
   void dependencies() {
     //Inyeccion de dependencias
     Get.lazyPut(() => HomeController(), fenix: true);
-
-
   }
 }

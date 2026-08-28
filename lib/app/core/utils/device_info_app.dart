@@ -4,8 +4,6 @@
 import 'dart:developer';
 import 'dart:io';
 
-
-
 import 'package:api_provider/data/data_source/remote/apis/host/host_app.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
@@ -17,54 +15,44 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-
-
 import '../../presentation/widgets/custom_app_widgets.dart';
 import 'my_date.dart';
 
 class DeviceInfoApp {
-
-
   static Future<String> get getImei async {
     try {
       bool permiso = await Permission.phone.isGranted;
       if (!permiso) {
         DialogosAwesome.getWarning(
-            descripcion:
-            "Necesitamos obtener información del teléfono (Nombre de la red a la que está conectado, Modelo de su celular, versión del sistema operativo), es necesario que active los permisos para continuar.",
-            btnOkOnPress: () async {
-              await openAppSettings();
-            });
+          descripcion:
+              "Necesitamos obtener información del teléfono (Nombre de la red a la que está conectado, Modelo de su celular, versión del sistema operativo), es necesario que active los permisos para continuar.",
+          btnOkOnPress: () async {
+            await openAppSettings();
+          },
+        );
       }
 
       print("ponhe permisos ${permiso}");
 
-
-
-
       DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 
-      if(GetPlatform.isAndroid){
+      if (GetPlatform.isAndroid) {
         AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
 
         return androidInfo.id;
-
       }
 
-
-      if(GetPlatform.isIOS){
+      if (GetPlatform.isIOS) {
         IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
         return iosInfo.utsname.nodename;
       }
 
-
-      if(GetPlatform.isWeb) {
+      if (GetPlatform.isWeb) {
         WebBrowserInfo webBrowserInfo = await deviceInfo.webBrowserInfo;
 
-        String? a=webBrowserInfo.platform;
-        return  a!=null?a:"";
+        String? a = webBrowserInfo.platform;
+        return a != null ? a : "";
       }
-
 
       return "";
     } catch (e) {
@@ -78,31 +66,25 @@ class DeviceInfoApp {
 
       DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 
-      if(GetPlatform.isAndroid){
+      if (GetPlatform.isAndroid) {
         AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
         return androidInfo.model;
-
       }
 
-
-      if(GetPlatform.isIOS){
-
+      if (GetPlatform.isIOS) {
         IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
         return iosInfo.utsname.machine;
       }
 
-
-      if(GetPlatform.isWeb) {
+      if (GetPlatform.isWeb) {
         WebBrowserInfo webBrowserInfo = await deviceInfo.webBrowserInfo;
 
-        String? a=webBrowserInfo.userAgent;
-        return  a!=null?a:"";
+        String? a = webBrowserInfo.userAgent;
+        return a != null ? a : "";
       }
 
-
-      if(GetPlatform.isDesktop) {
-
-        return  "Escitorio App";
+      if (GetPlatform.isDesktop) {
+        return "Escitorio App";
       }
 
       return "No info model";
@@ -156,10 +138,8 @@ class DeviceInfoApp {
           'systemFeatures': build.systemFeatures,
         };
 
-
-
         result = "ANDROID: " + build.version.release!;
-      } else if (Platform.isIOS){
+      } else if (Platform.isIOS) {
         IosDeviceInfo data = await deviceInfo.iosInfo;
 
         Map<String, dynamic> dataInfo = <String, dynamic>{
@@ -178,13 +158,10 @@ class DeviceInfoApp {
         };
 
         result = "iOs: ${data.systemName} ${data.systemVersion}";
-      }else {
-
+      } else {
         WebBrowserInfo data = await deviceInfo.webBrowserInfo;
         result = "web: ${data.appName} ${data.appVersion}";
-
       }
-
 
       return result;
     } catch (e) {
@@ -209,9 +186,6 @@ class DeviceInfoApp {
 
     return detalle;
   }
-
-
-
 
   static Future<String> get getIp async {
     try {
@@ -275,7 +249,6 @@ class DeviceInfoApp {
         result = Platform.operatingSystem.toUpperCase();
       }
       return "PLATAFORMA " + result;
-
     } catch (e) {
       return "PLATAFORMA " + "NO CODE";
     }
@@ -294,12 +267,10 @@ class DeviceInfoApp {
         result = Platform.operatingSystem.toUpperCase();
       }
       return result;
-
     } catch (e) {
       return "NO CODE";
     }
   }
-
 
   static Future<String> get getVersionName async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -325,39 +296,36 @@ class DeviceInfoApp {
     final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 
     if (Platform.isAndroid) {
-
-
       final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
       log("androidInfo: ${androidInfo}");
-        return androidInfo.brand ?? 'Unknown'; // Marca del dispositivo Android
-
+      return androidInfo.brand ?? 'Unknown'; // Marca del dispositivo Android
     }
     if (Platform.isIOS) {
       final IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
 
-        return  iosInfo.name ?? 'Unknown'; // Nombre del dispositivo iOS
-
+      return iosInfo.name ?? 'Unknown'; // Nombre del dispositivo iOS
     }
 
     return "Unknown";
-
-
   }
-
 
   static Future<String> get getVersionCodeNameApp async {
     String versionName = await getVersionName;
     String versionCode = await getVersionCode;
 
-    String resultPl= "Android-Build-";
+    String resultPl = "Android-Build-";
     if (Platform.isIOS) {
       resultPl = "iOS-Build-";
     }
 
-
-    String result ='V.'+resultPl+ versionName + '.' + versionCode+'-'+HostApp.getAmbiente();
-
-
+    String result =
+        'V.' +
+        resultPl +
+        versionName +
+        '.' +
+        versionCode +
+        '-' +
+        HostApp.getAmbiente();
 
     return result;
   }

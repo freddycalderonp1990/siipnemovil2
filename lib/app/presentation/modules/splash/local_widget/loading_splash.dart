@@ -4,7 +4,6 @@ import '../../../../../app/core/utils/responsiveUtil.dart';
 import '../../../../../app/core/values/app_colors.dart';
 import '../../../../../app/presentation/widgets/custom_app_widgets.dart';
 
-
 class LoadingSplash extends StatefulWidget {
   @override
   _LoadingSplashState createState() => _LoadingSplashState();
@@ -36,20 +35,19 @@ class _LoadingSplashState extends State<LoadingSplash>
             animation: _animation,
             builder: (context, child) {
               return Transform.scale(
-                scale: 1.0 +
+                scale:
+                    1.0 +
                     _animation.value *
                         0.5, // Ajusta el factor de zoom según lo deseado
                 child: TextSombrasWidget(
                   title: "Cargando...",
-                  size: responsive.diagonalP(AppConfig.tamTextoTitulo ),
+                  size: responsive.diagonalP(AppConfig.tamTextoTitulo),
                 ),
               );
             },
           ),
           SizedBox(height: 10),
-          CircularProgressIndicator(
-            color: AppColors.colorAzul_1,
-          ),
+          CircularProgressIndicator(color: AppColors.colorAzul_1),
         ],
       ),
     );

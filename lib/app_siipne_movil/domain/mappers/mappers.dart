@@ -1,5 +1,1 @@
-
-
-class Mappers {
-
-}
+class Mappers {}
