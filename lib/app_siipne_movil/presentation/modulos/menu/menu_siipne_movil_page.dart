@@ -9,7 +9,7 @@ class MenuSiipneMovilPage extends StatefulWidget {
 
 class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
   final MenuSiipneMovilController controller =
-      Get.find<MenuSiipneMovilController>();
+  Get.find<MenuSiipneMovilController>();
 
   bool _dialogoPendienteMostrado = false;
 
@@ -344,11 +344,11 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
               ),
               child: Column(
                 children: [
-                  _datoHorizontal(
+                  /*  _datoHorizontal(
                     icon: Icons.apartment_rounded,
                     titulo: "UNIDAD",
                     valor: user.unidad,
-                  ),
+                  ),*/
                   const SizedBox(height: 2),
                   _datoHorizontal(
                     icon: Icons.work_outline_rounded,
@@ -800,13 +800,13 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
                 onPressed: cargando ? null : _buscarOperativos,
                 icon: cargando
                     ? const SizedBox(
-                        width: 17,
-                        height: 17,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
+                  width: 17,
+                  height: 17,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
                     : const Icon(Icons.search_rounded, size: 19),
                 label: Text(
                   cargando ? "BUSCANDO..." : "BUSCAR OPERATIVOS",
@@ -839,7 +839,7 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
     required VoidCallback onTap,
   }) {
     return Obx(
-      () => Material(
+          () => Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
@@ -1144,8 +1144,8 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
                     child: Obx(() {
                       final bool cargando =
                           controller.descargandoPdf.value &&
-                          controller.idOperativoDescargando.value ==
-                              data.idHdrEvento;
+                              controller.idOperativoDescargando.value ==
+                                  data.idHdrEvento;
 
                       return ElevatedButton.icon(
                         onPressed: controller.descargandoPdf.value
@@ -1153,17 +1153,17 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
                             : () => _abrirPdf(data),
                         icon: cargando
                             ? const SizedBox(
-                                width: 14,
-                                height: 14,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
                             : const Icon(
-                                Icons.picture_as_pdf_rounded,
-                                size: 16,
-                              ),
+                          Icons.picture_as_pdf_rounded,
+                          size: 16,
+                        ),
                         label: Text(
                           cargando ? "CARGANDO" : "VER PDF",
                           style: const TextStyle(
@@ -1448,7 +1448,7 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
 
                                 debugPrint(
                                   'PDF RENDERIZADO -> '
-                                  '${paginas ?? 0} páginas',
+                                      '${paginas ?? 0} páginas',
                                 );
                               },
 
@@ -1476,14 +1476,14 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
                                 setStateDialog(() {
                                   cargando = false;
                                   mensajeError =
-                                      'No fue posible visualizar el documento PDF.';
+                                  'No fue posible visualizar el documento PDF.';
                                 });
                               },
 
                               onPageError: (int? pagina, dynamic error) {
                                 debugPrint(
                                   'ERROR PÁGINA PDF '
-                                  '$pagina: $error',
+                                      '$pagina: $error',
                                 );
                               },
                             ),
@@ -1657,95 +1657,434 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
   // ============================================================
 
   void _confirmarCerrarSesion() {
+    FocusManager.instance.primaryFocus?.unfocus();
+
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black.withOpacity(.60),
+      barrierColor: const Color(0xD9061C35),
+      useSafeArea: true,
       builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+        final MediaQueryData mediaQuery = MediaQuery.of(dialogContext);
+        final double altoDisponible =
+            mediaQuery.size.height -
+                mediaQuery.viewInsets.bottom -
+                mediaQuery.padding.vertical -
+                32;
+        final double altoMaximo = altoDisponible
+            .clamp(260.0, mediaQuery.size.height)
+            .toDouble();
+
+        return Dialog(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 16,
           ),
-          title: const Row(
-            children: [
-              Icon(Icons.logout_rounded, color: Color(0xFFB42318)),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  "CERRAR SESIÓN",
-                  style: TextStyle(
-                    color: Color(0xFF293D51),
-                    fontSize: 15,
-                    fontWeight: FontWeight.w900,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: altoMaximo),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(1.2),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: <Color>[
+                    Color(0xFF7E93A6),
+                    Color(0xFF294A68),
+                    Color(0xFF38BDF8),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(23),
+                boxShadow: const <BoxShadow>[
+                  BoxShadow(
+                    color: Color(0x66061C35),
+                    blurRadius: 28,
+                    offset: Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22),
+                child: Material(
+                  color: const Color(0xFFF0F4F7),
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.fromLTRB(14, 14, 8, 14),
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: <Color>[
+                                Color(0xFF061C35),
+                                Color(0xFF163B5B),
+                                Color(0xFF455F76),
+                              ],
+                            ),
+                          ),
+                          child: Stack(
+                            children: <Widget>[
+                              Positioned(
+                                right: 34,
+                                top: -20,
+                                child: Icon(
+                                  Icons.power_settings_new_rounded,
+                                  color: Colors.white.withOpacity(.045),
+                                  size: 96,
+                                ),
+                              ),
+                              Row(
+                                children: <Widget>[
+                                  Container(
+                                    width: 50,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(.11),
+                                      borderRadius: BorderRadius.circular(15),
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(.20),
+                                      ),
+                                    ),
+                                    child: const Icon(
+                                      Icons.logout_rounded,
+                                      color: Colors.white,
+                                      size: 26,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 11),
+                                  const Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text(
+                                          "SIIPNE MÓVIL // SESIÓN SEGURA",
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: Color(0xFFB8DDF4),
+                                            fontSize: 7.4,
+                                            letterSpacing: .55,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          "CERRAR SESIÓN",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            height: 1.1,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          "Finalización controlada del acceso actual",
+                                          style: TextStyle(
+                                            color: Color(0xFFD3E2EC),
+                                            fontSize: 8,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  IconButton(
+                                    tooltip: "Cancelar",
+                                    onPressed: () {
+                                      Navigator.of(dialogContext).pop();
+                                    },
+                                    icon: const Icon(
+                                      Icons.close_rounded,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(15, 15, 15, 13),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF9FBFC),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: const Color(0xFFC8D5DF),
+                                  ),
+                                  boxShadow: const <BoxShadow>[
+                                    BoxShadow(
+                                      color: Color(0x14061C35),
+                                      blurRadius: 13,
+                                      offset: Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                                child: IntrinsicHeight(
+                                  child: Row(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Container(
+                                        width: 3,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF536C82),
+                                          borderRadius:
+                                          BorderRadius.circular(4),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Container(
+                                        width: 38,
+                                        height: 38,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF536C82)
+                                              .withOpacity(.10),
+                                          borderRadius:
+                                          BorderRadius.circular(11),
+                                          border: Border.all(
+                                            color: const Color(0xFF536C82)
+                                                .withOpacity(.20),
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.person_off_outlined,
+                                          color: Color(0xFF536C82),
+                                          size: 20,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      const Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Text(
+                                              "FINALIZAR ACCESO ACTUAL",
+                                              style: TextStyle(
+                                                color: Color(0xFF455F76),
+                                                fontSize: 8,
+                                                letterSpacing: .40,
+                                                fontWeight: FontWeight.w900,
+                                              ),
+                                            ),
+                                            SizedBox(height: 6),
+                                            Text(
+                                              "¿Está seguro de cerrar la sesión actual y salir del módulo SIIPNE Móvil?",
+                                              textAlign: TextAlign.justify,
+                                              style: TextStyle(
+                                                color: Color(0xFF293D51),
+                                                fontSize: 11.5,
+                                                height: 1.42,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 11),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(11),
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: <Color>[
+                                      Color(0xFFE5EDF3),
+                                      Color(0xFFF4F7F9),
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(
+                                    color: const Color(0xFFC1D0DC),
+                                  ),
+                                ),
+                                child: const Row(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    SizedBox(
+                                      width: 32,
+                                      height: 32,
+                                      child: DecoratedBox(
+                                        decoration: BoxDecoration(
+                                          color: Color(0x14536C82),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(10),
+                                          ),
+                                        ),
+                                        child: Icon(
+                                          Icons.lock_outline_rounded,
+                                          color: Color(0xFF536C82),
+                                          size: 18,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 9),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Text(
+                                            "SEGURIDAD DE LA CUENTA",
+                                            style: TextStyle(
+                                              color: Color(0xFF455F76),
+                                              fontSize: 7.8,
+                                              letterSpacing: .35,
+                                              fontWeight: FontWeight.w900,
+                                            ),
+                                          ),
+                                          SizedBox(height: 3),
+                                          Text(
+                                            "Para volver a ingresar deberá autenticarse nuevamente con sus credenciales institucionales.",
+                                            textAlign: TextAlign.justify,
+                                            style: TextStyle(
+                                              color: Color(0xFF617487),
+                                              fontSize: 9.3,
+                                              height: 1.38,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 15),
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: OutlinedButton.icon(
+                                      onPressed: () {
+                                        Navigator.of(dialogContext).pop();
+                                      },
+                                      icon: const Icon(
+                                        Icons.keyboard_return_rounded,
+                                        size: 17,
+                                      ),
+                                      label: const Text(
+                                        "CANCELAR",
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
+                                      style: OutlinedButton.styleFrom(
+                                        minimumSize:
+                                        const Size.fromHeight(50),
+                                        foregroundColor:
+                                        const Color(0xFF617487),
+                                        backgroundColor: Colors.white,
+                                        side: const BorderSide(
+                                          color: Color(0xFFB8C8D6),
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                          BorderRadius.circular(13),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 9),
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      onPressed: () {
+                                        Navigator.of(dialogContext).pop();
+                                        controller.cerrarSesion();
+                                      },
+                                      icon: const Icon(
+                                        Icons.logout_rounded,
+                                        size: 17,
+                                      ),
+                                      label: const FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          "CERRAR SESIÓN",
+                                          maxLines: 1,
+                                          style: TextStyle(
+                                            fontSize: 8.8,
+                                            letterSpacing: .15,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                        ),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        minimumSize:
+                                        const Size.fromHeight(50),
+                                        backgroundColor:
+                                        const Color(0xFF294A68),
+                                        foregroundColor: Colors.white,
+                                        elevation: 4,
+                                        shadowColor:
+                                        const Color(0x66294A68),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                          BorderRadius.circular(13),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Icon(
+                                    Icons.verified_user_outlined,
+                                    color: Color(0xFF718294),
+                                    size: 11,
+                                  ),
+                                  SizedBox(width: 5),
+                                  Flexible(
+                                    child: Text(
+                                      "SALIDA SEGURA  ·  SIIPNE MÓVIL",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: Color(0xFF718294),
+                                        fontSize: 7,
+                                        letterSpacing: .32,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ],
-          ),
-          content: const Text(
-            "¿Está seguro de cerrar la sesión actual y salir del módulo SIIPNE Móvil?",
-            style: TextStyle(
-              color: Color(0xFF617487),
-              fontSize: 11,
-              height: 1.35,
             ),
           ),
-          actions: [
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Navigator.of(dialogContext).pop();
-                    },
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(43),
-                      side: const BorderSide(color: Color(0xFFD1DCE6)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: const Text(
-                      "CANCELAR",
-                      style: TextStyle(
-                        color: Color(0xFF66798C),
-                        fontSize: 9,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(width: 7),
-
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(dialogContext).pop();
-
-                      controller.cerrarSesion();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFB42318),
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size.fromHeight(43),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: const Text(
-                      "CERRAR SESIÓN",
-                      style: TextStyle(
-                        fontSize: 8.5,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
         );
       },
     );

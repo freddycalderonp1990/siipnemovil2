@@ -5,7 +5,7 @@ class OpMigracionController extends GetxController {
 
   final LoginController loginController = Get.find<LoginController>();
   final SiipneMovilOpMigracionUseCase siipneMovilOpMigracionUseCase =
-      Get.find<SiipneMovilOpMigracionUseCase>();
+  Get.find<SiipneMovilOpMigracionUseCase>();
 
   late UserEntities user;
 
@@ -19,7 +19,7 @@ class OpMigracionController extends GetxController {
   final RxBool puedeFinalizarOperativo = false.obs;
 
   final TextEditingController controllerClaveFinalizar =
-      TextEditingController();
+  TextEditingController();
   final RxBool ocultarClaveFinalizar = true.obs;
   final RxBool autenticandoBiometria = false.obs;
   final RxBool finalizandoOperativo = false.obs;
@@ -29,14 +29,14 @@ class OpMigracionController extends GetxController {
   String mensajeErrorPersonalOperativo = '';
 
   final Rxn<ResultadosOperativo> resultadosOperativo =
-      Rxn<ResultadosOperativo>();
+  Rxn<ResultadosOperativo>();
   final RxBool cargandoResultadosOperativo = false.obs;
   String mensajeErrorResultadosOperativo = '';
 
   final RxList<DataConsultaPersona> dataPersonaComplementaria =
       <DataConsultaPersona>[].obs;
   final Rxn<DataAntecedentes> datosAntecedentesPersona =
-      Rxn<DataAntecedentes>();
+  Rxn<DataAntecedentes>();
   final RxBool fuentesPersonaConsultadas = false.obs;
   final RxBool antecedentesPersonaConsultados = false.obs;
   String mensajeErrorFuentesPersona = '';
@@ -51,20 +51,20 @@ class OpMigracionController extends GetxController {
   final RxList<VariablesResultado> variablesResultado =
       <VariablesResultado>[].obs;
   final Rxn<VariablesResultado> variableResultadoSeleccionada =
-      Rxn<VariablesResultado>();
+  Rxn<VariablesResultado>();
   final RxBool cargandoVariablesResultado = false.obs;
 
   final RxList<DataExtranjeroDocumento> extranjerosEncontrados =
       <DataExtranjeroDocumento>[].obs;
   final Rxn<DataExtranjeroDocumento> extranjeroSeleccionado =
-      Rxn<DataExtranjeroDocumento>();
+  Rxn<DataExtranjeroDocumento>();
   final Rxn<DataMovimientosMigratorios> movimientosMigratorios =
-      Rxn<DataMovimientosMigratorios>();
+  Rxn<DataMovimientosMigratorios>();
   final Rxn<DataVisaExtranjero> visaExtranjero = Rxn<DataVisaExtranjero>();
   final Rxn<DataVisasElectronicas> visasElectronicas =
-      Rxn<DataVisasElectronicas>();
+  Rxn<DataVisasElectronicas>();
   final Rxn<DataRegistroConsultaMigracion> registroConsulta =
-      Rxn<DataRegistroConsultaMigracion>();
+  Rxn<DataRegistroConsultaMigracion>();
 
   final RxBool cargandoMovimientos = false.obs;
   final RxBool cargandoVisa = false.obs;
@@ -100,9 +100,9 @@ class OpMigracionController extends GetxController {
 
   bool get cargandoComplementos =>
       cargandoMovimientos.value ||
-      cargandoVisa.value ||
-      cargandoVisaElectronica.value ||
-      registrandoConsulta.value;
+          cargandoVisa.value ||
+          cargandoVisaElectronica.value ||
+          registrandoConsulta.value;
 
   bool get tieneConsultaPersonaComplementaria =>
       dataPersonaComplementaria.isNotEmpty;
@@ -233,11 +233,11 @@ class OpMigracionController extends GetxController {
     }
 
     final String tipoModulo =
-        nombreModulo.isNotEmpty ? nombreModulo : nombre;
+    nombreModulo.isNotEmpty ? nombreModulo : nombre;
 
     final bool tipoMigracionPorId = idTipo == idTipoOperativoMigracion;
     final bool tipoMigracionPorDescripcion =
-        _esTipoMovilMigracion(tipoModulo);
+    _esTipoMovilMigracion(tipoModulo);
 
     if (!tipoMigracionPorId && !tipoMigracionPorDescripcion) {
       _marcarOperativoInvalido(
@@ -251,7 +251,7 @@ class OpMigracionController extends GetxController {
     idHdrEventoActual.value = idEvento;
     idTipoOperativoActual.value = idTipo;
     nombreOperativoActual.value =
-        nombre.isNotEmpty ? nombre : nombreModulo;
+    nombre.isNotEmpty ? nombre : nombreModulo;
   }
 
   bool _esTipoMovilMigracion(String value) {
@@ -303,7 +303,7 @@ class OpMigracionController extends GetxController {
 
     if (idTipo <= 0) {
       mensajeErrorVariables =
-          'No se recibió el identificador del tipo de operativo.';
+      'No se recibió el identificador del tipo de operativo.';
       return false;
     }
 
@@ -311,17 +311,24 @@ class OpMigracionController extends GetxController {
 
     try {
       final List<VariablesResultado> resultado =
-          await siipneMovilOpMigracionUseCase.consultarVariblesResultado(
+      await siipneMovilOpMigracionUseCase.consultarVariblesResultado(
         request: GetVariablesResultadosRequest(idOperativo: idTipo),
       );
 
-      variablesResultado.assignAll(resultado);
-      variableResultadoSeleccionada.value =
-          resultado.isEmpty ? null : resultado.first;
+      final List<VariablesResultado> variablesPersona = resultado
+          .where(
+            (VariablesResultado variable) =>
+        _string(variable.tipoConsulta).toUpperCase() == 'P',
+      )
+          .toList(growable: false);
 
-      if (resultado.isEmpty) {
+      variablesResultado.assignAll(variablesPersona);
+      variableResultadoSeleccionada.value =
+      variablesPersona.isEmpty ? null : variablesPersona.first;
+
+      if (variablesPersona.isEmpty) {
         mensajeErrorVariables =
-            'No existen variables de resultado configuradas para este operativo.';
+        'No existen variables de resultado tipo persona (P) configuradas para este operativo.';
         return false;
       }
 
@@ -371,13 +378,13 @@ class OpMigracionController extends GetxController {
 
     if (!datosOperativoValidos.value || idHdrEventoActual.value <= 0) {
       mensajeErrorConsulta =
-          'No existe un operativo Móvil Migración válido.';
+      'No existe un operativo Móvil Migración válido.';
       return false;
     }
 
     if (idVariableResultado <= 0) {
       mensajeErrorConsulta =
-          'Seleccione una variable de resultado antes de consultar.';
+      'Seleccione una variable de resultado antes de consultar.';
       return false;
     }
 
@@ -397,7 +404,7 @@ class OpMigracionController extends GetxController {
       final BuildContext? context = Get.context;
       if (context == null) {
         mensajeErrorConsulta =
-            'No fue posible acceder al contexto de ubicación.';
+        'No fue posible acceder al contexto de ubicación.';
         return false;
       }
 
@@ -408,7 +415,7 @@ class OpMigracionController extends GetxController {
       _ipConsulta = await DeviceInfoApp.getIp;
 
       final List<DataExtranjeroDocumento> resultado =
-          await siipneMovilOpMigracionUseCase.getDatosExtranjeroDocumento(
+      await siipneMovilOpMigracionUseCase.getDatosExtranjeroDocumento(
         request: GetDatosExtranjeroDocumentoRequest(
           documento: _documentoConsultado,
           nacionalidad: _nacionalidadConsultada,
@@ -454,8 +461,8 @@ class OpMigracionController extends GetxController {
   }
 
   Future<void> _cargarDetalleExtranjero(
-    DataExtranjeroDocumento extranjero,
-  ) async {
+      DataExtranjeroDocumento extranjero,
+      ) async {
     extranjeroSeleccionado.value = extranjero;
     movimientosMigratorios.value = null;
     visaExtranjero.value = null;
@@ -483,12 +490,12 @@ class OpMigracionController extends GetxController {
     final DataExtranjeroDocumento? extranjero = extranjeroSeleccionado.value;
     if (extranjero == null || extranjero.idCiudadano.trim().isEmpty) {
       mensajeErrorMovimientos =
-          'No existe un ciudadano seleccionado para realizar la consulta.';
+      'No existe un ciudadano seleccionado para realizar la consulta.';
       return false;
     }
     if (!consultaRegistrada) {
       mensajeErrorMovimientos =
-          'La consulta inicial todavía no ha sido registrada.';
+      'La consulta inicial todavía no ha sido registrada.';
       return false;
     }
     if (movimientosConsultados.value) return true;
@@ -498,7 +505,7 @@ class OpMigracionController extends GetxController {
     peticionServerState.value = true;
     try {
       movimientosMigratorios.value =
-          await siipneMovilOpMigracionUseCase.getMovimientosMigratorios(
+      await siipneMovilOpMigracionUseCase.getMovimientosMigratorios(
         request: GetMovimientosMigratoriosRequest(
           idCiudadano: extranjero.idCiudadano,
           idGenPersonaUsuario: user.idGenPersona,
@@ -525,7 +532,7 @@ class OpMigracionController extends GetxController {
     final DataExtranjeroDocumento? extranjero = extranjeroSeleccionado.value;
     if (extranjero == null || extranjero.idCiudadano.trim().isEmpty) {
       mensajeErrorVisas =
-          'No existe un ciudadano seleccionado para realizar la consulta.';
+      'No existe un ciudadano seleccionado para realizar la consulta.';
       return false;
     }
     if (!consultaRegistrada) {
@@ -539,7 +546,7 @@ class OpMigracionController extends GetxController {
     peticionServerState.value = true;
     try {
       visaExtranjero.value =
-          await siipneMovilOpMigracionUseCase.getVisaExtranjero(
+      await siipneMovilOpMigracionUseCase.getVisaExtranjero(
         request: GetVisaExtranjeroRequest(
           idCiudadano: extranjero.idCiudadano,
           idGenPersonaUsuario: user.idGenPersona,
@@ -568,12 +575,12 @@ class OpMigracionController extends GetxController {
     final DataExtranjeroDocumento? extranjero = extranjeroSeleccionado.value;
     if (extranjero == null) {
       mensajeErrorVisasElectronicas =
-          'No existe un ciudadano seleccionado para realizar la consulta.';
+      'No existe un ciudadano seleccionado para realizar la consulta.';
       return false;
     }
     if (!consultaRegistrada) {
       mensajeErrorVisasElectronicas =
-          'La consulta inicial todavía no ha sido registrada.';
+      'La consulta inicial todavía no ha sido registrada.';
       return false;
     }
     if (visasElectronicasConsultadas.value) return true;
@@ -583,7 +590,7 @@ class OpMigracionController extends GetxController {
 
     if (bio == null) {
       mensajeErrorVisasElectronicas =
-          'No existen datos biográficos para consultar visas electrónicas.';
+      'No existen datos biográficos para consultar visas electrónicas.';
       return false;
     }
 
@@ -592,7 +599,7 @@ class OpMigracionController extends GetxController {
     peticionServerState.value = true;
     try {
       visasElectronicas.value =
-          await siipneMovilOpMigracionUseCase.getVisasElectronicas(
+      await siipneMovilOpMigracionUseCase.getVisasElectronicas(
         request: GetVisasElectronicasRequest(
           apellidos: bio.apellidos,
           nombres: bio.nombres,
@@ -627,7 +634,7 @@ class OpMigracionController extends GetxController {
     final DataExtranjeroDocumento? extranjero = extranjeroSeleccionado.value;
     if (extranjero == null || !consultaRegistrada) {
       mensajeErrorFuentesPersona =
-          'Primero debe completar y registrar la consulta migratoria.';
+      'Primero debe completar y registrar la consulta migratoria.';
       return false;
     }
     if (fuentesPersonaConsultadas.value &&
@@ -636,14 +643,14 @@ class OpMigracionController extends GetxController {
     }
 
     final DocumentoExtranjeroMigracion? documento =
-        _documentoCoincidente(extranjero.documentos);
+    _documentoCoincidente(extranjero.documentos);
     final String numero = documento?.numeroDocumento.trim().isNotEmpty == true
         ? documento!.numeroDocumento.trim()
         : _documentoConsultado;
 
     if (numero.isEmpty) {
       mensajeErrorFuentesPersona =
-          'No fue posible determinar el documento de la persona.';
+      'No fue posible determinar el documento de la persona.';
       return false;
     }
 
@@ -651,7 +658,7 @@ class OpMigracionController extends GetxController {
     peticionServerState.value = true;
     try {
       final DataConsultaPersona resultado =
-          await siipneMovilOpMigracionUseCase.consultarPersona(
+      await siipneMovilOpMigracionUseCase.consultarPersona(
         request: ConsultarPersonaRequest(
           idOperativo: idHdrEventoActual.value,
           documento: numero,
@@ -685,7 +692,7 @@ class OpMigracionController extends GetxController {
     final DataExtranjeroDocumento? extranjero = extranjeroSeleccionado.value;
     if (extranjero == null || !consultaRegistrada) {
       mensajeErrorAntecedentesPersona =
-          'Primero debe completar y registrar la consulta migratoria.';
+      'Primero debe completar y registrar la consulta migratoria.';
       return false;
     }
     if (antecedentesPersonaConsultados.value &&
@@ -694,14 +701,14 @@ class OpMigracionController extends GetxController {
     }
 
     final DocumentoExtranjeroMigracion? documento =
-        _documentoCoincidente(extranjero.documentos);
+    _documentoCoincidente(extranjero.documentos);
     final String numero = documento?.numeroDocumento.trim().isNotEmpty == true
         ? documento!.numeroDocumento.trim()
         : _documentoConsultado;
 
     if (numero.isEmpty) {
       mensajeErrorAntecedentesPersona =
-          'No fue posible determinar el documento de la persona.';
+      'No fue posible determinar el documento de la persona.';
       return false;
     }
 
@@ -709,7 +716,7 @@ class OpMigracionController extends GetxController {
     peticionServerState.value = true;
     try {
       datosAntecedentesPersona.value =
-          await siipneMovilOpMigracionUseCase.getDatosAntecedentes(
+      await siipneMovilOpMigracionUseCase.getDatosAntecedentes(
         request: AntecedentesRequest(documento: numero),
       );
       antecedentesPersonaConsultados.value = true;
@@ -734,7 +741,7 @@ class OpMigracionController extends GetxController {
     final int idEvento = idHdrEventoActual.value;
     if (idEvento <= 0) {
       mensajeErrorPersonalOperativo =
-          'No existe un operativo válido para consultar el personal.';
+      'No existe un operativo válido para consultar el personal.';
       return false;
     }
 
@@ -745,7 +752,7 @@ class OpMigracionController extends GetxController {
       debugPrint('CONSULTANDO PERSONAL OPERATIVO MIGRACIÓN');
       debugPrint('ID HDR EVENTO: $idEvento');
       final List<Integrante> resultado =
-          await siipneMovilOpMigracionUseCase.consultarPersonalOperativo(
+      await siipneMovilOpMigracionUseCase.consultarPersonalOperativo(
         request: GetDatosPoliciasOperativoRequest(idHdrEvento: idEvento),
       );
       debugPrint('INTEGRANTES RECIBIDOS: ${resultado.length}');
@@ -753,7 +760,7 @@ class OpMigracionController extends GetxController {
       personalOperativo.assignAll(resultado);
       if (resultado.isEmpty) {
         mensajeErrorPersonalOperativo =
-            'No existen servidores policiales registrados en este operativo.';
+        'No existen servidores policiales registrados en este operativo.';
         return false;
       }
       return true;
@@ -779,7 +786,7 @@ class OpMigracionController extends GetxController {
     final int idEvento = idHdrEventoActual.value;
     if (idEvento <= 0) {
       mensajeErrorResultadosOperativo =
-          'No existe un operativo válido para consultar el resumen.';
+      'No existe un operativo válido para consultar el resumen.';
       return false;
     }
 
@@ -794,13 +801,13 @@ class OpMigracionController extends GetxController {
       debugPrint('ID HDR EVENTO: $idEvento');
 
       final ResultadosOperativo resultado =
-          await siipneMovilOpMigracionUseCase.getDatosResultadosOperativo(
+      await siipneMovilOpMigracionUseCase.getDatosResultadosOperativo(
         request: ResultadosOperativoRequest(idHdrEvento: idEvento),
       );
 
       if (!resultado.tieneDatos || resultado.idHdrEvento != idEvento) {
         mensajeErrorResultadosOperativo =
-            'El servidor no devolvió un resumen válido del operativo.';
+        'El servidor no devolvió un resumen válido del operativo.';
         return false;
       }
 
@@ -861,7 +868,7 @@ class OpMigracionController extends GetxController {
       if ((await auth.getAvailableBiometrics()).isEmpty) return false;
       return await auth.authenticate(
         localizedReason:
-            'Confirme su identidad para finalizar el operativo ${idHdrEventoActual.value}',
+        'Confirme su identidad para finalizar el operativo ${idHdrEventoActual.value}',
         biometricOnly: true,
         persistAcrossBackgrounding: true,
       );
@@ -879,7 +886,7 @@ class OpMigracionController extends GetxController {
     if (peticionServerState.value || finalizandoOperativo.value) return false;
     if (!puedeFinalizarOperativo.value) {
       mensajeErrorFinalizar =
-          'Los servidores anexados no pueden finalizar el operativo.';
+      'Los servidores anexados no pueden finalizar el operativo.';
       return false;
     }
 
@@ -894,12 +901,12 @@ class OpMigracionController extends GetxController {
     peticionServerState.value = true;
     try {
       final Finalizar resultado =
-          await siipneMovilOpMigracionUseCase.finalizaOperativo(
+      await siipneMovilOpMigracionUseCase.finalizaOperativo(
         request: FinalizarOperativoRequest(idHdrEvento: idEvento),
       );
       if (resultado.idHdrEvento != idEvento) {
         mensajeErrorFinalizar =
-            'El servidor no confirmó la finalización del operativo actual.';
+        'El servidor no confirmó la finalización del operativo actual.';
         return false;
       }
       return true;
@@ -944,17 +951,17 @@ class OpMigracionController extends GetxController {
     registrandoConsulta.value = true;
     try {
       final DocumentoExtranjeroMigracion? documento =
-          _documentoCoincidente(extranjero.documentos);
+      _documentoCoincidente(extranjero.documentos);
 
       final String nacionalidad =
-          documento?.nacionalidadDocumento.trim().isNotEmpty == true
-              ? documento!.nacionalidadDocumento.trim()
-              : bio.paisNacimiento.trim().isNotEmpty
-                  ? bio.paisNacimiento.trim()
-                  : _nacionalidadConsultada;
+      documento?.nacionalidadDocumento.trim().isNotEmpty == true
+          ? documento!.nacionalidadDocumento.trim()
+          : bio.paisNacimiento.trim().isNotEmpty
+          ? bio.paisNacimiento.trim()
+          : _nacionalidadConsultada;
 
       final DataRegistroConsultaMigracion registro =
-          await siipneMovilOpMigracionUseCase.registrarConsultaMigracion(
+      await siipneMovilOpMigracionUseCase.registrarConsultaMigracion(
         request: RegistroConsultaMigracionRequest(
           documento: _documentoConsultado,
           nombres: bio.nombresCompletos.trim().isNotEmpty
@@ -998,8 +1005,8 @@ class OpMigracionController extends GetxController {
   }
 
   DocumentoExtranjeroMigracion? _documentoCoincidente(
-    List<DocumentoExtranjeroMigracion> documentos,
-  ) {
+      List<DocumentoExtranjeroMigracion> documentos,
+      ) {
     for (final DocumentoExtranjeroMigracion item in documentos) {
       if (item.numeroDocumento.trim().toUpperCase() == _documentoConsultado) {
         return item;
