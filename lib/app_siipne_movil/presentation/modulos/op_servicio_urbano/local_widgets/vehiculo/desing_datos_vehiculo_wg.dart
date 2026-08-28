@@ -7,6 +7,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
   final bool onlyDataCar;
   final VoidCallback? onPressedOcupantes;
   final VoidCallback? onPressedNewConsulta;
+  final Widget? widgetAntesNuevaConsulta;
 
   const DesingDatosVehiculoWg({
     Key? key,
@@ -16,6 +17,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
     this.onlyDataCar = false,
     this.onPressedOcupantes,
     this.onPressedNewConsulta,
+    this.widgetAntesNuevaConsulta,
   }) : super(key: key);
 
   @override
@@ -39,7 +41,14 @@ class DesingDatosVehiculoWg extends StatelessWidget {
               ? ColorsLocal.colorTitulosOrdenCaptura
               : ColorsLocal.colorTitulosNormal,
         ),
-        if (!onlyDataCar) ...[const SizedBox(height: 8), _acciones()],
+        if (!onlyDataCar) ...<Widget>[
+          const SizedBox(height: 8),
+          if (widgetAntesNuevaConsulta != null) ...<Widget>[
+            widgetAntesNuevaConsulta!,
+            const SizedBox(height: 8),
+          ],
+          _acciones(),
+        ],
       ],
     );
   }

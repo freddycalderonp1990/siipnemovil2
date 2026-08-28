@@ -107,14 +107,13 @@ mixin FinalizarOperativoViewMixin on OpServicioUrbanoPageBase {
                           child: TextButton.icon(
                             onPressed: () {
                               controller.limpiarClaveFinalizar();
-
                               Navigator.of(dialogContext).pop();
                             },
-                            icon: const Icon(Icons.close_rounded, size: 17),
+                            icon: const Icon(Icons.close_rounded, size: 20),
                             label: const Text(
                               "CANCELAR",
                               style: TextStyle(
-                                fontSize: 9,
+                                fontSize: 12,
                                 fontWeight: FontWeight.w900,
                               ),
                             ),
@@ -156,7 +155,7 @@ mixin FinalizarOperativoViewMixin on OpServicioUrbanoPageBase {
               borderRadius: BorderRadius.circular(13),
             ),
             child: const Icon(
-              Icons.power_settings_new_rounded,
+              Icons.edgesensor_low_sharp,
               color: Colors.white,
               size: 24,
             ),

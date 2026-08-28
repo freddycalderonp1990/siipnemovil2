@@ -287,7 +287,7 @@ mixin ResumenOperativoViewMixin on OpServicioUrbanoPageBase {
                 mostrarFinalizarOperativo();
               });
             },
-            icon: const Icon(Icons.power_settings_new_rounded, size: 18),
+            icon: const Icon(Icons.edgesensor_low_sharp, size: 18),
             label: const Text(
               "FINALIZAR",
               style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900),

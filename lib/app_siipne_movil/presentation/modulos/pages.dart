@@ -9,6 +9,7 @@ import 'package:get/get.dart' hide Transition;
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../../app/core/utils/responsiveUtil.dart';
+import 'package:country_utils/country_utils.dart';
 
 import '../../../app/core/values/app_colors.dart';
 import '../../../app/core/values/app_images.dart';
@@ -57,4 +58,14 @@ part 'op_migracion/local_widgets/movimientos_migratorios_wg.dart';
 part 'op_migracion/local_widgets/visas_migracion_wg.dart';
 part 'op_migracion/local_widgets/registro_migracion_wg.dart';
 part 'op_migracion/local_widgets/estados_migracion_wg.dart';
+
+part 'op_migracion/local_widgets/acciones_operativo_migracion_wg.dart';
+part 'op_migracion/local_widgets/personal_operativo_migracion_wg.dart';
+part 'op_migracion/local_widgets/qr_operativo_migracion_wg.dart';
+part 'op_migracion/local_widgets/finalizar_operativo_migracion_wg.dart';
+
+part 'op_migracion/local_widgets/fuentes_persona_migracion_wg.dart';
 part 'op_migracion/local_widgets/acciones_migracion_wg.dart';
+
+part 'op_migracion/local_widgets/foto_visa_electronica_wg.dart';
+part 'op_migracion/local_widgets/selector_nacionalidad_migracion_wg.dart';

@@ -192,77 +192,9 @@ mixin CabeceraMigracionViewMixin on OpMigracionPageBase {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: SizedBox(
-                width: double.infinity,
-                height: 43,
-                child: OutlinedButton.icon(
-                  onPressed: controller.peticionServerState.value
-                      ? null
-                      : _confirmarSalidaMigracion,
-                  icon: const Icon(Icons.logout_rounded, size: 18),
-                  label: const Text(
-                    'SALIR DEL MÓDULO',
-                    style: TextStyle(
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF586D82),
-                    side: const BorderSide(color: Color(0xFFD5DFE8)),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(11),
-                    ),
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       );
     });
-  }
-
-  void _confirmarSalidaMigracion() {
-    final BuildContext? context = Get.context;
-    if (context == null) return;
-
-    showDialog<void>(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          title: const Text(
-            'SALIR DEL MÓDULO',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900),
-          ),
-          content: const Text(
-            '¿Desea salir de Móvil Migración y regresar al menú operativo?',
-            style: TextStyle(fontSize: 11),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('CANCELAR'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                Get.back<void>();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _MigracionColors.azul,
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('SALIR'),
-            ),
-          ],
-        );
-      },
-    );
   }
 }

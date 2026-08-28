@@ -72,6 +72,7 @@ mixin VisasMigracionViewMixin on OpMigracionPageBase {
       builder: (BuildContext dialogContext) {
         return Dialog(
           insetPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 24),
+          clipBehavior: Clip.antiAlias,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(19),
           ),
@@ -149,18 +150,26 @@ mixin VisasMigracionViewMixin on OpMigracionPageBase {
     required String subtitulo,
     required int total,
   }) {
-    return Padding(
+    return Container(
       padding: const EdgeInsets.fromLTRB(15, 13, 9, 11),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: <Color>[
+            _MigracionColors.azul,
+            _MigracionColors.azulOscuro,
+          ],
+        ),
+      ),
       child: Row(
         children: <Widget>[
           Container(
             width: 39,
             height: 39,
             decoration: BoxDecoration(
-              color: const Color(0xFFE8F2FC),
+              color: Colors.white.withOpacity(.15),
               borderRadius: BorderRadius.circular(11),
             ),
-            child: Icon(icono, color: _MigracionColors.azul, size: 22),
+            child: Icon(icono, color: Colors.white, size: 22),
           ),
           const SizedBox(width: 9),
           Expanded(
@@ -170,7 +179,7 @@ mixin VisasMigracionViewMixin on OpMigracionPageBase {
                 Text(
                   titulo,
                   style: const TextStyle(
-                    color: _MigracionColors.texto,
+                    color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w900,
                   ),
@@ -178,7 +187,7 @@ mixin VisasMigracionViewMixin on OpMigracionPageBase {
                 Text(
                   subtitulo,
                   style: const TextStyle(
-                    color: _MigracionColors.textoSuave,
+                    color: Color(0xFFDCEAF7),
                     fontSize: 8,
                     fontWeight: FontWeight.w600,
                   ),
@@ -189,13 +198,13 @@ mixin VisasMigracionViewMixin on OpMigracionPageBase {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
             decoration: BoxDecoration(
-              color: const Color(0xFFEAF3FC),
+              color: Colors.white.withOpacity(.15),
               borderRadius: BorderRadius.circular(15),
             ),
             child: Text(
               '$total',
               style: const TextStyle(
-                color: _MigracionColors.azul,
+                color: Colors.white,
                 fontSize: 8,
                 fontWeight: FontWeight.w900,
               ),
@@ -204,7 +213,7 @@ mixin VisasMigracionViewMixin on OpMigracionPageBase {
           IconButton(
             onPressed: () => Navigator.of(context).pop(),
             icon: const Icon(Icons.close_rounded),
-            color: _MigracionColors.textoSuave,
+            color: Colors.white,
           ),
         ],
       ),
@@ -390,13 +399,42 @@ mixin VisasMigracionViewMixin on OpMigracionPageBase {
                 ),
             ],
           ),
+          if (visa.tieneFoto) ...<Widget>[
+            const SizedBox(height: 10),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _FotoVisaElectronica(fotoBase64: visa.fotoPrincipal),
+                const SizedBox(width: 9),
+                Expanded(
+                  child: Column(
+                    children: <Widget>[
+                      _MigracionDato(
+                        titulo: 'PASAPORTE',
+                        valor: visa.numeroPasaporte,
+                        icono: Icons.menu_book_outlined,
+                      ),
+                      const SizedBox(height: 7),
+                      _MigracionDato(
+                        titulo: 'ACTIVIDAD AUTORIZADA',
+                        valor: visa.actividad,
+                        icono: Icons.work_outline_rounded,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
           const SizedBox(height: 8),
-          _MigracionDato(
-            titulo: 'PASAPORTE',
-            valor: visa.numeroPasaporte,
-            icono: Icons.menu_book_outlined,
-          ),
-          const SizedBox(height: 7),
+          if (!visa.tieneFoto) ...<Widget>[
+            _MigracionDato(
+              titulo: 'PASAPORTE',
+              valor: visa.numeroPasaporte,
+              icono: Icons.menu_book_outlined,
+            ),
+            const SizedBox(height: 7),
+          ],
           Row(
             children: <Widget>[
               Expanded(

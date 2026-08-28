@@ -25,6 +25,7 @@ mixin MovimientosMigratoriosViewMixin on OpMigracionPageBase {
       builder: (BuildContext dialogContext) {
         return Dialog(
           insetPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 24),
+          clipBehavior: Clip.antiAlias,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(19),
           ),
@@ -68,20 +69,28 @@ mixin MovimientosMigratoriosViewMixin on OpMigracionPageBase {
   }
 
   Widget _encabezadoMovimientos(BuildContext context, int total) {
-    return Padding(
+    return Container(
       padding: const EdgeInsets.fromLTRB(15, 13, 9, 11),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: <Color>[
+            _MigracionColors.azul,
+            _MigracionColors.azulOscuro,
+          ],
+        ),
+      ),
       child: Row(
         children: <Widget>[
           Container(
             width: 39,
             height: 39,
             decoration: BoxDecoration(
-              color: const Color(0xFFE8F2FC),
+              color: Colors.white.withOpacity(.15),
               borderRadius: BorderRadius.circular(11),
             ),
             child: const Icon(
               Icons.swap_vert_circle_outlined,
-              color: _MigracionColors.azul,
+              color: Colors.white,
               size: 22,
             ),
           ),
@@ -93,7 +102,7 @@ mixin MovimientosMigratoriosViewMixin on OpMigracionPageBase {
                 Text(
                   'MOVIMIENTOS MIGRATORIOS',
                   style: TextStyle(
-                    color: _MigracionColors.texto,
+                    color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w900,
                   ),
@@ -101,7 +110,7 @@ mixin MovimientosMigratoriosViewMixin on OpMigracionPageBase {
                 Text(
                   'Historial de arribos y salidas.',
                   style: TextStyle(
-                    color: _MigracionColors.textoSuave,
+                    color: Color(0xFFDCEAF7),
                     fontSize: 8,
                     fontWeight: FontWeight.w600,
                   ),
@@ -112,13 +121,13 @@ mixin MovimientosMigratoriosViewMixin on OpMigracionPageBase {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
             decoration: BoxDecoration(
-              color: const Color(0xFFEAF3FC),
+              color: Colors.white.withOpacity(.15),
               borderRadius: BorderRadius.circular(15),
             ),
             child: Text(
               '$total',
               style: const TextStyle(
-                color: _MigracionColors.azul,
+                color: Colors.white,
                 fontSize: 8,
                 fontWeight: FontWeight.w900,
               ),
@@ -127,7 +136,7 @@ mixin MovimientosMigratoriosViewMixin on OpMigracionPageBase {
           IconButton(
             onPressed: () => Navigator.of(context).pop(),
             icon: const Icon(Icons.close_rounded),
-            color: _MigracionColors.textoSuave,
+            color: Colors.white,
           ),
         ],
       ),

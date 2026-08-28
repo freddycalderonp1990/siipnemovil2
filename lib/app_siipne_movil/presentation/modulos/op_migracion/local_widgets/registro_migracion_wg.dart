@@ -4,7 +4,6 @@ mixin RegistroMigracionViewMixin on OpMigracionPageBase {
   Widget registroConsultaMigratoria() {
     final DataRegistroConsultaMigracion? registro =
         controller.registroConsulta.value;
-
     return _MigracionCard(
       borderColor: registro == null
           ? _MigracionColors.borde

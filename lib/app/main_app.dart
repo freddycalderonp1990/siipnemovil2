@@ -4,7 +4,8 @@ import 'package:get/get.dart';
 
 import '../../../../../app/di_app.dart';
 import '../../../../../app/presentation/routes/app_routes.dart';
-
+import 'package:country_utils/country_utils.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'presentation/routes/app_pages.dart';
 
 class MainApp extends StatelessWidget {
@@ -14,13 +15,20 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      //theme: AppTheme.lightTheme,
-      /*theme: ThemeData(
-        fontFamily: 'Century Gothic',
-        primarySwatch:UtilidadesUtil.convertirAColorMaterial(AppColors.colorAzul_1),
-      ),*/
+      locale: const Locale('es'),
 
-      locale: Locale('es'),
+      supportedLocales: const <Locale>[
+        Locale('es'),
+        Locale('en'),
+      ],
+
+      localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+        CountryLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+
       // translations will be displayed in that locale
       fallbackLocale: Locale('es'),
       initialRoute: AppRoutes.SPLASH_APP,

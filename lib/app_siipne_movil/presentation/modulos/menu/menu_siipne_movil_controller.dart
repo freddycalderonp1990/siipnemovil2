@@ -125,21 +125,72 @@ class MenuSiipneMovilController extends GetxController {
     }
   }
 
+
+  static const int _idTipoOperativoMovilMigracion = 21288;
+
+  String _normalizarModuloPendiente(String value) {
+    return value
+        .trim()
+        .toUpperCase()
+        .replaceAll('Á', 'A')
+        .replaceAll('É', 'E')
+        .replaceAll('Í', 'I')
+        .replaceAll('Ó', 'O')
+        .replaceAll('Ú', 'U')
+        .replaceAll('Ü', 'U')
+        .replaceAll(RegExp(r'\s+'), ' ');
+  }
+
+  bool _esPendienteMovilMigracion(Pendiente pendiente) {
+    // El ID es la fuente principal. La respuesta real describe este operativo
+    // como "EXTRANJEROS", por eso el texto no puede ser el único criterio.
+    if (pendiente.idTipoOperativo == _idTipoOperativoMovilMigracion) {
+      return true;
+    }
+
+    final String descripcion =
+    _normalizarModuloPendiente(pendiente.descripcion);
+    return descripcion.contains('MOVIL MIGRACION') ||
+        descripcion.contains('OPERATIVO MIGRACION');
+  }
+
   void continuarOperativoPendiente() {
     final Pendiente? pendiente = operativoPendiente.value;
 
     if (pendiente == null || pendiente.idHdrEvento <= 0) {
+      DialogosAwesome.getError(
+        title: 'OPERATIVO NO DISPONIBLE',
+        descripcion:
+        'No se recibió un identificador válido del operativo pendiente.',
+      );
       return;
     }
 
+    final bool esMigracion = _esPendienteMovilMigracion(pendiente);
+    final String ruta = esMigracion
+        ? SiipneMovilRoutes.OPERATIVOS_MIGRACION
+        : SiipneMovilRoutes.OPERATIVOS_SERVICIO_URBANO;
+
+    debugPrint('==========================================');
+    debugPrint('ABRIENDO OPERATIVO PENDIENTE');
+    debugPrint('ID HDR EVENTO: ${pendiente.idHdrEvento}');
+    debugPrint('ID TIPO: ${pendiente.idTipoOperativo}');
+    debugPrint('DESCRIPCIÓN: ${pendiente.descripcion}');
+    debugPrint('ES MIGRACIÓN: $esMigracion');
+    debugPrint('RUTA: $ruta');
+    debugPrint('==========================================');
+
     Get.offAllNamed(
-      SiipneMovilRoutes.OPERATIVOS_SERVICIO_URBANO,
-      arguments: {
-        "tipoAcceso": "PENDIENTE",
-        "pendiente": pendiente,
-        "idHdrEvento": pendiente.idHdrEvento,
-        "idGenGeoSenplades": pendiente.idGenGeoSenplades,
-        "idOperativo": pendiente.idTipoOperativo,
+      ruta,
+      arguments: <String, dynamic>{
+        'tipoAcceso': 'PENDIENTE',
+        'pendiente': pendiente,
+        'idHdrEvento': pendiente.idHdrEvento,
+        'idGenGeoSenplades': pendiente.idGenGeoSenplades,
+        'idOperativo': pendiente.idTipoOperativo,
+        'idTipoOperativo': pendiente.idTipoOperativo,
+        'nombreModulo': esMigracion ? 'Móvil Migración' : 'Servicio Urbano',
+        'nombreOperativo': pendiente.descripcion,
       },
     );
   }
