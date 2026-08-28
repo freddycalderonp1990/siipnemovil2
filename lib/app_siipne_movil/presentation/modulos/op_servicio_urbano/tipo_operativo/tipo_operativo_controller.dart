@@ -19,7 +19,7 @@ class TipoOperativoController extends GetxController {
   RxBool showContinuar = false.obs;
 
   final TextEditingController numeroOperativoController =
-  TextEditingController();
+      TextEditingController();
 
   final Rxn<Anexarse> datosAnexarse = Rxn<Anexarse>();
   final RxBool consultandoAnexarse = false.obs;
@@ -76,7 +76,7 @@ class TipoOperativoController extends GetxController {
     try {
       await ExceptionDialogos.manejarErroresShowDialogo(
         showMsjNodata: false,
-            () async {
+        () async {
           GetTipoOperativosRequest request = GetTipoOperativosRequest(
             idGenModulo: dataModuloResponse.idGenModulo,
           );
@@ -150,7 +150,7 @@ class TipoOperativoController extends GetxController {
     print('Descripción: ${padre.descripcion}');
     print(
       'idGenTipoTipificacion: '
-          '${padre.idGenTipoTipificacion}',
+      '${padre.idGenTipoTipificacion}',
     );
     print('Tiene hijos: ${tieneHijos(padre.idGenTipoTipificacion)}');
     print('======================================');
@@ -165,7 +165,7 @@ class TipoOperativoController extends GetxController {
       DialogosAwesome.getInformation(
         title: "Operativo requerido",
         descripcion:
-        "Seleccione completamente el tipo de operativo antes de continuar.",
+            "Seleccione completamente el tipo de operativo antes de continuar.",
         titleBtn: "Entendido",
       );
       return;
@@ -176,7 +176,7 @@ class TipoOperativoController extends GetxController {
     try {
       await ExceptionDialogos.manejarErroresShowDialogo(
         showMsjNodata: false,
-            () async {
+        () async {
           final locationBloc = BlocProvider.of<LocationBloc>(Get.context!);
 
           LatLng pos = await locationBloc.getCurrentPosition();
@@ -189,7 +189,7 @@ class TipoOperativoController extends GetxController {
             latitud: pos.latitude,
             longitud: pos.longitude,
             dataModuloIdGenTipoTipificacionEcu:
-            dataModuloResponse.idGenTipoTipificacionEcu,
+                dataModuloResponse.idGenTipoTipificacionEcu,
             dataModuloIdTipoServicio: dataModuloResponse.idHdrTipoServicio,
             idTipoOperativo: selectTipoOperativo.value.idOperativo,
             ip: ip,
@@ -252,7 +252,7 @@ class TipoOperativoController extends GetxController {
       debugPrint('==========================================');
 
       final GetDatosAnexarseOperativoRequest request =
-      GetDatosAnexarseOperativoRequest(idHdrEvento: numeroOperativo);
+          GetDatosAnexarseOperativoRequest(idHdrEvento: numeroOperativo);
 
       final Anexarse respuesta = await siipneMovilUseCase.consultarAnexarse(
         request: request,
@@ -275,7 +275,7 @@ class TipoOperativoController extends GetxController {
 
       if (respuesta.idTipoOperativo <= 0) {
         mensajeErrorAnexarse =
-        'El operativo no posee una configuración válida.';
+            'El operativo no posee una configuración válida.';
         return null;
       }
 
@@ -447,7 +447,7 @@ class TipoOperativoController extends GetxController {
   void goToPageOperativo(DataCreateOp dataCreateOp) {
     final String nombreModulo = dataModuloResponse.descripcion.trim();
     final String nombreOperativo =
-    selectTipoOperativo.value.descripcion.trim();
+        selectTipoOperativo.value.descripcion.trim();
     final String ruta = _rutaPorModulo(nombreOperativo);
 
     debugPrint('==========================================');
@@ -511,7 +511,7 @@ class TipoOperativoController extends GetxController {
 
   bool tieneHijos(int idGenTipoTipificacion) {
     return listTipoOperativos.any(
-          (item) => item.idPadre == idGenTipoTipificacion,
+      (item) => item.idPadre == idGenTipoTipificacion,
     );
   }
 
@@ -588,7 +588,7 @@ class TipoOperativoController extends GetxController {
     print('Descripción: ${item.descripcion}');
     print(
       'idGenTipoTipificacion: '
-          '${item.idGenTipoTipificacion}',
+      '${item.idGenTipoTipificacion}',
     );
     print('idPadre: ${item.idPadre}');
 
@@ -600,12 +600,12 @@ class TipoOperativoController extends GetxController {
       print('No tiene hijos -> selección final');
       print(
         'idOperativo final: '
-            '${item.idOperativo}',
+        '${item.idOperativo}',
       );
 
       print(
         'select idOperativo: '
-            '${selectTipoOperativo.value.idOperativo}',
+        '${selectTipoOperativo.value.idOperativo}',
       );
 
       showContinuar.value = true;
@@ -719,7 +719,7 @@ class TipoOperativoController extends GetxController {
 
       showContinuar.value =
           rutaSeleccionada.length > 1 &&
-              !tieneHijos(ultimo.idGenTipoTipificacion);
+          !tieneHijos(ultimo.idGenTipoTipificacion);
     } else {
       /*
        * Seguridad adicional.

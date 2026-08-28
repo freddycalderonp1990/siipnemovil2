@@ -3,9 +3,15 @@ part of '../pages.dart';
 class OpMigracionPage extends OpMigracionPageBase
     with
         CabeceraMigracionViewMixin,
+        AccionesOperativoMigracionViewMixin,
+        PersonalOperativoMigracionViewMixin,
+        QrOperativoMigracionViewMixin,
+        FinalizarOperativoMigracionViewMixin,
         BusquedaMigracionViewMixin,
+        SelectorNacionalidadMigracionViewMixin,
         IdentidadMigratoriaViewMixin,
         DocumentosMigracionViewMixin,
+        FuentesPersonaMigracionViewMixin,
         AccionesMigracionViewMixin,
         MovimientosMigratoriosViewMixin,
         VisasMigracionViewMixin,
@@ -27,7 +33,7 @@ class OpMigracionPage extends OpMigracionPageBase
         title: null,
         peticionServer: controller.peticionServerState,
         contenido: Obx(
-          () => controller.datosOperativoValidos.value
+              () => controller.datosOperativoValidos.value
               ? contenidoMigracion(context)
               : operativoMigracionInvalido(),
         ),
@@ -47,6 +53,7 @@ class OpMigracionPage extends OpMigracionPageBase
         padding: EdgeInsets.fromLTRB(0, 0, 0, teclado + 24),
         children: <Widget>[
           cabeceraMigracion(),
+          accionesOperativoMigracion(),
           const SizedBox(height: 4),
           busquedaMigracion(),
           if (controller.extranjerosEncontrados.isEmpty &&
@@ -58,9 +65,12 @@ class OpMigracionPage extends OpMigracionPageBase
           if (controller.extranjeroSeleccionado.value != null) ...<Widget>[
             identidadMigratoria(),
             documentosMigratorios(),
-            registroConsultaMigratoria(),
+            fuentesPersonaMigracion(),
             accionesConsultaMigratoria(),
             advertenciasMigracion(),
+            const SizedBox(height: 10),
+            selectorVariableMigracion(),
+            const SizedBox(height: 10),
             botonNuevaConsulta(),
           ],
           const SizedBox(height: 18),

@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../app/core/utils/responsiveUtil.dart';
-import '../../../../../app/presentation/widgets/custom_app_widgets.dart';
 import '../../../../core/values/app_siipne_movil_images.dart';
 import '../../../../data/models/models_siipne_movil.dart';
 import 'btnIconOperativoWidget.dart';
 import 'colors_local.dart';
 import 'operativo_polco_local_widgets.dart';
 import 'package:get/get.dart';
+
 class DesingBusquedaPorCedulaWidget extends StatelessWidget {
   final List<DataConsultaPersona> dataPersona;
   final VoidCallback? onPressedAceptar;
   final VoidCallback? onPressedAntecedentes;
+  final Widget? widgetAntesNuevaConsulta;
 
   const DesingBusquedaPorCedulaWidget({
     super.key,
     required this.dataPersona,
     this.onPressedAceptar,
     this.onPressedAntecedentes,
+    this.widgetAntesNuevaConsulta,
   });
 
   @override
@@ -146,12 +148,10 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
                     tieneOrdenCaptura: tieneOrdenCaptura,
                   ),
 
-                  if (
-                  data.dataSiipne.success &&
+                  if (data.dataSiipne.success &&
                       _tieneFechaDefuncion(
                         data.dataSiipne.datosSiipne.fechaDefuncion,
-                      )
-                  ) ...[
+                      )) ...[
                     const SizedBox(height: 8),
 
                     _fechaDefuncionPersona(data),
@@ -183,6 +183,10 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
                   // ============================================
                   // NUEVA CONSULTA
                   // ============================================
+                  if (widgetAntesNuevaConsulta != null) ...<Widget>[
+                    widgetAntesNuevaConsulta!,
+                    const SizedBox(height: 8),
+                  ],
                   _botonAceptar(),
                 ],
               ),
@@ -1023,24 +1027,22 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
       pais: pais,
     );
   }
-// ============================================================
-// VALIDAR FECHA DEFUNCIÓN
-// ============================================================
+  // ============================================================
+  // VALIDAR FECHA DEFUNCIÓN
+  // ============================================================
 
   bool _tieneFechaDefuncion(String? fecha) {
     if (fecha == null) {
       return false;
     }
 
-    final String valor =
-    fecha.trim();
+    final String valor = fecha.trim();
 
     if (valor.isEmpty) {
       return false;
     }
 
-    final String normalizado =
-    valor.toUpperCase();
+    final String normalizado = valor.toUpperCase();
 
     const List<String> valoresInvalidos = [
       'N/D',
@@ -1057,28 +1059,19 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
       '0000-00-00 00:00:00',
     ];
 
-    return !valoresInvalidos.contains(
-      normalizado,
-    );
+    return !valoresInvalidos.contains(normalizado);
   }
 
-// ============================================================
-// FECHA DEFUNCIÓN PERSONA
-// ============================================================
+  // ============================================================
+  // FECHA DEFUNCIÓN PERSONA
+  // ============================================================
 
-  Widget _fechaDefuncionPersona(
-      DataConsultaPersona data,
-      ) {
+  Widget _fechaDefuncionPersona(DataConsultaPersona data) {
     if (!data.dataSiipne.success) {
       return const SizedBox.shrink();
     }
 
-    final String fecha =
-    data
-        .dataSiipne
-        .datosSiipne
-        .fechaDefuncion
-        .trim();
+    final String fecha = data.dataSiipne.datosSiipne.fechaDefuncion.trim();
 
     if (!_tieneFechaDefuncion(fecha)) {
       return const SizedBox.shrink();
@@ -1086,16 +1079,11 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 9,
-        vertical: 8,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
       decoration: BoxDecoration(
         color: const Color(0xFFFFECEA),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFFE5AAA5),
-        ),
+        border: Border.all(color: const Color(0xFFE5AAA5)),
       ),
       child: Row(
         children: [
@@ -1117,8 +1105,7 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
 
           Expanded(
             child: Column(
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
                   "REGISTRO DE DEFUNCIÓN",
@@ -1144,11 +1131,7 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
             ),
           ),
 
-          const Icon(
-            Icons.error_rounded,
-            color: Color(0xFFB42318),
-            size: 18,
-          ),
+          const Icon(Icons.error_rounded, color: Color(0xFFB42318), size: 18),
         ],
       ),
     );
@@ -1375,15 +1358,15 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
               const SizedBox(width: 6),
 
               Expanded(
-                child:_estadoAnt(
-                  titulo:"INFRACCIONES",
-                  valor:ant.infracciones.cantidad.isEmpty
-                      ?"0"
-                      :ant.infracciones.cantidad,
-                  icono:Icons.warning_amber_rounded,
-                  positivo:ant.infracciones.cantidad=="0",
-                  onTap:(){
-                   // _mostrarDialogoInfracciones(ant);
+                child: _estadoAnt(
+                  titulo: "INFRACCIONES",
+                  valor: ant.infracciones.cantidad.isEmpty
+                      ? "0"
+                      : ant.infracciones.cantidad,
+                  icono: Icons.warning_amber_rounded,
+                  positivo: ant.infracciones.cantidad == "0",
+                  onTap: () {
+                    // _mostrarDialogoInfracciones(ant);
                   },
                 ),
               ),
@@ -1651,60 +1634,51 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
     required IconData icono,
     required bool positivo,
     VoidCallback? onTap,
-  }){
-    final Widget contenido=Container(
-      width:double.infinity,
-      padding:const EdgeInsets.symmetric(
-        horizontal:5,
-        vertical:5,
-      ),
-      decoration:BoxDecoration(
-        color:positivo
-            ?const Color(0xFFEAF7F0)
-            :const Color(0xFFFFF0EF),
-        borderRadius:BorderRadius.circular(9),
-        border:Border.all(
-          color:positivo
-              ?const Color(0xFFB7DDC7)
-              :const Color(0xFFE8B8B4),
+  }) {
+    final Widget contenido = Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+      decoration: BoxDecoration(
+        color: positivo ? const Color(0xFFEAF7F0) : const Color(0xFFFFF0EF),
+        borderRadius: BorderRadius.circular(9),
+        border: Border.all(
+          color: positivo ? const Color(0xFFB7DDC7) : const Color(0xFFE8B8B4),
         ),
       ),
-      child:Column(
-        mainAxisSize:MainAxisSize.min,
-        children:[
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
           Icon(
             icono,
-            color:positivo
-                ?const Color(0xFF198754)
-                :const Color(0xFFB42318),
-            size:15,
+            color: positivo ? const Color(0xFF198754) : const Color(0xFFB42318),
+            size: 15,
           ),
 
-          const SizedBox(height:2),
+          const SizedBox(height: 2),
 
           Text(
             valor,
-            style:TextStyle(
-              color:positivo
-                  ?const Color(0xFF176F47)
-                  :const Color(0xFF9D2821),
-              fontSize:11,
-              fontWeight:FontWeight.w900,
+            style: TextStyle(
+              color: positivo
+                  ? const Color(0xFF176F47)
+                  : const Color(0xFF9D2821),
+              fontSize: 11,
+              fontWeight: FontWeight.w900,
             ),
           ),
 
           Text(
             titulo,
-            maxLines:1,
-            overflow:TextOverflow.ellipsis,
-            style:const TextStyle(
-              color:Color(0xFF6C7B89),
-              fontSize:6.5,
-              fontWeight:FontWeight.w800,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Color(0xFF6C7B89),
+              fontSize: 6.5,
+              fontWeight: FontWeight.w800,
             ),
           ),
 
-        /*  if(onTap!=null)...[
+          /*  if(onTap!=null)...[
             const SizedBox(height:2),
 
             const Row(
@@ -1733,146 +1707,124 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
       ),
     );
 
-    if(onTap==null){
+    if (onTap == null) {
       return contenido;
     }
 
     return Material(
-      color:Colors.transparent,
-      child:InkWell(
-        onTap:onTap,
-        borderRadius:BorderRadius.circular(9),
-        child:contenido,
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(9),
+        child: contenido,
       ),
     );
   }
-
 }
 
-void _mostrarDialogoInfracciones(DataAnt ant){
-  final BuildContext? context=Get.context;
+void _mostrarDialogoInfracciones(DataAnt ant) {
+  final BuildContext? context = Get.context;
 
-  if(context==null)return;
+  if (context == null) return;
 
-  final String cantidad=
-  ant.infracciones.cantidad.trim().isEmpty
-      ?"0"
-      :ant.infracciones.cantidad.trim();
+  final String cantidad = ant.infracciones.cantidad.trim().isEmpty
+      ? "0"
+      : ant.infracciones.cantidad.trim();
 
-  final String valor=
-  ant.infracciones.valor.trim();
+  final String valor = ant.infracciones.valor.trim();
 
-  final bool tieneInfracciones=
-      cantidad!="0" &&
-          cantidad!="0.0";
+  final bool tieneInfracciones = cantidad != "0" && cantidad != "0.0";
 
   showDialog<void>(
-    context:context,
-    barrierDismissible:false,
-    useSafeArea:true,
-    barrierColor:Colors.black.withOpacity(.68),
-    builder:(dialogContext){
-      final double alto=
-          MediaQuery.sizeOf(dialogContext).height;
+    context: context,
+    barrierDismissible: false,
+    useSafeArea: true,
+    barrierColor: Colors.black.withOpacity(.68),
+    builder: (dialogContext) {
+      final double alto = MediaQuery.sizeOf(dialogContext).height;
 
       return Dialog(
-        backgroundColor:Colors.transparent,
-        insetPadding:const EdgeInsets.symmetric(
-          horizontal:16,
-          vertical:20,
-        ),
-        child:Container(
-          width:double.infinity,
-          constraints:BoxConstraints(
-            maxHeight:alto*.78,
-          ),
-          decoration:BoxDecoration(
-            color:const Color(0xFFF5F7FA),
-            borderRadius:BorderRadius.circular(22),
-            boxShadow:[
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        child: Container(
+          width: double.infinity,
+          constraints: BoxConstraints(maxHeight: alto * .78),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF5F7FA),
+            borderRadius: BorderRadius.circular(22),
+            boxShadow: [
               BoxShadow(
-                color:Colors.black.withOpacity(.22),
-                blurRadius:24,
-                offset:const Offset(0,8),
+                color: Colors.black.withOpacity(.22),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
-          child:ClipRRect(
-            borderRadius:BorderRadius.circular(22),
-            child:Column(
-              mainAxisSize:MainAxisSize.min,
-              children:[
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(22),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
                 // ==============================================
                 // HEADER
                 // ==============================================
 
                 Container(
-                  width:double.infinity,
-                  padding:const EdgeInsets.fromLTRB(
-                    13,
-                    11,
-                    6,
-                    11,
-                  ),
-                  decoration:BoxDecoration(
-                    gradient:LinearGradient(
-                      begin:Alignment.centerLeft,
-                      end:Alignment.centerRight,
-                      colors:tieneInfracciones
-                          ?const[
-                        Color(0xFFB42318),
-                        Color(0xFF7A1710),
-                      ]
-                          :const[
-                        Color(0xFF238457),
-                        Color(0xFF176A45),
-                      ],
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(13, 11, 6, 11),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: tieneInfracciones
+                          ? const [Color(0xFFB42318), Color(0xFF7A1710)]
+                          : const [Color(0xFF238457), Color(0xFF176A45)],
                     ),
                   ),
-                  child:Row(
-                    children:[
+                  child: Row(
+                    children: [
                       Container(
-                        width:42,
-                        height:42,
-                        decoration:BoxDecoration(
-                          color:Colors.white.withOpacity(.14),
-                          borderRadius:BorderRadius.circular(12),
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(.14),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child:Icon(
+                        child: Icon(
                           tieneInfracciones
-                              ?Icons.warning_amber_rounded
-                              :Icons.verified_rounded,
-                          color:Colors.white,
-                          size:23,
+                              ? Icons.warning_amber_rounded
+                              : Icons.verified_rounded,
+                          color: Colors.white,
+                          size: 23,
                         ),
                       ),
 
-                      const SizedBox(width:9),
+                      const SizedBox(width: 9),
 
                       Expanded(
-                        child:Column(
-                          crossAxisAlignment:CrossAxisAlignment.start,
-                          children:[
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             const Text(
                               "INFRACCIONES ANT",
-                              style:TextStyle(
-                                color:Colors.white,
-                                fontSize:13,
-                                fontWeight:FontWeight.w900,
-                                letterSpacing:.25,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: .25,
                               ),
                             ),
 
-                            const SizedBox(height:1),
+                            const SizedBox(height: 1),
 
                             Text(
                               tieneInfracciones
-                                  ?"INFORMACIÓN REGISTRADA"
-                                  :"SIN INFRACCIONES REGISTRADAS",
-                              style:TextStyle(
-                                color:Colors.white.withOpacity(.82),
-                                fontSize:7.5,
-                                fontWeight:FontWeight.w700,
+                                  ? "INFORMACIÓN REGISTRADA"
+                                  : "SIN INFRACCIONES REGISTRADAS",
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(.82),
+                                fontSize: 7.5,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
                           ],
@@ -1880,18 +1832,18 @@ void _mostrarDialogoInfracciones(DataAnt ant){
                       ),
 
                       IconButton(
-                        constraints:const BoxConstraints(
-                          minWidth:34,
-                          minHeight:34,
+                        constraints: const BoxConstraints(
+                          minWidth: 34,
+                          minHeight: 34,
                         ),
-                        padding:EdgeInsets.zero,
-                        onPressed:(){
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
                           Navigator.of(dialogContext).pop();
                         },
-                        icon:const Icon(
+                        icon: const Icon(
                           Icons.close_rounded,
-                          color:Colors.white,
-                          size:21,
+                          color: Colors.white,
+                          size: 21,
                         ),
                       ),
                     ],
@@ -1901,116 +1853,111 @@ void _mostrarDialogoInfracciones(DataAnt ant){
                 // ==============================================
                 // CONTENIDO
                 // ==============================================
-
                 Flexible(
-                  child:SingleChildScrollView(
-                    physics:const BouncingScrollPhysics(),
-                    padding:const EdgeInsets.all(12),
-                    child:Column(
-                      children:[
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      children: [
                         // ========================================
                         // RESUMEN
                         // ========================================
 
                         Row(
-                          children:[
+                          children: [
                             Expanded(
-                              child:_datoDialogoInfraccion(
-                                icono:Icons.format_list_numbered_rounded,
-                                titulo:"CANTIDAD",
-                                valor:cantidad,
-                                alerta:tieneInfracciones,
+                              child: _datoDialogoInfraccion(
+                                icono: Icons.format_list_numbered_rounded,
+                                titulo: "CANTIDAD",
+                                valor: cantidad,
+                                alerta: tieneInfracciones,
                               ),
                             ),
 
-                            const SizedBox(width:7),
+                            const SizedBox(width: 7),
 
                             Expanded(
-                              child:_datoDialogoInfraccion(
-                                icono:Icons.account_balance_wallet_outlined,
-                                titulo:"VALOR",
-                                valor:valor.isEmpty
-                                    ?"NO REGISTRADO"
-                                    :valor,
-                                alerta:tieneInfracciones,
+                              child: _datoDialogoInfraccion(
+                                icono: Icons.account_balance_wallet_outlined,
+                                titulo: "VALOR",
+                                valor: valor.isEmpty ? "NO REGISTRADO" : valor,
+                                alerta: tieneInfracciones,
                               ),
                             ),
                           ],
                         ),
 
-                        const SizedBox(height:10),
+                        const SizedBox(height: 10),
 
                         // ========================================
                         // ESTADO
                         // ========================================
-
                         Container(
-                          width:double.infinity,
-                          padding:const EdgeInsets.all(10),
-                          decoration:BoxDecoration(
-                            color:tieneInfracciones
-                                ?const Color(0xFFFFF0EF)
-                                :const Color(0xFFF0F8F4),
-                            borderRadius:BorderRadius.circular(13),
-                            border:Border.all(
-                              color:tieneInfracciones
-                                  ?const Color(0xFFE7B8B4)
-                                  :const Color(0xFFB8DCC8),
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: tieneInfracciones
+                                ? const Color(0xFFFFF0EF)
+                                : const Color(0xFFF0F8F4),
+                            borderRadius: BorderRadius.circular(13),
+                            border: Border.all(
+                              color: tieneInfracciones
+                                  ? const Color(0xFFE7B8B4)
+                                  : const Color(0xFFB8DCC8),
                             ),
                           ),
-                          child:Row(
-                            children:[
+                          child: Row(
+                            children: [
                               Container(
-                                width:38,
-                                height:38,
-                                decoration:BoxDecoration(
-                                  color:tieneInfracciones
-                                      ?const Color(0xFFFFDCD8)
-                                      :const Color(0xFFDDF1E5),
-                                  borderRadius:BorderRadius.circular(10),
+                                width: 38,
+                                height: 38,
+                                decoration: BoxDecoration(
+                                  color: tieneInfracciones
+                                      ? const Color(0xFFFFDCD8)
+                                      : const Color(0xFFDDF1E5),
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                child:Icon(
+                                child: Icon(
                                   tieneInfracciones
-                                      ?Icons.report_problem_rounded
-                                      :Icons.verified_user_rounded,
-                                  color:tieneInfracciones
-                                      ?const Color(0xFFB42318)
-                                      :const Color(0xFF198754),
-                                  size:20,
+                                      ? Icons.report_problem_rounded
+                                      : Icons.verified_user_rounded,
+                                  color: tieneInfracciones
+                                      ? const Color(0xFFB42318)
+                                      : const Color(0xFF198754),
+                                  size: 20,
                                 ),
                               ),
 
-                              const SizedBox(width:8),
+                              const SizedBox(width: 8),
 
                               Expanded(
-                                child:Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children:[
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
                                     Text(
                                       tieneInfracciones
-                                          ?"REGISTRA INFRACCIONES"
-                                          :"SIN NOVEDADES",
-                                      style:TextStyle(
-                                        color:tieneInfracciones
-                                            ?const Color(0xFF9C241B)
-                                            :const Color(0xFF267149),
-                                        fontSize:9.5,
-                                        fontWeight:FontWeight.w900,
+                                          ? "REGISTRA INFRACCIONES"
+                                          : "SIN NOVEDADES",
+                                      style: TextStyle(
+                                        color: tieneInfracciones
+                                            ? const Color(0xFF9C241B)
+                                            : const Color(0xFF267149),
+                                        fontSize: 9.5,
+                                        fontWeight: FontWeight.w900,
                                       ),
                                     ),
 
-                                    const SizedBox(height:2),
+                                    const SizedBox(height: 2),
 
                                     Text(
                                       tieneInfracciones
-                                          ?"La Agencia Nacional de Tránsito registra $cantidad infracción${cantidad=="1"?"":"es"}."
-                                          :"No se registran infracciones en la información consultada.",
-                                      style:const TextStyle(
-                                        color:Color(0xFF718496),
-                                        fontSize:8,
-                                        fontWeight:FontWeight.w600,
-                                        height:1.3,
+                                          ? "La Agencia Nacional de Tránsito registra $cantidad infracción${cantidad == "1" ? "" : "es"}."
+                                          : "No se registran infracciones en la información consultada.",
+                                      style: const TextStyle(
+                                        color: Color(0xFF718496),
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.w600,
+                                        height: 1.3,
                                       ),
                                     ),
                                   ],
@@ -2020,38 +1967,37 @@ void _mostrarDialogoInfracciones(DataAnt ant){
                           ),
                         ),
 
-                        const SizedBox(height:10),
+                        const SizedBox(height: 10),
 
                         // ========================================
                         // INFORMACIÓN SERVICIO
                         // ========================================
-
                         Container(
-                          width:double.infinity,
-                          padding:const EdgeInsets.all(9),
-                          decoration:BoxDecoration(
-                            color:const Color(0xFFF2F6FA),
-                            borderRadius:BorderRadius.circular(11),
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(9),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF2F6FA),
+                            borderRadius: BorderRadius.circular(11),
                           ),
-                          child:const Row(
-                            crossAxisAlignment:CrossAxisAlignment.start,
-                            children:[
+                          child: const Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
                               Icon(
                                 Icons.info_outline_rounded,
-                                color:Color(0xFF607589),
-                                size:16,
+                                color: Color(0xFF607589),
+                                size: 16,
                               ),
 
-                              SizedBox(width:7),
+                              SizedBox(width: 7),
 
                               Expanded(
-                                child:Text(
+                                child: Text(
                                   "La información mostrada corresponde a los datos entregados por el servicio de la Agencia Nacional de Tránsito.",
-                                  style:TextStyle(
-                                    color:Color(0xFF6E8091),
-                                    fontSize:7.5,
-                                    fontWeight:FontWeight.w600,
-                                    height:1.3,
+                                  style: TextStyle(
+                                    color: Color(0xFF6E8091),
+                                    fontSize: 7.5,
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.3,
                                   ),
                                 ),
                               ),
@@ -2059,32 +2005,29 @@ void _mostrarDialogoInfracciones(DataAnt ant){
                           ),
                         ),
 
-                        const SizedBox(height:11),
+                        const SizedBox(height: 11),
 
                         SizedBox(
-                          width:double.infinity,
-                          child:ElevatedButton.icon(
-                            onPressed:(){
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
                               Navigator.of(dialogContext).pop();
                             },
-                            icon:const Icon(
-                              Icons.check_rounded,
-                              size:18,
-                            ),
-                            label:const Text(
+                            icon: const Icon(Icons.check_rounded, size: 18),
+                            label: const Text(
                               "CERRAR",
-                              style:TextStyle(
-                                fontSize:9.5,
-                                fontWeight:FontWeight.w900,
+                              style: TextStyle(
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w900,
                               ),
                             ),
-                            style:ElevatedButton.styleFrom(
-                              minimumSize:const Size.fromHeight(44),
-                              backgroundColor:const Color(0xFF195BA6),
-                              foregroundColor:Colors.white,
-                              elevation:0,
-                              shape:RoundedRectangleBorder(
-                                borderRadius:BorderRadius.circular(12),
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size.fromHeight(44),
+                              backgroundColor: const Color(0xFF195BA6),
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
                             ),
                           ),
@@ -2107,66 +2050,60 @@ Widget _datoDialogoInfraccion({
   required String titulo,
   required String valor,
   required bool alerta,
-}){
+}) {
   return Container(
-    padding:const EdgeInsets.all(8),
-    decoration:BoxDecoration(
-      color:Colors.white,
-      borderRadius:BorderRadius.circular(12),
-      border:Border.all(
-        color:alerta
-            ?const Color(0xFFE6C0BD)
-            :const Color(0xFFD8E3ED),
+    padding: const EdgeInsets.all(8),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(
+        color: alerta ? const Color(0xFFE6C0BD) : const Color(0xFFD8E3ED),
       ),
     ),
-    child:Row(
-      children:[
+    child: Row(
+      children: [
         Container(
-          width:34,
-          height:34,
-          decoration:BoxDecoration(
-            color:alerta
-                ?const Color(0xFFFFE8E6)
-                :const Color(0xFFE8F2FC),
-            borderRadius:BorderRadius.circular(9),
+          width: 34,
+          height: 34,
+          decoration: BoxDecoration(
+            color: alerta ? const Color(0xFFFFE8E6) : const Color(0xFFE8F2FC),
+            borderRadius: BorderRadius.circular(9),
           ),
-          child:Icon(
+          child: Icon(
             icono,
-            color:alerta
-                ?const Color(0xFFB42318)
-                :const Color(0xFF195BA6),
-            size:18,
+            color: alerta ? const Color(0xFFB42318) : const Color(0xFF195BA6),
+            size: 18,
           ),
         ),
 
-        const SizedBox(width:7),
+        const SizedBox(width: 7),
 
         Expanded(
-          child:Column(
-            mainAxisAlignment:MainAxisAlignment.center,
-            crossAxisAlignment:CrossAxisAlignment.start,
-            children:[
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
                 titulo,
-                style:const TextStyle(
-                  color:Color(0xFF8291A0),
-                  fontSize:7,
-                  fontWeight:FontWeight.w900,
+                style: const TextStyle(
+                  color: Color(0xFF8291A0),
+                  fontSize: 7,
+                  fontWeight: FontWeight.w900,
                 ),
               ),
 
-              const SizedBox(height:2),
+              const SizedBox(height: 2),
 
               Text(
                 valor,
-                maxLines:2,
-                overflow:TextOverflow.ellipsis,
-                style:TextStyle(
-                  color:alerta
-                      ?const Color(0xFF9C241B)
-                      :const Color(0xFF29445D),
-                  fontSize:11,
-                  fontWeight:FontWeight.w900,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: alerta
+                      ? const Color(0xFF9C241B)
+                      : const Color(0xFF29445D),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w900,
                 ),
               ),
             ],

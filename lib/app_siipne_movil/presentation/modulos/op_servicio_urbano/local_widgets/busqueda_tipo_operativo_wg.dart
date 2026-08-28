@@ -37,7 +37,7 @@ class BusquedaTipoOperativoWg extends StatelessWidget {
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
         color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFD7E3EE)),
       ),
       child: Row(
@@ -72,9 +72,9 @@ class BusquedaTipoOperativoWg extends StatelessWidget {
             color: Colors.transparent,
             child: InkWell(
               onTap: onTap,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(18),
               child: Container(
-                height: 46,
+                height: 50,
                 padding: const EdgeInsets.symmetric(horizontal: 9),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
@@ -90,20 +90,11 @@ class BusquedaTipoOperativoWg extends StatelessWidget {
                     const Icon(
                       Icons.search_rounded,
                       color: Colors.white,
-                      size: 19,
+                      size: 25,
                     ),
 
                     if (tipo == 'N') ...[
                       const SizedBox(width: 4),
-
-                      const Text(
-                        "BUSCAR",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 8,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
                     ],
                   ],
                 ),

@@ -14,10 +14,10 @@ mixin PersonaResultadoViewMixin on OpServicioUrbanoPageBase {
 
       return Column(
         children: [
-          resultadoConsultaVariable(),
           Padding(
             padding: const EdgeInsets.fromLTRB(5, 2, 5, 8),
             child: DesingBusquedaPorCedulaWidget(
+              widgetAntesNuevaConsulta: resultadoConsultaVariable(),
               onPressedAceptar: () {
                 nuevaConsultaPersona();
               },

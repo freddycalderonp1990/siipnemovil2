@@ -1,12 +1,10 @@
 part of '../../pages.dart';
 
 mixin AccionesMigracionViewMixin on OpMigracionPageBase {
-  @override
   Widget accionesConsultaMigratoria() {
-    final bool habilitado =
-        controller.consultaRegistrada &&
-            !controller.registrandoConsulta.value &&
-            !controller.peticionServerState.value;
+    final bool habilitado = controller.consultaRegistrada &&
+        !controller.registrandoConsulta.value &&
+        !controller.peticionServerState.value;
 
     return _MigracionCard(
       child: Column(
@@ -47,8 +45,7 @@ mixin AccionesMigracionViewMixin on OpMigracionPageBase {
                   icono: Icons.contactless_outlined,
                   texto: 'VISAS\nELECTRÓNICAS',
                   cargando: controller.cargandoVisaElectronica.value,
-                  consultado:
-                  controller.visasElectronicasConsultadas.value,
+                  consultado: controller.visasElectronicasConsultadas.value,
                   habilitado: habilitado,
                   onTap: abrirVisasElectronicas,
                 ),
@@ -90,17 +87,14 @@ mixin AccionesMigracionViewMixin on OpMigracionPageBase {
       borderRadius: BorderRadius.circular(13),
       child: InkWell(
         onTap: habilitado && !cargando
-            ? () async {
-          await onTap();
-        }
+            ? () {
+                onTap();
+              }
             : null,
         borderRadius: BorderRadius.circular(13),
         child: Container(
           height: 74,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 4,
-            vertical: 8,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(13),
             border: Border.all(
@@ -125,11 +119,7 @@ mixin AccionesMigracionViewMixin on OpMigracionPageBase {
                 Stack(
                   clipBehavior: Clip.none,
                   children: <Widget>[
-                    Icon(
-                      icono,
-                      color: color,
-                      size: 24,
-                    ),
+                    Icon(icono, color: color, size: 24),
                     if (consultado)
                       const Positioned(
                         right: -5,

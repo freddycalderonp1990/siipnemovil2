@@ -12,6 +12,147 @@ abstract final class _MigracionColors {
   static const Color naranja = Color(0xFFA97814);
 }
 
+class _MigracionDialog extends StatelessWidget {
+  final IconData icono;
+  final String titulo;
+  final String subtitulo;
+  final Widget child;
+  final Color colorInicio;
+  final Color colorFin;
+  final double maxHeightFactor;
+
+  const _MigracionDialog({
+    required this.icono,
+    required this.titulo,
+    required this.subtitulo,
+    required this.child,
+    this.colorInicio = _MigracionColors.azul,
+    this.colorFin = _MigracionColors.azulOscuro,
+    this.maxHeightFactor = .86,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+      child: Container(
+        width: double.infinity,
+        constraints: BoxConstraints(
+          maxWidth: 580,
+          maxHeight: MediaQuery.sizeOf(context).height * maxHeightFactor,
+        ),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF7F9FC),
+          borderRadius: BorderRadius.circular(23),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: Colors.black.withOpacity(.24),
+              blurRadius: 25,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(23),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(14, 12, 6, 12),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: <Color>[colorInicio, colorFin],
+                  ),
+                ),
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      width: 43,
+                      height: 43,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(.15),
+                        borderRadius: BorderRadius.circular(13),
+                        border: Border.all(color: Colors.white.withOpacity(.16)),
+                      ),
+                      child: Icon(icono, color: Colors.white, size: 24),
+                    ),
+                    const SizedBox(width: 9),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            titulo,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: .25,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            subtitulo,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Color(0xFFDCEAF7),
+                              fontSize: 8,
+                              height: 1.25,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.close_rounded, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+              Flexible(child: child),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MigracionDialogCloseButton extends StatelessWidget {
+  final String texto;
+
+  const _MigracionDialogCloseButton({this.texto = 'CERRAR'});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 44,
+      child: ElevatedButton.icon(
+        onPressed: () => Navigator.of(context).pop(),
+        icon: const Icon(Icons.check_rounded, size: 17),
+        label: Text(
+          texto,
+          style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w900),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: _MigracionColors.azul,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _MigracionCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;

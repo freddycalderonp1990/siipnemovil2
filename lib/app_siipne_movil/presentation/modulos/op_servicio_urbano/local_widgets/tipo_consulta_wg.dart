@@ -34,10 +34,10 @@ mixin TipoConsultaViewMixin on OpServicioUrbanoPageBase {
                   SizedBox(width: 5),
                   Expanded(
                     child: Text(
-                      "SELECCIONE QUÉ DESEA CONSULTAR",
+                      "SELECCIONE UN TIPO DE CONSULTA",
                       style: TextStyle(
                         color: Color(0xFF52687C),
-                        fontSize: 8.5,
+                        fontSize: 12,
                         fontWeight: FontWeight.w900,
                         letterSpacing: .35,
                       ),
@@ -165,7 +165,7 @@ mixin TipoConsultaViewMixin on OpServicioUrbanoPageBase {
                             color: seleccionado
                                 ? Colors.white
                                 : const Color(0xFF253E55),
-                            fontSize: 12,
+                            fontSize: 14,
                             fontWeight: FontWeight.w900,
                           ),
                         ),
@@ -180,7 +180,7 @@ mixin TipoConsultaViewMixin on OpServicioUrbanoPageBase {
                             color: seleccionado
                                 ? Colors.white.withOpacity(.78)
                                 : const Color(0xFF7C8998),
-                            fontSize: 7.5,
+                            fontSize: 10,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -201,7 +201,7 @@ mixin TipoConsultaViewMixin on OpServicioUrbanoPageBase {
                       seleccionado
                           ? Icons.check_rounded
                           : Icons.circle_outlined,
-                      size: 15,
+                      size: 22,
                       color: seleccionado
                           ? const Color(0xFF1764B2)
                           : const Color(0xFFA1ACB7),

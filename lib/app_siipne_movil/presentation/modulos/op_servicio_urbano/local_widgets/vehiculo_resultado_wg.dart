@@ -14,12 +14,11 @@ mixin VehiculoResultadoViewMixin on OpServicioUrbanoPageBase {
 
       return Column(
         children: [
-          resultadoConsultaVariable(),
-
           Padding(
             padding: const EdgeInsets.fromLTRB(6, 3, 6, 15),
             child: DesingDatosVehiculoWg(
               data: controller.dataVehiculo.first,
+              widgetAntesNuevaConsulta: resultadoConsultaVariable(),
               onPressedNewConsulta: () {
                 nuevaConsultaVehiculo();
               },

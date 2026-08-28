@@ -10,6 +10,12 @@ abstract class OpMigracionPageBase extends GetView<OpMigracionController> {
   GlobalKey<FormState> get keyBusqueda;
 
   Widget cabeceraMigracion();
+  Widget accionesOperativoMigracion();
+  Future<void> mostrarPersonalOperativo();
+  Future<void> mostrarQrOperativo();
+  void mostrarFinalizarOperativo();
+  void confirmarFinalizacionDefinitiva();
+  void confirmarCerrarSesion();
   Widget busquedaMigracion();
   Future<void> confirmarConsultaMigratoria();
   void dialogoConfirmarConsulta();
@@ -17,6 +23,9 @@ abstract class OpMigracionPageBase extends GetView<OpMigracionController> {
   Widget selectorExtranjeros();
   Widget identidadMigratoria();
   Widget documentosMigratorios();
+  Widget fuentesPersonaMigracion();
+  Future<void> abrirFuentesPersona();
+  Future<void> abrirAntecedentesPersona();
   Widget registroConsultaMigratoria();
   Widget accionesConsultaMigratoria();
   Future<void> abrirMovimientosMigratorios();
@@ -29,4 +38,7 @@ abstract class OpMigracionPageBase extends GetView<OpMigracionController> {
   Widget botonNuevaConsulta();
   Widget estadoInicialMigracion();
   Widget operativoMigracionInvalido();
+  Widget selectorNacionalidadMigracion({
+    required bool bloqueado,
+  });
 }

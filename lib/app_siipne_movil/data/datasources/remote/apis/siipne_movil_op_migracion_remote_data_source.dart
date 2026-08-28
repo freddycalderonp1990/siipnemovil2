@@ -1,6 +1,7 @@
 part of '../../datasource_impl_siipne_movil.dart';
 
 abstract class SiipneMovilOpMigracionRemoteDataSource {
+
   Future<List<DataModulo>> getPermisosModulos({
     required GetPermisosModulosRequest request,
   });
@@ -91,16 +92,29 @@ class SiipneMovilOpMigracionRemoteDataSourceImpl
     implements SiipneMovilOpMigracionRemoteDataSource {
   const SiipneMovilOpMigracionRemoteDataSourceImpl();
 
+  bool _sinContenido(String response) {
+    final String contenido = response.trim().toLowerCase();
+
+    return contenido.isEmpty ||
+        contenido == 'null' ||
+        contenido == '{}' ||
+        contenido == '[]';
+  }
+
   Future<String> _post({
     required String uri,
     required Map<String, dynamic> bodyRequest,
+    Duration? timeout,
   }) {
     final Map<String, dynamic> body = HeadAppSiipneMovilRequest(
       uri: uri,
       bodyRequest: bodyRequest,
     ).toJson();
 
-    return UrlApiProviderAppCenso.post(body: body);
+    return UrlApiProviderAppCenso.post(
+      body: body,
+      timeout: timeout,
+    );
   }
 
   Future<String> _put({
@@ -405,7 +419,12 @@ class SiipneMovilOpMigracionRemoteDataSourceImpl
       uri: SiipneMovilApiConstantes
           .SIIPNE_MOVIL_GET_DATOS_VISAS_ELECTRONICAS,
       bodyRequest: request.toJson(),
+      timeout: const Duration(seconds: 120),
     );
+
+    if (_sinContenido(response)) {
+      return DataVisasElectronicas.empty();
+    }
 
     return ExceptionHelper.manejarErroresParseJsonException(() async {
       return visasElectronicasModelFromJson(response).data;
