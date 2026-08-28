@@ -181,7 +181,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
     return _cardSeccion(
       icono: Icons.directions_car_outlined,
       titulo: "INFORMACIÓN VEHICULAR",
-      subtitulo: "Datos registrados en SIIPNE",
+      subtitulo: "Datos obtenidos de ${v.fuente}",
       child: Column(
         children: [
           _fila2(

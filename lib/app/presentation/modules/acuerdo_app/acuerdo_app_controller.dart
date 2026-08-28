@@ -22,6 +22,8 @@ class AcuerdoAppController extends GetxController {
 
   String mensajeError = '';
 
+  static const FlutterSecureStorage _storage = FlutterSecureStorage();
+
   static const String _prefAcuerdo = 'siipne_movil_acuerdo_aceptado';
   static const String _prefIdAcuerdo = 'siipne_movil_id_acuerdo';
 
@@ -71,6 +73,7 @@ Al seleccionar la opción "ACEPTO", declaro que he leído, comprendido y acepto 
   // ============================================================
 
   Future<void> verificarAcuerdoAceptado() async {
+
     if (redireccionando.value) return;
 
     verificandoAcuerdoInicial.value = true;
@@ -88,11 +91,14 @@ Al seleccionar la opción "ACEPTO", declaro que he leído, comprendido y acepto 
         return;
       }
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-      final bool aceptado = prefs.getBool(_keyAcuerdo) ?? false;
+      final String? valorAceptado = await _storage.read(key: _keyAcuerdo);
+      final bool aceptado = valorAceptado == 'true';
 
-      final String idAcuerdo = prefs.getString(_keyIdAcuerdo) ?? '';
+      final String idAcuerdo =
+          await _storage.read(key: _keyIdAcuerdo) ?? '';
+
+
 
       debugPrint('------------------------------------------');
       debugPrint('VERIFICACIÓN ACUERDO LOCAL');
@@ -292,26 +298,30 @@ Al seleccionar la opción "ACEPTO", declaro que he leído, comprendido y acepto 
     try {
       if (user.idGenPersona <= 0) {
         debugPrint('No se puede guardar acuerdo: idGenPersona inválido.');
-
         return false;
       }
 
       if (idAcuerdo.trim().isEmpty) {
         debugPrint('No se puede guardar acuerdo: idAcuerdo vacío.');
-
         return false;
       }
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-      final bool guardadoAcuerdo = await prefs.setBool(_keyAcuerdo, true);
-
-      final bool guardadoId = await prefs.setString(
-        _keyIdAcuerdo,
-        idAcuerdo.trim(),
+      await _storage.write(
+        key: _keyAcuerdo,
+        value: 'true',
       );
 
-      debugPrint('------------------------------------------');
+      await _storage.write(
+        key: _keyIdAcuerdo,
+        value: idAcuerdo.trim(),
+      );
+
+      final bool guardadoAcuerdo =
+          await _storage.read(key: _keyAcuerdo) == 'true';
+
+      final bool guardadoId =
+          (await _storage.read(key: _keyIdAcuerdo) ?? '').isNotEmpty;
+
       debugPrint('ACUERDO GUARDADO LOCALMENTE');
       debugPrint('PERSONA: ${user.idGenPersona}');
       debugPrint('KEY ACUERDO: $_keyAcuerdo');
@@ -319,14 +329,11 @@ Al seleccionar la opción "ACEPTO", declaro que he leído, comprendido y acepto 
       debugPrint('ID ACUERDO: $idAcuerdo');
       debugPrint('BOOL GUARDADO: $guardadoAcuerdo');
       debugPrint('ID GUARDADO: $guardadoId');
-      debugPrint('------------------------------------------');
 
       return guardadoAcuerdo && guardadoId;
     } catch (e, stackTrace) {
-      debugPrint('Error guardando acuerdo en preferencias: $e');
-
+      debugPrint('Error guardando acuerdo en almacenamiento seguro: $e');
       debugPrint('$stackTrace');
-
       return false;
     }
   }
@@ -341,11 +348,12 @@ Al seleccionar la opción "ACEPTO", declaro que he leído, comprendido y acepto 
 
       if (user.idGenPersona <= 0) return false;
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? valorAceptado = await _storage.read(key: _keyAcuerdo);
+      final bool aceptado = valorAceptado == 'true';
 
-      final bool aceptado = prefs.getBool(_keyAcuerdo) ?? false;
+      final String idAcuerdo =
+          await _storage.read(key: _keyIdAcuerdo) ?? '';
 
-      final String idAcuerdo = prefs.getString(_keyIdAcuerdo) ?? '';
 
       return aceptado && idAcuerdo.trim().isNotEmpty;
     } catch (e) {
@@ -365,9 +373,9 @@ Al seleccionar la opción "ACEPTO", declaro que he leído, comprendido y acepto 
 
       if (user.idGenPersona <= 0) return null;
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-      return prefs.getString(_keyIdAcuerdo);
+
+      return await _storage.read(key: _keyIdAcuerdo);
     } catch (e) {
       debugPrint('Error obteniendo ID del acuerdo local: $e');
 
@@ -385,11 +393,10 @@ Al seleccionar la opción "ACEPTO", declaro que he leído, comprendido y acepto 
 
       if (user.idGenPersona <= 0) return;
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-      await prefs.remove(_keyAcuerdo);
 
-      await prefs.remove(_keyIdAcuerdo);
+      await _storage.delete(key: _keyAcuerdo);
+      await _storage.delete(key: _keyIdAcuerdo);
 
       acepta.value = false;
       puedeAceptar.value = false;
@@ -432,11 +439,11 @@ Al seleccionar la opción "ACEPTO", declaro que he leído, comprendido y acepto 
     try {
       user = loginController.user.value;
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final bool aceptado =
+          await _storage.read(key: _keyAcuerdo) == 'true';
 
-      final bool aceptado = prefs.getBool(_keyAcuerdo) ?? false;
-
-      final String idAcuerdo = prefs.getString(_keyIdAcuerdo) ?? '';
+      final String idAcuerdo =
+          await _storage.read(key: _keyIdAcuerdo) ?? '';
 
       debugPrint('==========================================');
       debugPrint('DEBUG ACUERDO SIIPNE MÓVIL');

@@ -42,7 +42,7 @@ dependencies:
   image_picker: ^1.2.3 #Obtener img de la camara o galeria
   flutter_pdfview: ^1.4.4 #Visaulizar PDF
   dropdown_search: ^7.0.0 #Combo con busqueda
-  shared_preferences: ^2.5.5
+
   #url_launcher: ^6.3.1 # Abrir Urls - lo trae desde el paquete de mi upp
   #share_plus: ^10.1.1 # Compartir archivos - lo trae desde el paquete de mi upp
   #awesome_dialog: ^3.2.1 #Dialogos - lo trae desde el paquete de mi upp
@@ -93,7 +93,7 @@ dependencies:
   app_mi_upc:
     git:
       url: https://github.com/freddycalderonp1990/app_mi_upc.git
-      ref: 4.0.0
+      ref: v4.0.1
 
 dev_dependencies:
   flutter_test:
