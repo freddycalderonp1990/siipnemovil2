@@ -14,12 +14,12 @@ mixin FinalizarOperativoMigracionViewMixin on OpMigracionPageBase {
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black.withOpacity(.70),
+      barrierColor: const Color(0xFF210408).withOpacity(.88),
       builder: (BuildContext dialogContext) => _MigracionDialog(
         icono: Icons.edgesensor_low_sharp,
         titulo: 'FINALIZAR OPERATIVO',
         subtitulo:
-            'OPERATIVO N.° ${controller.idHdrEventoActual.value} · VALIDACIÓN DE IDENTIDAD',
+        'OPERATIVO N.° ${controller.idHdrEventoActual.value} · VALIDACIÓN DE IDENTIDAD',
         colorInicio: const Color(0xFFB42318),
         colorFin: const Color(0xFF78170F),
         child: SingleChildScrollView(
@@ -29,20 +29,20 @@ mixin FinalizarOperativoMigracionViewMixin on OpMigracionPageBase {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFF7F1),
+                  color: const Color(0xFFFFF2F3),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFF0D3BF)),
+                  border: Border.all(color: const Color(0xFFF0B8BE)),
                 ),
                 child: const Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Icon(Icons.info_outline_rounded, color: Color(0xFFB76832)),
+                    Icon(Icons.gpp_bad_rounded, color: Color(0xFFB42318)),
                     SizedBox(width: 7),
                     Expanded(
                       child: Text(
                         'Al finalizar se bloqueará el registro de nuevas consultas. Valide su identidad con la clave institucional o biometría.',
                         style: TextStyle(
-                          color: Color(0xFF7A4A2A),
+                          color: Color(0xFF7A1821),
                           fontSize: 9.5,
                           height: 1.35,
                           fontWeight: FontWeight.w600,
@@ -67,10 +67,10 @@ mixin FinalizarOperativoMigracionViewMixin on OpMigracionPageBase {
                       children: <Widget>[
                         CircleAvatar(
                           radius: 16,
-                          backgroundColor: Color(0xFFE6EFF8),
+                          backgroundColor: Color(0xFFFFE1E4),
                           child: Icon(
                             Icons.lock_outline_rounded,
-                            color: _MigracionColors.azul,
+                            color: _MigracionColors.rojo,
                             size: 17,
                           ),
                         ),
@@ -87,7 +87,7 @@ mixin FinalizarOperativoMigracionViewMixin on OpMigracionPageBase {
                     ),
                     const SizedBox(height: 9),
                     Obx(
-                      () => TextFormField(
+                          () => TextFormField(
                         controller: controller.controllerClaveFinalizar,
                         obscureText: controller.ocultarClaveFinalizar.value,
                         textInputAction: TextInputAction.done,
@@ -96,7 +96,7 @@ mixin FinalizarOperativoMigracionViewMixin on OpMigracionPageBase {
                           prefixIcon: const Icon(Icons.password_rounded),
                           suffixIcon: IconButton(
                             onPressed:
-                                controller.cambiarVisibilidadClaveFinalizar,
+                            controller.cambiarVisibilidadClaveFinalizar,
                             icon: Icon(
                               controller.ocultarClaveFinalizar.value
                                   ? Icons.visibility_outlined
@@ -120,7 +120,7 @@ mixin FinalizarOperativoMigracionViewMixin on OpMigracionPageBase {
                         icon: const Icon(Icons.verified_user_rounded, size: 18),
                         label: const Text('VALIDAR CLAVE'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _MigracionColors.azul,
+                          backgroundColor: _MigracionColors.rojo,
                           foregroundColor: Colors.white,
                         ),
                       ),
@@ -138,19 +138,19 @@ mixin FinalizarOperativoMigracionViewMixin on OpMigracionPageBase {
                     padding: const EdgeInsets.all(11),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: <Color>[Color(0xFFEAF3FC), Color(0xFFF4F8FC)],
+                        colors: <Color>[Color(0xFFFFE8EA), Color(0xFFFFF5F6)],
                       ),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFFACC9E3)),
+                      border: Border.all(color: const Color(0xFFE7A6AD)),
                     ),
                     child: const Row(
                       children: <Widget>[
                         CircleAvatar(
                           radius: 22,
-                          backgroundColor: Color(0xFFDCEBFA),
+                          backgroundColor: Color(0xFFFFD7DB),
                           child: Icon(
                             Icons.fingerprint_rounded,
-                            color: _MigracionColors.azul,
+                            color: _MigracionColors.rojo,
                             size: 30,
                           ),
                         ),
@@ -162,7 +162,7 @@ mixin FinalizarOperativoMigracionViewMixin on OpMigracionPageBase {
                               Text(
                                 'HUELLA / BIOMETRÍA',
                                 style: TextStyle(
-                                  color: _MigracionColors.azul,
+                                  color: _MigracionColors.rojo,
                                   fontSize: 10.5,
                                   fontWeight: FontWeight.w900,
                                 ),
@@ -179,7 +179,7 @@ mixin FinalizarOperativoMigracionViewMixin on OpMigracionPageBase {
                         ),
                         Icon(
                           Icons.arrow_forward_ios_rounded,
-                          color: _MigracionColors.azul,
+                          color: _MigracionColors.rojo,
                           size: 15,
                         ),
                       ],
@@ -227,15 +227,15 @@ mixin FinalizarOperativoMigracionViewMixin on OpMigracionPageBase {
   }
 
   Future<void> _validarBiometriaYConfirmar(
-    BuildContext dialogContext,
-  ) async {
+      BuildContext dialogContext,
+      ) async {
     FocusManager.instance.primaryFocus?.unfocus();
     final bool ok = await controller.autenticarBiometriaFinalizar();
     if (!ok) {
       DialogosAwesome.getError(
         title: 'AUTENTICACIÓN NO VALIDADA',
         descripcion:
-            'No fue posible validar su identidad mediante biometría.',
+        'No fue posible validar su identidad mediante biometría.',
       );
       return;
     }
@@ -246,77 +246,34 @@ mixin FinalizarOperativoMigracionViewMixin on OpMigracionPageBase {
   }
 
   void confirmarFinalizacionDefinitiva() {
-    final BuildContext? context = Get.context;
-    if (context == null) return;
-
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      barrierColor: Colors.black.withOpacity(.70),
-      builder: (BuildContext dialogContext) => _MigracionDialog(
-        icono: Icons.gpp_maybe_rounded,
-        titulo: 'CONFIRMAR FINALIZACIÓN',
-        subtitulo: 'Esta acción no se puede revertir.',
-        colorInicio: const Color(0xFFB42318),
-        colorFin: const Color(0xFF78170F),
-        maxHeightFactor: .55,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(15),
-          child: Column(
-            children: <Widget>[
-              Text(
-                '¿Está seguro de finalizar el operativo N.° ${controller.idHdrEventoActual.value}? Una vez finalizado no podrá registrar nuevas consultas.',
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: _MigracionColors.texto,
-                  fontSize: 10,
-                  height: 1.45,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 14),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(dialogContext).pop(),
-                      child: const Text('CANCELAR'),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () async {
-                        Navigator.of(dialogContext).pop();
-                        final bool ok = await controller.finalizarOperativo();
-                        if (!ok) {
-                          DialogosAwesome.getError(
-                            title: 'NO SE PUDO FINALIZAR',
-                            descripcion: controller.mensajeErrorFinalizar,
-                          );
-                          return;
-                        }
-                        DialogosAwesome.getSucess(
-                          title: 'OPERATIVO FINALIZADO',
-                          descripcion:
-                              'El operativo fue finalizado correctamente.',
-                          btnOkOnPress: controller.volverMenu,
-                        );
-                      },
-                      icon: const Icon(Icons.edgesensor_low_sharp),
-                      label: const Text('FINALIZAR'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _MigracionColors.rojo,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+    DialogosAwesome.getWarningSiNo(
+      title: 'CONFIRMAR FINALIZACIÓN',
+      colorAccion: DialogosAwesome.colorError,
+      iconoAccion: Icons.gpp_bad_rounded,
+      codigoEstado: 'SIIPNE MIGRACIÓN // CIERRE DEFINITIVO',
+      etiquetaDetalle: 'CONFIRMACIÓN DE ACCIÓN IRREVERSIBLE',
+      descripcion:
+      '¿Está seguro de finalizar el operativo migratorio N.° ${controller.idHdrEventoActual.value}?\n\n'
+          'Una vez finalizado no podrá registrar nuevas consultas migratorias.',
+      btnOkOnPress: () async {
+        final bool ok = await controller.finalizarOperativo();
+        if (!ok) {
+          DialogosAwesome.getError(
+            title: 'NO SE PUDO FINALIZAR',
+            descripcion: controller.mensajeErrorFinalizar.isEmpty
+                ? 'No fue posible finalizar el operativo migratorio.'
+                : controller.mensajeErrorFinalizar,
+          );
+          return;
+        }
+        DialogosAwesome.getSucess(
+          title: 'OPERATIVO FINALIZADO',
+          descripcion:
+          'El operativo migratorio fue finalizado correctamente.',
+          btnOkOnPress: controller.volverMenu,
+        );
+      },
+      btnCancelOnPress: () {},
     );
   }
 }

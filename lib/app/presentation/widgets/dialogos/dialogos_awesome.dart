@@ -9,6 +9,14 @@ class DialogosAwesome {
 
   static String imgDefault = AppImages.escudopolicia;
 
+  // Ancho común para todos los diálogos: más amplio en teléfonos y
+  // controlado en pantallas grandes para conservar una buena lectura.
+  static double _anchoDialogo(BuildContext context) {
+    return (MediaQuery.of(context).size.width - 12)
+        .clamp(0.0, 720.0)
+        .toDouble();
+  }
+
   // Paleta institucional de alto contraste.
   static const Color _fondoTecnico = Color(0xFF071E35);
   static const Color _fondoCard = Color(0xFFF4F8FC);
@@ -81,10 +89,10 @@ class DialogosAwesome {
           gradient: secundario
               ? null
               : LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: <Color>[color, colorFinal],
-          ),
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: <Color>[color, colorFinal],
+                ),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: secundario ? color.withOpacity(.38) : color.withOpacity(.90),
@@ -241,6 +249,8 @@ class DialogosAwesome {
     String imgString = AppImages.escudopolicia,
     IconData? iconoEstado,
   }) {
+    final bool esTemaRojo = color == colorError;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(14, 14, 13, 14),
@@ -248,17 +258,29 @@ class DialogosAwesome {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: <Color>[
-            Color.lerp(_azulProfundo, color, .18)!,
-            _azulPanel,
-            Color.lerp(_azulPanel, color, .42)!,
-          ],
+          colors: esTemaRojo
+              ? const <Color>[
+                  Color(0xFF35070C),
+                  Color(0xFF78111C),
+                  Color(0xFFB51F2E),
+                ]
+              : <Color>[
+                  Color.lerp(_azulProfundo, color, .18)!,
+                  _azulPanel,
+                  Color.lerp(_azulPanel, color, .42)!,
+                ],
         ),
         borderRadius: BorderRadius.circular(19),
-        border: Border.all(color: _azulNeon.withOpacity(.32)),
+        border: Border.all(
+          color: esTemaRojo
+              ? const Color(0xFFFF98A2).withOpacity(.68)
+              : _azulNeon.withOpacity(.32),
+        ),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: _azulProfundo.withOpacity(.28),
+            color: esTemaRojo
+                ? colorError.withOpacity(.34)
+                : _azulProfundo.withOpacity(.28),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -447,8 +469,13 @@ class DialogosAwesome {
 
   static Widget _fondoDialogo({required Widget child, Color? color}) {
     final Color tono = color ?? colorInformacion;
-    final Color fondoInicio = Color.lerp(_fondoTecnico, tono, .10)!;
-    final Color fondoFin = Color.lerp(_azulProfundo, tono, .20)!;
+    final bool esTemaRojo = tono == colorError;
+    final Color fondoInicio = esTemaRojo
+        ? const Color(0xFF29070B)
+        : Color.lerp(_fondoTecnico, tono, .10)!;
+    final Color fondoFin = esTemaRojo
+        ? const Color(0xFF510C14)
+        : Color.lerp(_azulProfundo, tono, .20)!;
 
     return Container(
       width: double.infinity,
@@ -457,12 +484,20 @@ class DialogosAwesome {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: <Color>[tono, tono.withOpacity(.45), _azulNeon],
+          colors: esTemaRojo
+              ? <Color>[
+                  colorError,
+                  const Color(0xFF7E101B),
+                  const Color(0xFFFF7C88),
+                ]
+              : <Color>[tono, tono.withOpacity(.45), _azulNeon],
         ),
         borderRadius: BorderRadius.circular(23),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: _azulProfundo.withOpacity(.24),
+            color: esTemaRojo
+                ? colorError.withOpacity(.30)
+                : _azulProfundo.withOpacity(.24),
             blurRadius: 28,
             offset: const Offset(0, 12),
           ),
@@ -486,19 +521,23 @@ class DialogosAwesome {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                const Icon(
+                Icon(
                   Icons.lock_outline_rounded,
-                  color: Color(0xFFAFC8DC),
+                  color: esTemaRojo
+                      ? const Color(0xFFFFCDD2)
+                      : const Color(0xFFAFC8DC),
                   size: 11,
                 ),
                 const SizedBox(width: 5),
-                const Flexible(
+                Flexible(
                   child: Text(
                     'CANAL SEGURO  ·  REGISTRO AUDITABLE',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: Color(0xFFAFC8DC),
+                      color: esTemaRojo
+                          ? const Color(0xFFFFCDD2)
+                          : const Color(0xFFAFC8DC),
                       fontSize: 7,
                       letterSpacing: .38,
                       fontWeight: FontWeight.w800,
@@ -567,10 +606,11 @@ class DialogosAwesome {
 
     isDiaslogoShow = true;
 
-    AwesomeDialog(
+    _DialogoAmplio(
       dismissOnTouchOutside: false,
       dismissOnBackKeyPress: false,
       context: Get.context!,
+      width: _anchoDialogo(Get.context!),
       dialogType: DialogType.noHeader,
       headerAnimationLoop: false,
       animType: AnimType.scale,
@@ -688,11 +728,17 @@ class DialogosAwesome {
     required String descripcion,
     Function()? btnOkOnPress,
     Function()? btnCancelOnPress,
+    Color? colorAccion,
+    IconData? iconoAccion,
+    String? codigoEstado,
+    String? etiquetaDetalle,
   }) {
+    final Color colorConfirmacion = colorAccion ?? _azulInstitucional;
+
     return _getIconPolicia(
-      colorBtnSi: _azulInstitucional,
-      colorCircleImg: _azulInstitucional,
-      colorTitle: _azulInstitucional,
+      colorBtnSi: colorConfirmacion,
+      colorCircleImg: colorConfirmacion,
+      colorTitle: colorConfirmacion,
       title: title,
       descripcion: descripcion,
       btnOkOnPress: btnOkOnPress ?? () {},
@@ -700,9 +746,9 @@ class DialogosAwesome {
       mostrarSegungoBtn: true,
       titleBtnNo: "NO",
       btnCancelOnPress: btnCancelOnPress ?? () {},
-      codigoEstado: 'SIIPNE MÓVIL // CONFIRMACIÓN',
-      etiquetaDetalle: 'DECISIÓN DE CONTINUIDAD',
-      iconoEstado: Icons.help_outline_rounded,
+      codigoEstado: codigoEstado ?? 'SIIPNE MÓVIL // CONFIRMACIÓN',
+      etiquetaDetalle: etiquetaDetalle ?? 'DECISIÓN DE CONTINUIDAD',
+      iconoEstado: iconoAccion ?? Icons.help_outline_rounded,
     );
   }
 
@@ -720,12 +766,13 @@ class DialogosAwesome {
     bool botonesHabilitados = false;
     Timer? timer;
 
-    late AwesomeDialog dialog;
+    late _DialogoAmplio dialog;
 
-    dialog = AwesomeDialog(
+    dialog = _DialogoAmplio(
       dismissOnTouchOutside: false,
       dismissOnBackKeyPress: false,
       context: Get.context!,
+      width: _anchoDialogo(Get.context!),
       dialogType: DialogType.noHeader,
       headerAnimationLoop: false,
       animType: AnimType.scale,
@@ -776,16 +823,8 @@ class DialogosAwesome {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: <Color>[
-                          Color.lerp(
-                            _azulProfundo,
-                            _grisInstitucional,
-                            .22,
-                          )!,
-                          Color.lerp(
-                            _azulPanel,
-                            _grisInstitucional,
-                            .42,
-                          )!,
+                          Color.lerp(_azulProfundo, _grisInstitucional, .22)!,
+                          Color.lerp(_azulPanel, _grisInstitucional, .42)!,
                         ],
                       ),
                       borderRadius: BorderRadius.circular(14),
@@ -856,7 +895,7 @@ class DialogosAwesome {
 
                             Future.delayed(
                               const Duration(milliseconds: 100),
-                                  () => btnCancelOnPress?.call(),
+                              () => btnCancelOnPress?.call(),
                             );
                           },
                         ),
@@ -873,7 +912,7 @@ class DialogosAwesome {
 
                             Future.delayed(
                               const Duration(milliseconds: 100),
-                                  () => btnOkOnPress?.call(),
+                              () => btnOkOnPress?.call(),
                             );
                           },
                         ),
@@ -1012,10 +1051,10 @@ class DialogosAwesome {
     final double sizeTxt = responsive.diagonalP(AppConfig.tamTextoTitulo);
 
     descripcion ??=
-    "Para abandonar el código $idDgoCreaOpReci, ingrese su clave de seguridad";
+        "Para abandonar el código $idDgoCreaOpReci, ingrese su clave de seguridad";
 
     void abrirDialogo() {
-      late AwesomeDialog dialog;
+      late _DialogoAmplio dialog;
 
       void confirmar() {
         Future.delayed(const Duration(milliseconds: 150), () {
@@ -1029,9 +1068,10 @@ class DialogosAwesome {
         });
       }
 
-      dialog = AwesomeDialog(
+      dialog = _DialogoAmplio(
         dismissOnTouchOutside: false,
         dismissOnBackKeyPress: false,
+        width: _anchoDialogo(Get.context!),
         dialogType: DialogType.noHeader,
         headerAnimationLoop: false,
         animType: AnimType.topSlide,
@@ -1121,7 +1161,7 @@ class DialogosAwesome {
                       if (!isValid) return;
 
                       final LoginController loginController =
-                      Get.find<LoginController>();
+                          Get.find<LoginController>();
 
                       final String pass = controllerPass.text;
 
@@ -1189,7 +1229,7 @@ class DialogosAwesome {
                             DialogosAwesome.getError(
                               title: "AUTENTICACIÓN",
                               descripcion:
-                              "No fue posible validar su identidad mediante biometría.",
+                                  "No fue posible validar su identidad mediante biometría.",
                               btnOkOnPress: () {
                                 abrirDialogo();
                               },
@@ -1229,10 +1269,11 @@ class DialogosAwesome {
     String title = 'Información',
     required String descripcion,
   }) {
-    AwesomeDialog(
+    _DialogoAmplio(
       dismissOnTouchOutside: false,
       dismissOnBackKeyPress: false,
       context: Get.context!,
+      width: _anchoDialogo(Get.context!),
       dialogType: DialogType.noHeader,
       headerAnimationLoop: false,
       animType: AnimType.scale,
@@ -1297,12 +1338,13 @@ class DialogosAwesome {
 
     T? seleccionado;
 
-    late AwesomeDialog dialog;
+    late _DialogoAmplio dialog;
 
-    dialog = AwesomeDialog(
+    dialog = _DialogoAmplio(
       dismissOnTouchOutside: false,
       dismissOnBackKeyPress: false,
       context: Get.context!,
+      width: _anchoDialogo(Get.context!),
       dialogType: DialogType.noHeader,
       headerAnimationLoop: false,
       animType: AnimType.scale,
@@ -1379,19 +1421,19 @@ class DialogosAwesome {
                   items: items
                       .map(
                         (T item) => DropdownMenuItem<T>(
-                      value: item,
-                      child: Text(
-                        itemText(item),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFF334155),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
+                          value: item,
+                          child: Text(
+                            itemText(item),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Color(0xFF334155),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  )
+                      )
                       .toList(),
                   onChanged: (T? value) {
                     setState(() {
@@ -1415,7 +1457,7 @@ class DialogosAwesome {
 
                           Future.delayed(
                             const Duration(milliseconds: 120),
-                                () => onCancel?.call(),
+                            () => onCancel?.call(),
                           );
                         },
                       ),
@@ -1437,7 +1479,7 @@ class DialogosAwesome {
 
                           Future.delayed(
                             const Duration(milliseconds: 150),
-                                () => onSelected(item),
+                            () => onSelected(item),
                           );
                         },
                       ),
@@ -1463,7 +1505,7 @@ class DialogosAwesome {
     required Future<bool> Function() onBiometria,
     required Future<void> Function() onFinalizar,
   }) {
-    late AwesomeDialog dialog;
+    late _DialogoAmplio dialog;
 
     final ResponsiveUtil responsive = ResponsiveUtil();
 
@@ -1473,8 +1515,12 @@ class DialogosAwesome {
       Future.delayed(const Duration(milliseconds: 150), () {
         DialogosAwesome.getWarningSiNo(
           title: "CONFIRMAR FINALIZACIÓN",
+          colorAccion: colorError,
+          iconoAccion: Icons.gpp_bad_rounded,
+          codigoEstado: 'SIIPNE MÓVIL // CIERRE DEFINITIVO',
+          etiquetaDetalle: 'CONFIRMACIÓN DE ACCIÓN IRREVERSIBLE',
           descripcion:
-          "¿Está seguro de finalizar el operativo N° $numeroOperativo?\n\n"
+              "¿Está seguro de finalizar el operativo N° $numeroOperativo?\n\n"
               "Esta acción cerrará el operativo y no permitirá registrar nuevas consultas.",
           btnOkOnPress: () async {
             await onFinalizar();
@@ -1484,15 +1530,16 @@ class DialogosAwesome {
     }
 
     void abrirDialogo() {
-      dialog = AwesomeDialog(
+      dialog = _DialogoAmplio(
         dismissOnTouchOutside: false,
         dismissOnBackKeyPress: false,
         context: Get.context!,
+        width: _anchoDialogo(Get.context!),
         dialogType: DialogType.noHeader,
         headerAnimationLoop: false,
         animType: AnimType.scale,
         dialogBackgroundColor: Colors.transparent,
-        barrierColor: _azulProfundo.withOpacity(.82),
+        barrierColor: const Color(0xFF210408).withOpacity(.88),
         keyboardAware: true,
         body: SingleChildScrollView(
           child: Form(
@@ -1513,12 +1560,18 @@ class DialogosAwesome {
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: <Color>[Color(0xFF102A43), Color(0xFF195BA6)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: <Color>[
+                          Color(0xFF3A080D),
+                          Color(0xFF81121E),
+                          Color(0xFFB62030),
+                        ],
                       ),
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: const <BoxShadow>[
                         BoxShadow(
-                          color: Color(0x25195BA6),
+                          color: Color(0x55B62030),
                           blurRadius: 14,
                           offset: Offset(0, 6),
                         ),
@@ -1550,7 +1603,7 @@ class DialogosAwesome {
                               const Text(
                                 'IDENTIFICADOR OPERATIVO',
                                 style: TextStyle(
-                                  color: Color(0xFFBFD5EA),
+                                  color: Color(0xFFFFCDD2),
                                   fontSize: 7.5,
                                   letterSpacing: .6,
                                   fontWeight: FontWeight.w900,
@@ -1570,7 +1623,7 @@ class DialogosAwesome {
                         ),
                         const Icon(
                           Icons.verified_user_outlined,
-                          color: Color(0xFF6ED5FF),
+                          color: Color(0xFFFFC5CB),
                           size: 23,
                         ),
                       ],
@@ -1578,8 +1631,8 @@ class DialogosAwesome {
                   ),
                   const SizedBox(height: 11),
                   _cardInformativa(
-                    color: colorWarning,
-                    icono: Icons.gpp_maybe_outlined,
+                    color: colorError,
+                    icono: Icons.gpp_bad_rounded,
                     etiqueta: 'AUTORIZACIÓN PARA CIERRE DEFINITIVO',
                     child: const Text(
                       "Para proteger el cierre del operativo debe validar su identidad mediante su clave institucional o biometría.",
@@ -1598,10 +1651,10 @@ class DialogosAwesome {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: const Color(0xFFD9E3ED)),
+                      border: Border.all(color: const Color(0xFFF0B8BE)),
                       boxShadow: const <BoxShadow>[
                         BoxShadow(
-                          color: Color(0x100B3558),
+                          color: Color(0x24B62030),
                           blurRadius: 10,
                           offset: Offset(0, 4),
                         ),
@@ -1640,7 +1693,7 @@ class DialogosAwesome {
                         if (!valido) return;
 
                         final LoginController loginController =
-                        Get.find<LoginController>();
+                            Get.find<LoginController>();
 
                         final String pass = controllerPass.text;
 
@@ -1656,7 +1709,7 @@ class DialogosAwesome {
                             DialogosAwesome.getError(
                               title: "CLAVE INCORRECTA",
                               descripcion:
-                              "La clave institucional ingresada no es correcta.",
+                                  "La clave institucional ingresada no es correcta.",
                               btnOkOnPress: () {
                                 abrirDialogo();
                               },
@@ -1710,7 +1763,7 @@ class DialogosAwesome {
                             DialogosAwesome.getError(
                               title: "BIOMETRÍA NO VALIDADA",
                               descripcion:
-                              "No fue posible validar su identidad mediante huella o biometría.",
+                                  "No fue posible validar su identidad mediante huella o biometría.",
                               btnOkOnPress: () {
                                 abrirDialogo();
                               },
@@ -1737,16 +1790,16 @@ class DialogosAwesome {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: <Color>[
-                              Color(0xFF102A43),
-                              Color(0xFF195BA6),
-                              Color(0xFF1C8ADB),
+                              Color(0xFF3A080D),
+                              Color(0xFF86131F),
+                              Color(0xFFC6283A),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(15),
-                          border: Border.all(color: const Color(0xFF6ED5FF)),
+                          border: Border.all(color: const Color(0xFFFF9FA9)),
                           boxShadow: const <BoxShadow>[
                             BoxShadow(
-                              color: Color(0x40195BA6),
+                              color: Color(0x55B62030),
                               blurRadius: 15,
                               offset: Offset(0, 7),
                             ),
@@ -1787,7 +1840,7 @@ class DialogosAwesome {
                                   Text(
                                     "Validación biométrica de alta seguridad",
                                     style: TextStyle(
-                                      color: Color(0xFFBFDDF4),
+                                      color: Color(0xFFFFD4D8),
                                       fontSize: 7.5,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -1797,7 +1850,7 @@ class DialogosAwesome {
                             ),
                             const Icon(
                               Icons.arrow_forward_ios_rounded,
-                              color: Color(0xFFBFEAFF),
+                              color: Color(0xFFFFD1D6),
                               size: 14,
                             ),
                           ],
@@ -1831,5 +1884,139 @@ class DialogosAwesome {
     }
 
     abrirDialogo();
+  }
+}
+
+/// Contenedor modal sin los 40 dp laterales que impone [Dialog].
+/// Conserva la misma interfaz utilizada por AwesomeDialog para no modificar
+/// los flujos, callbacks ni la forma en que se abren y cierran los diálogos.
+class _DialogoAmplio {
+  final BuildContext context;
+  final Widget body;
+  final double width;
+  final bool dismissOnTouchOutside;
+  final bool dismissOnBackKeyPress;
+  final Color dialogBackgroundColor;
+  final Color barrierColor;
+  final bool keyboardAware;
+  final bool showCloseIcon;
+  final Widget? closeIcon;
+  final AnimType animType;
+  final bool useRootNavigator;
+
+  bool _visible = false;
+
+  _DialogoAmplio({
+    required this.context,
+    required this.body,
+    required this.width,
+    required this.animType,
+    this.dismissOnTouchOutside = true,
+    this.dismissOnBackKeyPress = true,
+    this.dialogBackgroundColor = Colors.transparent,
+    this.barrierColor = Colors.black54,
+    this.keyboardAware = true,
+    this.showCloseIcon = false,
+    this.closeIcon,
+    this.useRootNavigator = false,
+    DialogType? dialogType,
+    bool headerAnimationLoop = false,
+  });
+
+  Future<void> show() async {
+    if (_visible) return;
+    _visible = true;
+
+    await showGeneralDialog<void>(
+      context: context,
+      useRootNavigator: useRootNavigator,
+      barrierDismissible: dismissOnTouchOutside,
+      barrierLabel: dismissOnTouchOutside ? 'Cerrar diálogo' : null,
+      barrierColor: barrierColor,
+      transitionDuration: const Duration(milliseconds: 280),
+      pageBuilder: (_, __, ___) => const SizedBox.shrink(),
+      transitionBuilder: (dialogContext, animation, _, __) {
+        final Animation<double> curved = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+          reverseCurve: Curves.easeInCubic,
+        );
+
+        Widget contenido = Material(
+          color: dialogBackgroundColor,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: <Widget>[
+              body,
+              if (showCloseIcon)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: dismiss,
+                      borderRadius: BorderRadius.circular(22),
+                      child: Padding(
+                        padding: const EdgeInsets.all(5),
+                        child:
+                            closeIcon ??
+                            const Icon(
+                              Icons.close_rounded,
+                              color: Colors.white,
+                            ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+
+        contenido = ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: width),
+          child: contenido,
+        );
+
+        contenido = AnimatedPadding(
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeOut,
+          padding: EdgeInsets.fromLTRB(
+            6,
+            12,
+            6,
+            keyboardAware
+                ? MediaQuery.of(dialogContext).viewInsets.bottom + 12
+                : 12,
+          ),
+          child: SafeArea(child: Center(child: contenido)),
+        );
+
+        final Widget transicion = animType == AnimType.topSlide
+            ? SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, -.08),
+                  end: Offset.zero,
+                ).animate(curved),
+                child: FadeTransition(opacity: curved, child: contenido),
+              )
+            : ScaleTransition(
+                scale: Tween<double>(begin: .94, end: 1).animate(curved),
+                child: FadeTransition(opacity: curved, child: contenido),
+              );
+
+        return WillPopScope(
+          onWillPop: () async => dismissOnBackKeyPress,
+          child: transicion,
+        );
+      },
+    );
+
+    _visible = false;
+  }
+
+  void dismiss() {
+    if (!_visible) return;
+    Navigator.of(context, rootNavigator: useRootNavigator).pop();
   }
 }
