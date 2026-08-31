@@ -42,6 +42,8 @@ class Anexarse {
   final String subcircuito;
   final String descripcion;
   final String estadoPolicia;
+  final String latitud;
+  final String longitud;
   final int idTipoOperativo;
 
   Anexarse({
@@ -57,6 +59,8 @@ class Anexarse {
     required this.subcircuito,
     required this.descripcion,
     required this.estadoPolicia,
+    required this.latitud,
+    required this.longitud,
     required this.idTipoOperativo,
   });
 
@@ -73,6 +77,8 @@ class Anexarse {
     subcircuito: ParseModel.parseToString(json["subcircuito"]),
     descripcion: ParseModel.parseToString(json["descripcion"]),
     estadoPolicia: ParseModel.parseToString(json["estadoPolicia"]),
+    latitud: ParseModel.parseToString(json["latitud"]),
+    longitud: ParseModel.parseToString(json["longitud"]),
     idTipoOperativo: ParseModel.parseToInt(json["idTipoOperativo"]),
   );
 
@@ -89,6 +95,8 @@ class Anexarse {
     subcircuito: '',
     descripcion: '',
     estadoPolicia: '',
+    latitud: '',
+    longitud: '',
     idTipoOperativo: 0,
   );
 
@@ -105,6 +113,8 @@ class Anexarse {
     "subcircuito": subcircuito,
     "descripcion": descripcion,
     "estadoPolicia": estadoPolicia,
+    "latitud": latitud,
+    "longitud": longitud,
     "idTipoOperativo": idTipoOperativo,
   };
 }

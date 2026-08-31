@@ -401,7 +401,11 @@
           idHdrEventoActual.value = datoAnexarse.idHdrEvento;
         }
         // NOMBRE DEL OPERATIVO
-        nombreOperativoActual.value = datoPendiente.descripcion.trim();
+        final String nombreAnexado = datoAnexarse.descripcion.trim();
+
+        if (nombreAnexado.isNotEmpty) {
+          nombreOperativoActual.value = nombreAnexado;
+        }
         if (datoAnexarse.idTipoOperativo > 0) {
           idOperativoVariablesActual.value = datoAnexarse.idTipoOperativo;
         }
