@@ -1,28 +1,46 @@
-import 'package:sqflite/sqflite.dart';
+
+
+import 'package:sqflite_sqlcipher/sqflite.dart';
 
 import '../models/models_push_notification.dart';
 import 'NotificationDatabase.dart';
 
 abstract class PushNotificationLocalDataSource {
+
   Future<List<NotificationLocalModel>> obtenerNotificaciones({
     required int idGenUsuario,
   });
 
-  Future<int> eliminarTodas({required int idGenUsuario});
+  Future<int> eliminarTodas({
+    required int idGenUsuario,
+  });
 
-  Future<int> obtenerCantidadNoLeidas({required int idGenUsuario});
+  Future<int> obtenerCantidadNoLeidas({
+    required int idGenUsuario,
+  });
+
 
   Future<int> guardarNotificacion({
     required NotificationLocalModel notification,
   });
 
-  Future<int> marcarComoLeida({required int id});
 
-  Future<int> eliminarNotificacion({required int id});
+  Future<int> marcarComoLeida({
+    required int id,
+  });
+
+  Future<int> eliminarNotificacion({
+    required int id,
+  });
+
+
 }
 
 class PushNotificationLocalDataSourceImpl
     implements PushNotificationLocalDataSource {
+
+
+
   final NotificationDatabase _database = NotificationDatabase.instance;
 
   @override
@@ -53,35 +71,44 @@ class PushNotificationLocalDataSourceImpl
 
     return List.generate(
       maps.length,
-      (index) => NotificationLocalModel.fromMap(maps[index]),
+          (index) => NotificationLocalModel.fromMap(maps[index]),
     );
   }
 
+
   @override
-  Future<int> marcarComoLeida({required int id}) async {
+  Future<int> marcarComoLeida({
+    required int id,
+  }) async {
     final db = await _database.database;
 
     return await db.update(
-      NotificationDatabase.tableNotifications,
-      {'leida': 1},
+            NotificationDatabase.tableNotifications,
+      {
+        'leida': 1,
+      },
       where: 'id = ?',
       whereArgs: [id],
     );
   }
 
   @override
-  Future<int> eliminarNotificacion({required int id}) async {
+  Future<int> eliminarNotificacion({
+    required int id,
+  }) async {
     final db = await _database.database;
 
     return await db.delete(
-      NotificationDatabase.tableNotifications,
+            NotificationDatabase.tableNotifications,
       where: 'id = ?',
       whereArgs: [id],
     );
   }
 
   @override
-  Future<int> eliminarTodas({required int idGenUsuario}) async {
+  Future<int> eliminarTodas({
+    required int idGenUsuario,
+  }) async {
     final db = await _database.database;
 
     return await db.delete(
@@ -92,7 +119,9 @@ class PushNotificationLocalDataSourceImpl
   }
 
   @override
-  Future<int> obtenerCantidadNoLeidas({required int idGenUsuario}) async {
+  Future<int> obtenerCantidadNoLeidas({
+    required int idGenUsuario,
+  }) async {
     final db = await _database.database;
 
     final result = await db.rawQuery(
@@ -107,4 +136,5 @@ class PushNotificationLocalDataSourceImpl
 
     return Sqflite.firstIntValue(result) ?? 0;
   }
+
 }
