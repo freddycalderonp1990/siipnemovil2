@@ -295,14 +295,14 @@ class MenuSiipneMovilController extends GetxController {
     try {
       final GetDatosOperativoUsuarioRequest request =
           GetDatosOperativoUsuarioRequest(
-            idGenUsuario: user.idGenUsuario,
+            idGenPersona: user.idGenPersona,
             fechaInicio: fechaFormato(fechaInicio.value),
             fechaFin: fechaFormato(fechaFin.value),
           );
 
       debugPrint('==========================================');
       debugPrint('CONSULTA OPERATIVOS USUARIO');
-      debugPrint('USUARIO: ${user.idGenUsuario}');
+      debugPrint('PERSONA: ${user.idGenPersona}');
       debugPrint('DESDE: ${request.fechaInicio}');
       debugPrint('HASTA: ${request.fechaFin}');
       debugPrint('==========================================');
