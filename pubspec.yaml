@@ -72,9 +72,7 @@ dependencies:
   flutter_secure_storage: ^11.0.0 #reemplaza SharedPreferences
 
 
-
   country_utils: ^0.5.3
-
   mobile_scanner: ^7.4.0
   cryptography: ^2.9.0
 
