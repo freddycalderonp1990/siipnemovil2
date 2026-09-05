@@ -293,7 +293,7 @@ mixin FinalizarOperativoViewMixin on OpServicioUrbanoPageBase {
                   DialogosAwesome.getWarning(
                     title: "CLAVE REQUERIDA",
                     descripcion:
-                        "Ingrese su clave institucional para continuar.",
+                    "Ingrese su clave institucional para continuar.",
                   );
 
                   return;
@@ -354,7 +354,7 @@ mixin FinalizarOperativoViewMixin on OpServicioUrbanoPageBase {
             DialogosAwesome.getError(
               title: "AUTENTICACIÓN NO VALIDADA",
               descripcion:
-                  "No fue posible validar su identidad mediante huella o biometría.",
+              "No fue posible validar su identidad mediante huella o biometría.",
             );
 
             return;
@@ -436,8 +436,12 @@ mixin FinalizarOperativoViewMixin on OpServicioUrbanoPageBase {
   void confirmarFinalizacionDefinitiva() {
     DialogosAwesome.getWarningSiNo(
       title: "CONFIRMAR FINALIZACIÓN",
+      colorAccion: DialogosAwesome.colorError,
+      iconoAccion: Icons.gpp_bad_rounded,
+      codigoEstado: 'SIIPNE MÓVIL // CIERRE DEFINITIVO',
+      etiquetaDetalle: 'CONFIRMACIÓN DE ACCIÓN IRREVERSIBLE',
       descripcion:
-          "¿Está seguro de finalizar el operativo N° ${controller.idHdrEventoActual.value}?\n\n"
+      "¿Está seguro de finalizar el operativo N° ${controller.idHdrEventoActual.value}?\n\n"
           "Una vez finalizado no se podrán registrar nuevas consultas.",
       btnOkOnPress: () async {
         final bool resultado = await controller.finalizarOperativo();
@@ -456,7 +460,7 @@ mixin FinalizarOperativoViewMixin on OpServicioUrbanoPageBase {
         DialogosAwesome.getSucess(
           title: "OPERATIVO FINALIZADO",
           descripcion:
-              "El operativo N° ${controller.idHdrEventoActual.value} fue finalizado correctamente.",
+          "El operativo N° ${controller.idHdrEventoActual.value} fue finalizado correctamente.",
           btnOkOnPress: () {
             controller.volverMenu();
           },

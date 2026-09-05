@@ -239,27 +239,6 @@ class OnlyDesingUserPass extends StatelessWidget {
   Widget desingOlvidoContrasena() {
     return Row(
       children: [
-        Transform.translate(
-          offset: const Offset(0, -2),
-          child: Checkbox(
-            value: true,
-            onChanged: (v) {},
-            activeColor: AppColors.colorAzul,
-            visualDensity: VisualDensity.compact,
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
-        ),
-        const Text(
-          "Recordar usuario",
-          style: TextStyle(
-            fontSize: 12,
-            color: Color(0xFF1F2937),
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-
-        const Spacer(),
-
         InkWell(
           borderRadius: BorderRadius.circular(4),
           onTap: () {

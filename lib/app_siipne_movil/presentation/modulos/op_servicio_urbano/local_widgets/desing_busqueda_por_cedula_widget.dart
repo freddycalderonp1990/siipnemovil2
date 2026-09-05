@@ -74,7 +74,7 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
   // ============================================================
 
   Widget _cardResultado({required DataConsultaPersona data}) {
-    final bool tieneOrdenCaptura = data.ordenCaptura.success;
+    final bool tieneOrdenCaptura = data.ordenCaptura.tieneOrdenes;
 
     final Color colorTexto = tieneOrdenCaptura
         ? ColorsLocal.colorTextoOrdenCaptura
@@ -86,7 +86,7 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
 
     final LocalPersonSuModel persona = setDatosPersona(data);
 
-    final LocalOrdenCapturaSuModel orden = setDatosOrdenCaptura(data);
+    final DatosCaptura orden = data.ordenCaptura.datosCaptura;
 
     return Container(
       width: double.infinity,
@@ -176,9 +176,9 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
                   // ============================================
                   // FUENTES CONSULTADAS
                   // ============================================
-                  _estadoServicios(data),
+                   _estadoServicios(data),
 
-                  const SizedBox(height: 8),
+                   const SizedBox(height: 8),
 
                   // ============================================
                   // NUEVA CONSULTA
@@ -401,58 +401,8 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
   Widget _cardBoletaCaptura({
     required bool tieneOrdenCaptura,
     required DataConsultaPersona data,
-    required LocalOrdenCapturaSuModel orden,
+    required DatosCaptura orden,
   }) {
-    final List<_DatoBoletaItem> datos = <_DatoBoletaItem>[];
-
-    if (tieneOrdenCaptura) {
-      datos.addAll([
-        _DatoBoletaItem(
-          icono: Icons.account_balance_rounded,
-          titulo: "AUTORIDAD / JUZGADO",
-          valor: orden.juzgado,
-        ),
-
-        _DatoBoletaItem(
-          icono: Icons.badge_outlined,
-          titulo: "DOCUMENTO",
-          valor: orden.documento,
-        ),
-
-        _DatoBoletaItem(
-          icono: Icons.description_outlined,
-          titulo: "NÚMERO DE OFICIO",
-          valor: orden.oficio,
-        ),
-
-        _DatoBoletaItem(
-          icono: Icons.public_rounded,
-          titulo: "PAÍS",
-          valor: data.ordenCaptura.datosCaptura.pais,
-        ),
-      ]);
-
-      if (data.ordenCaptura.datosCaptura.causapenal.trim().isNotEmpty) {
-        datos.add(
-          _DatoBoletaItem(
-            icono: Icons.balance_rounded,
-            titulo: "CAUSA PENAL",
-            valor: data.ordenCaptura.datosCaptura.causapenal,
-          ),
-        );
-      }
-
-      if (data.ordenCaptura.datosCaptura.descrtipoinfra.trim().isNotEmpty) {
-        datos.add(
-          _DatoBoletaItem(
-            icono: Icons.report_problem_rounded,
-            titulo: "TIPO DE INFRACCIÓN",
-            valor: data.ordenCaptura.datosCaptura.descrtipoinfra,
-          ),
-        );
-      }
-    }
-
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -536,7 +486,9 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
 
                         Text(
                           tieneOrdenCaptura
-                              ? "SE ENCONTRÓ INFORMACIÓN VIGENTE"
+                              ? data.ordenCaptura.totalOrdenes == 1
+                                    ? "SE ENCONTRÓ 1 ORDEN VIGENTE"
+                                    : "SE ENCONTRARON ${data.ordenCaptura.totalOrdenes} ÓRDENES VIGENTES"
                               : "NO SE REGISTRAN NOVEDADES",
                           style: TextStyle(
                             color: Colors.white.withOpacity(.80),
@@ -630,29 +582,36 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
 
                     const SizedBox(height: 8),
 
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        const double espacio = 6;
-
-                        final double ancho =
-                            (constraints.maxWidth - espacio) / 2;
-
-                        return Wrap(
-                          spacing: espacio,
-                          runSpacing: 6,
-                          children: datos.map((item) {
-                            return SizedBox(
-                              width: ancho,
-                              child: _datoBoleta(
-                                icono: item.icono,
-                                titulo: item.titulo,
-                                valor: item.valor,
-                              ),
-                            );
-                          }).toList(),
-                        );
-                      },
-                    ),
+                    _detalleVisualOrden(orden),
+                    if (data.ordenCaptura.totalOrdenes > 1) ...[
+                      const SizedBox(height: 9),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () => _mostrarTodasOrdenes(
+                            data.ordenCaptura.ordenesCaptura,
+                          ),
+                          icon: const Icon(Icons.list_alt_rounded, size: 17),
+                          label: Text(
+                            "VER TODAS (${data.ordenCaptura.totalOrdenes})",
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFB42318),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: .3,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ] else ...[
                     Container(
                       width: double.infinity,
@@ -720,6 +679,205 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _mostrarTodasOrdenes(List<DatosCaptura> ordenes) {
+    Get.dialog<void>(
+      Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 24),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: 620,
+            maxHeight: Get.height * .84,
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF9F2118),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.gavel_rounded,
+                        color: Colors.white,
+                        size: 23,
+                      ),
+                      const SizedBox(width: 9),
+                      Expanded(
+                        child: Text(
+                          "ÓRDENES DE CAPTURA (${ordenes.length})",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: Get.back,
+                        icon: const Icon(
+                          Icons.close_rounded,
+                          color: Colors.white,
+                        ),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.all(10),
+                    itemCount: ordenes.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 9),
+                    itemBuilder: (_, index) =>
+                        _cardOrdenDialogo(ordenes[index], index + 1),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: Get.back,
+                      icon: const Icon(Icons.check_rounded, size: 18),
+                      label: const Text("ENTENDIDO"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF173F6B),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 11),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(11),
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(.72),
+    );
+  }
+
+  Widget _cardOrdenDialogo(DatosCaptura orden, int numero) {
+    return Container(
+      padding: const EdgeInsets.all(9),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF5F4),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE4A39E)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+            decoration: BoxDecoration(
+              color: const Color(0xFFB42318),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              "ORDEN $numero",
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 8.5,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          _detalleVisualOrden(orden),
+        ],
+      ),
+    );
+  }
+
+  Widget _detalleVisualOrden(DatosCaptura orden) {
+    final List<_DatoBoletaItem> datosDosColumnas = <_DatoBoletaItem>[
+      _DatoBoletaItem(
+        icono: Icons.calendar_month_rounded,
+        titulo: "FECHA DE BOLETA",
+        valor: orden.fechaBoleta,
+      ),
+      _DatoBoletaItem(
+        icono: Icons.description_outlined,
+        titulo: "NÚMERO DE OFICIO",
+        valor: orden.numoficio,
+      ),
+      _DatoBoletaItem(
+        icono: Icons.apartment_rounded,
+        titulo: "UNIDAD DE REGISTRO",
+        valor: orden.unidadRegistro,
+      ),
+      _DatoBoletaItem(
+        icono: Icons.assignment_rounded,
+        titulo: "TIPO DE BOLETA",
+        valor: orden.tipoBoleta,
+      ),
+    ];
+    return Column(
+      children: [
+        SizedBox(
+          width: double.infinity,
+          child: _datoBoleta(
+            icono: Icons.account_balance_rounded,
+            titulo: "AUTORIDAD / JUZGADO",
+            valor: orden.juzgado,
+          ),
+        ),
+        const SizedBox(height: 6),
+        SizedBox(
+          width: double.infinity,
+          child: _datoBoleta(
+            icono: Icons.balance_rounded,
+            titulo: "CAUSA",
+            valor: orden.causa,
+          ),
+        ),
+        const SizedBox(height: 6),
+        LayoutBuilder(
+          builder: (_, constraints) {
+            const double espacio = 6;
+            final double ancho = (constraints.maxWidth - espacio) / 2;
+            return Wrap(
+              spacing: espacio,
+              runSpacing: 6,
+              children: datosDosColumnas
+                  .map(
+                    (item) => SizedBox(
+                      width: ancho,
+                      child: _datoBoleta(
+                        icono: item.icono,
+                        titulo: item.titulo,
+                        valor: item.valor,
+                      ),
+                    ),
+                  )
+                  .toList(),
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -846,7 +1004,7 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
               Expanded(
                 child: _badgeServicio(
                   titulo: "DINARDAP",
-                  activo: data.dataDinardap.success,
+                  activo: true,
                 ),
               ),
 
@@ -1136,32 +1294,6 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
       ),
     );
   }
-  // ============================================================
-  // DATOS ORDEN CAPTURA
-  // ============================================================
-
-  LocalOrdenCapturaSuModel setDatosOrdenCaptura(DataConsultaPersona data) {
-    String descripcion = "NO REGISTRADO";
-
-    String documento = "";
-
-    String oficio = "";
-
-    if (data.ordenCaptura.success) {
-      descripcion = data.ordenCaptura.datosCaptura.juzgado;
-
-      documento = data.ordenCaptura.datosCaptura.documento;
-
-      oficio = data.ordenCaptura.datosCaptura.numoficio;
-    }
-
-    return LocalOrdenCapturaSuModel(
-      documento: documento,
-      juzgado: descripcion,
-      oficio: oficio,
-    );
-  }
-
   // ============================================================
   // CARD ANT
   // ============================================================
