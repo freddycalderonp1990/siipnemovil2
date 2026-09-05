@@ -340,70 +340,110 @@ class InfraccionesAnt {
 class OrdenCaptura {
   final bool success;
   final String message;
-  final DatosCaptura datosCaptura;
+  final List<DatosCaptura> ordenesCaptura;
 
   OrdenCaptura({
     required this.success,
     required this.message,
-    required this.datosCaptura,
+    required this.ordenesCaptura,
   });
 
-  factory OrdenCaptura.fromJson(Map<String, dynamic> json) => OrdenCaptura(
-    success: ParseModel.parseToBool(json["success"]),
-    message: ParseModel.parseToString(json["message"]),
+  factory OrdenCaptura.fromJson(Map<String, dynamic> json) {
+    final dynamic data = json["data"];
+    final List<DatosCaptura> ordenes = data is List
+        ? data
+              .whereType<Map>()
+              .map(
+                (item) =>
+                    DatosCaptura.fromJson(Map<String, dynamic>.from(item)),
+              )
+              .where((item) => item.tieneDatos)
+              .toList()
+        : data is Map
+        ? <DatosCaptura>[
+            DatosCaptura.fromJson(Map<String, dynamic>.from(data)),
+          ].where((item) => item.tieneDatos).toList()
+        : <DatosCaptura>[];
+    return OrdenCaptura(
+      success: ParseModel.parseToBool(json["success"]),
+      message: ParseModel.parseToString(json["message"]),
+      ordenesCaptura: ordenes,
+    );
+  }
 
-    /// IMPORTANTE:
-    /// cuando no existe orden de captura el API no envía "data".
-    datosCaptura: DatosCaptura.fromJson(json["data"] ?? {}),
-  );
+  bool get tieneOrdenes => success && ordenesCaptura.isNotEmpty;
+  int get totalOrdenes => ordenesCaptura.length;
+  DatosCaptura get datosCaptura =>
+      ordenesCaptura.isNotEmpty ? ordenesCaptura.first : DatosCaptura.empty();
 
   Map<String, dynamic> toJson() => {
     "success": success,
     "message": message,
-    "data": datosCaptura.toJson(),
+    "data": ordenesCaptura.map((item) => item.toJson()).toList(),
   };
 }
 
 class DatosCaptura {
-  final String tipoDoc;
-  final int idGenPersona;
   final String juzgado;
-  final String documento;
   final String numoficio;
-  final String causapenal;
-  final String descrtipoinfra;
+  final String fechaBoleta;
+  final String causa;
+  final String delito;
+  final String tipoBoleta;
+  final String unidadRegistro;
   final String pais;
 
   DatosCaptura({
-    required this.tipoDoc,
-    required this.idGenPersona,
     required this.juzgado,
-    required this.documento,
     required this.numoficio,
-    required this.causapenal,
-    required this.descrtipoinfra,
+    required this.fechaBoleta,
+    required this.causa,
+    required this.delito,
+    required this.tipoBoleta,
+    required this.unidadRegistro,
     required this.pais,
   });
 
+  factory DatosCaptura.empty() => DatosCaptura(
+    juzgado: "",
+    numoficio: "",
+    fechaBoleta: "",
+    causa: "",
+    delito: "",
+    tipoBoleta: "",
+    unidadRegistro: "",
+    pais: "",
+  );
+
+  bool get tieneDatos =>
+      juzgado.trim().isNotEmpty &&
+      numoficio.trim().isNotEmpty &&
+      fechaBoleta.trim().isNotEmpty &&
+      causa.trim().isNotEmpty &&
+      delito.trim().isNotEmpty &&
+      tipoBoleta.trim().isNotEmpty &&
+      unidadRegistro.trim().isNotEmpty &&
+      pais.trim().isNotEmpty;
+
   factory DatosCaptura.fromJson(Map<String, dynamic> json) => DatosCaptura(
-    tipoDoc: ParseModel.parseToString(json["tipoDoc"]),
-    idGenPersona: ParseModel.parseToInt(json["idGenPersona"]),
     juzgado: ParseModel.parseToString(json["juzgado"]),
-    documento: ParseModel.parseToString(json["documento"]),
     numoficio: ParseModel.parseToString(json["numoficio"]),
-    causapenal: ParseModel.parseToString(json["causapenal"]),
-    descrtipoinfra: ParseModel.parseToString(json["descrtipoinfra"]),
+    fechaBoleta: ParseModel.parseToString(json["fechaBoleta"]),
+    causa: ParseModel.parseToString(json["causa"]),
+    delito: ParseModel.parseToString(json["delito"]),
+    tipoBoleta: ParseModel.parseToString(json["tipoBoleta"]),
+    unidadRegistro: ParseModel.parseToString(json["unidadRegistro"]),
     pais: ParseModel.parseToString(json["pais"]),
   );
 
   Map<String, dynamic> toJson() => {
-    "tipoDoc": tipoDoc,
-    "idGenPersona": idGenPersona,
     "juzgado": juzgado,
-    "documento": documento,
     "numoficio": numoficio,
-    "causapenal": causapenal,
-    "descrtipoinfra": descrtipoinfra,
+    "fechaBoleta": fechaBoleta,
+    "causa": causa,
+    "delito": delito,
+    "tipoBoleta": tipoBoleta,
+    "unidadRegistro": unidadRegistro,
     "pais": pais,
   };
 }
