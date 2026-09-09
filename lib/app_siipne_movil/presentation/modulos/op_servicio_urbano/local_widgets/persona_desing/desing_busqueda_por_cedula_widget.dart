@@ -1,12 +1,4 @@
-import 'package:flutter/material.dart';
-
-import '../../../../../app/core/utils/responsiveUtil.dart';
-import '../../../../core/values/app_siipne_movil_images.dart';
-import '../../../../data/models/models_siipne_movil.dart';
-import 'btnIconOperativoWidget.dart';
-import 'colors_local.dart';
-import 'operativo_polco_local_widgets.dart';
-import 'package:get/get.dart';
+part of 'persona_desing.dart';
 
 class DesingBusquedaPorCedulaWidget extends StatelessWidget {
   final List<DataConsultaPersona> dataPersona;

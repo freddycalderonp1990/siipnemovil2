@@ -1,9 +1,4 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-
-import '../../../../../app/core/app_config.dart';
-import '../../../../../app/core/utils/responsiveUtil.dart';
-import '../../../../../app/core/values/app_colors.dart';
+part of '../operativo_polco_local_widgets.dart';
 
 class BtnIconOperativoWidget extends StatelessWidget {
   final String titulo;

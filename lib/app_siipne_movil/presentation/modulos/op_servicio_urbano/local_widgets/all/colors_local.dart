@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart' show Color, Colors;
 
-import '../../../../../app/core/values/app_colors.dart';
+import '../../../../../../app/core/values/app_colors.dart';
 
 class ColorsLocal {
   static const Color colorTextoOrdenCaptura = Colors.white;

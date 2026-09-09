@@ -24,8 +24,11 @@ import '../../data/models/models_siipne_movil.dart';
 import '../widgets/custom_siipne_movil_widgets.dart';
 import 'controllers.dart';
 import 'menu/widgets/indicador_scroll.dart';
-import 'op_servicio_urbano/local_widgets/desing_busqueda_por_cedula_widget.dart';
+
+
+
 import 'op_servicio_urbano/local_widgets/operativo_polco_local_widgets.dart';
+import 'op_servicio_urbano/local_widgets/persona_desing/persona_desing.dart';
 
 part 'menu/menu_siipne_movil_page.dart';
 part 'op_servicio_urbano/op_servicio_urbano_page.dart';
@@ -33,20 +36,6 @@ part 'op_servicio_urbano/tipo_operativo/tipo_operativo_page.dart';
 part 'op_servicio_urbano/anexarse/anexarse_page.dart';
 part 'op_servicio_urbano/ocupantes/op_Vehiculo_Personas_Page.dart';
 
-part 'op_servicio_urbano/local_widgets/op_servicio_urbano_view_contract.dart';
-part 'op_servicio_urbano/local_widgets/variable_resultado_wg.dart';
-part 'op_servicio_urbano/local_widgets/cabecera_operativo_wg.dart';
-part 'op_servicio_urbano/local_widgets/resumen_operativo_wg.dart';
-part 'op_servicio_urbano/local_widgets/estadisticas_operativo_wg.dart';
-part 'op_servicio_urbano/local_widgets/finalizar_operativo_wg.dart';
-part 'op_servicio_urbano/local_widgets/personal_operativo_wg.dart';
-part 'op_servicio_urbano/local_widgets/qr_operativo_wg.dart';
-part 'op_servicio_urbano/local_widgets/tipo_consulta_wg.dart';
-part 'op_servicio_urbano/local_widgets/consulta_operativa_wg.dart';
-part 'op_servicio_urbano/local_widgets/confirmacion_busqueda_wg.dart';
-part 'op_servicio_urbano/local_widgets/persona_resultado_wg.dart';
-part 'op_servicio_urbano/local_widgets/vehiculo_resultado_wg.dart';
-part 'op_servicio_urbano/local_widgets/estados_operativo_wg.dart';
 part 'op_migracion/op_migracion_page.dart';
 part 'op_migracion/local_widgets/op_migracion_view_contract.dart';
 part 'op_migracion/local_widgets/migracion_theme.dart';

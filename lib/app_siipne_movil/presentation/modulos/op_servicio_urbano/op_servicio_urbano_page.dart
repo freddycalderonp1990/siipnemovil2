@@ -5,7 +5,7 @@ class OpServicioUrbanoPage extends OpServicioUrbanoPageBase
         VariableResultadoViewMixin,
         CabeceraOperativoViewMixin,
         ResumenOperativoViewMixin,
-        EstadisticasOperativoViewMixin,
+        VariableResultadoViewMixin,
         FinalizarOperativoViewMixin,
         PersonalOperativoViewMixin,
         QrOperativoViewMixin,
@@ -83,5 +83,59 @@ class OpServicioUrbanoPage extends OpServicioUrbanoPageBase
         ],
       );
     });
+  }
+
+  @override
+  Widget cardConsultaResultado({required String titulo, required String subtitulo, required int cantidad, required int alertas, required IconData icono, required IconData iconoAlerta}) {
+    // TODO: implement cardConsultaResultado
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget cardTotalConsultas(int valor) {
+    // TODO: implement cardTotalConsultas
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget datoTextoCompacto({required IconData icono, required String titulo, required String valor}) {
+    // TODO: implement datoTextoCompacto
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget estadisticasCompactas(ResultadosOperativo resultado) {
+    // TODO: implement estadisticasCompactas
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget filaVariableResultado({required VariableResultadoOperativo variable, required int index, required bool ultima}) {
+    // TODO: implement filaVariableResultado
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget resumenPrincipalCompacto(ResultadosOperativo resultado) {
+    // TODO: implement resumenPrincipalCompacto
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget ubicacionCompacta(ResultadosOperativo resultado) {
+    // TODO: implement ubicacionCompacta
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget ubicacionFila({required String titulo, required String valor, bool linea = true}) {
+    // TODO: implement ubicacionFila
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget variablesResultadoCompactas(ResultadosOperativo resultado) {
+    // TODO: implement variablesResultadoCompactas
+    throw UnimplementedError();
   }
 }

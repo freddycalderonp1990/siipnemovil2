@@ -6,7 +6,7 @@ toda la carpeta
 
 /Volumes/siipne/appmovil/appsMoviles
 
-/Volumes/siipne/movil/modulos/vehiculo/pendiente.php
+
 
 /Volumes/siipne/appmovil/apis/helper/responseApi.php - SE MEJORE LA VELOCIDAD Y TAMAÑO DE LOS ARCHIVOS
 

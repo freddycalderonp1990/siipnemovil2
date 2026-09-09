@@ -1,4 +1,4 @@
-part of '../../pages.dart';
+part of 'operativo_polco_local_widgets.dart';
 
 mixin FinalizarOperativoViewMixin on OpServicioUrbanoPageBase {
   void mostrarFinalizarOperativo() {

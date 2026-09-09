@@ -1,6 +1,6 @@
-part of '../../pages.dart';
+part of 'persona_desing.dart';
 
-mixin EstadisticasOperativoViewMixin on OpServicioUrbanoPageBase {
+mixin VariablesResultadosOperativoViewMixin on OpServicioUrbanoPageBase {
   Widget variablesResultadoCompactas(ResultadosOperativo resultado) {
     final List<VariableResultadoOperativo> variables = resultado
         .variablesResultado
