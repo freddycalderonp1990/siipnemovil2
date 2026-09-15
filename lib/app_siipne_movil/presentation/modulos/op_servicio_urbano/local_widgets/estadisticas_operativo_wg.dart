@@ -54,7 +54,7 @@ mixin EstadisticasOperativoViewMixin on OpServicioUrbanoPageBase {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "VARIABLES DE RESULTADO",
+                      "RESULTADO PRELIMINAR",
                       style: TextStyle(
                         color: Color(0xFF29445D),
                         fontSize: 12,

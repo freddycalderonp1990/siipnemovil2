@@ -682,7 +682,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
               SizedBox(width: 7),
               Expanded(
                 child: Text(
-                  "CARGANDO VARIABLES DE RESULTADO...",
+                  "CARGANDO RESULTADO PRELIMINAR...",
                   style: TextStyle(
                     color: Color(0xFF718496),
                     fontSize: 7.5,

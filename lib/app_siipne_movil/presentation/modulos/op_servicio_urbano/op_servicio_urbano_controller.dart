@@ -1949,9 +1949,9 @@
       final String placa = data.datosVehiculo.data.placa.trim();
 
       DialogosAwesome.getWarning(
-        title: "CONSULTA YA REGISTRADA",
+        title: "VEHÍCULO CONSULTADO",
         descripcion:
-        "El vehículo${placa.isNotEmpty ? ' con placa $placa' : ''} ya fue consultado dentro de este operativo."
+        "El vehículo${placa.isNotEmpty ? ' con placa $placa' : ''} ya fue consultado en otro operativo."
             "${ubicacion.isNotEmpty ? '\n\nUbicación registrada:\n${ubicacion.join(' · ')}' : ''}",
       );
     }
