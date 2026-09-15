@@ -761,7 +761,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                 ),
                 SizedBox(width: 4),
                 Text(
-                  "VARIABLE DE RESULTADO",
+                  "RESULTADO PRELIMINAR",
                   style: TextStyle(
                     color: Color(0xFF607589),
                     fontSize: 10,
