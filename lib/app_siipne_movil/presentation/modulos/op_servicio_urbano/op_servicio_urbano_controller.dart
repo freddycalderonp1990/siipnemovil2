@@ -1131,6 +1131,8 @@
 
         dataVehiculo.assignAll(<DataVehiculo>[data]);
 
+        _mostrarAlertaVehiculoConsultado(data);
+
         /*
          * Guardamos la variable técnica con la cual
          * se insertó el registro.
@@ -1929,6 +1931,30 @@
      */
       return true;
     }
+
+    void _mostrarAlertaVehiculoConsultado(DataVehiculo data) {
+      final DatosConsultaDuplicadoOperativo duplicado =
+          data.datosConsultaDuplicadoOperativo;
+
+      if (duplicado.idHdrEvento <= 0) return;
+
+      final List<String> ubicacion = <String>[
+        duplicado.zona.trim(),
+        duplicado.subzona.trim(),
+        duplicado.distrito.trim(),
+        duplicado.circuito.trim(),
+        duplicado.subcircuito.trim(),
+      ].where((String valor) => valor.isNotEmpty).toList();
+
+      final String placa = data.datosVehiculo.data.placa.trim();
+
+      DialogosAwesome.getWarning(
+        title: "CONSULTA YA REGISTRADA",
+        descripcion:
+        "El vehículo${placa.isNotEmpty ? ' con placa $placa' : ''} ya fue consultado dentro de este operativo."
+            "${ubicacion.isNotEmpty ? '\n\nUbicación registrada:\n${ubicacion.join(' · ')}' : ''}",
+      );
+    }
     // ============================================================
     // CONSULTAR RESUMEN DEL OPERATIVO
     // ============================================================
@@ -2142,3 +2168,4 @@
       super.onClose();
     }
   }
+
