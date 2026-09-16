@@ -646,11 +646,12 @@
       final VariablesResultado? variable = variableResultadoSeleccionada.value;
 
       if (variable == null || variable.idVariable <= 0) {
-        mensajeErrorActualizaResultado = 'Seleccione un resultado preliminar';
+        mensajeErrorActualizaResultado = 'Seleccione un resultado preliminar.';
         return false;
       }
 
       final int idVariableNueva = variable.idVariable;
+
       /*
        * Si el resultado elegido es exactamente el mismo
        * con el cual se insertó originalmente el registro,
@@ -1129,6 +1130,8 @@
         }
 
         dataVehiculo.assignAll(<DataVehiculo>[data]);
+
+        _mostrarAlertaVehiculoConsultado(data);
 
         /*
          * Guardamos la variable técnica con la cual
@@ -1928,6 +1931,32 @@
      */
       return true;
     }
+
+    void _mostrarAlertaVehiculoConsultado(DataVehiculo data) {
+      final DatosConsultaDuplicadoOperativo duplicado =
+          data.datosConsultaDuplicadoOperativo;
+
+      if (duplicado.idHdrEvento <= 0) return;
+
+      final List<String> ubicacion = <String>[
+        duplicado.zona.trim(),
+        duplicado.subzona.trim(),
+        duplicado.distrito.trim(),
+        duplicado.circuito.trim(),
+        duplicado.subcircuito.trim(),
+
+      ].where((String valor) => valor.isNotEmpty).toList();
+
+      final String placa = data.datosVehiculo.data.placa.trim();
+
+      DialogosAwesome.getWarning(
+        title: "VEHÍCULO CONSULTADO",
+        descripcion:
+        "El vehículo${placa.isNotEmpty ? ' con placa $placa' : ''} ya fue consultado en otro operativo."
+            "${ubicacion.isNotEmpty ? '\n\nUbicación registrada:\n${ubicacion.join(' · ')}' : ''}"
+        "${ubicacion.isNotEmpty ? '\n\nFecha Consulta:\n${duplicado.fecha.trim()}' : ''}",
+      );
+    }
     // ============================================================
     // CONSULTAR RESUMEN DEL OPERATIVO
     // ============================================================
@@ -2141,3 +2170,4 @@
       super.onClose();
     }
   }
+
