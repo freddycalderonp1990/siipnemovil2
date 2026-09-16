@@ -130,6 +130,7 @@ abstract class OpServicioUrbanoPageBase
     required String titulo,
     required IconData icono,
     required DataConsultaPersona data,
+
     required VoidCallback onEliminar,
   });
   void abrirPersonasVehiculo();

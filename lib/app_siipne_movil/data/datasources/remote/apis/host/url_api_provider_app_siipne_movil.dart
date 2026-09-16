@@ -158,16 +158,49 @@ class UrlApiProviderAppCenso {
       late http.Response response;
 
       switch (metodoHttp) {
-        case 'POST':
-          response = await client
-              .post(
-            uri,
-            headers: headers,
-            body: jsonEncode(body),
-          )
-              .timeout(tiempoEspera);
-          break;
 
+        case 'POST':
+          final stopwatch = Stopwatch()..start();
+
+          print('════════════════════════════════════════');
+          print('🌐 API REQUEST');
+          print('➡️ MÉTODO: POST');
+          print('➡️ URL: $uri');
+          print('➡️ HEADERS: $headers');
+          print('➡️ BODY: ${jsonEncode(body)}');
+          print('════════════════════════════════════════');
+
+          try {
+            response = await client
+                .post(
+              uri,
+              headers: headers,
+              body: jsonEncode(body),
+            )
+                .timeout(tiempoEspera);
+
+            stopwatch.stop();
+
+            print('════════════════════════════════════════');
+            print('📥 API RESPONSE');
+            print('⬅️ STATUS CODE: ${response.statusCode}');
+            print('⬅️ URL: ${response.request?.url}');
+            print('⏱️ TIEMPO RESPUESTA: ${stopwatch.elapsedMilliseconds} ms');
+            print('⏱️ TIEMPO RESPUESTA: ${stopwatch.elapsed.inMilliseconds / 1000} s');
+            log('⬅️ RESPONSE: ${response.body}');
+            print('════════════════════════════════════════');
+          } catch (e) {
+            stopwatch.stop();
+
+            print('════════════════════════════════════════');
+            print('❌ API ERROR');
+            print('❌ ERROR: $e');
+            print('⏱️ TIEMPO HASTA ERROR: ${stopwatch.elapsedMilliseconds} ms');
+            print('════════════════════════════════════════');
+
+            rethrow;
+          }
+          break;
         case 'PUT':
           response = await client
               .put(

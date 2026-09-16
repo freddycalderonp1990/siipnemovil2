@@ -1387,7 +1387,7 @@ class DialogosAwesome {
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
-                    labelText: 'VARIABLE DE RESULTADO',
+                    labelText: 'RESULTADO PRELIMINAR',
                     labelStyle: TextStyle(
                       color: colorInformacion,
                       fontSize: 9,

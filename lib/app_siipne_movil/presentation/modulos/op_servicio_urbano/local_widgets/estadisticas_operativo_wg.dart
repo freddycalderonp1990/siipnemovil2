@@ -54,7 +54,7 @@ mixin EstadisticasOperativoViewMixin on OpServicioUrbanoPageBase {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "VARIABLES DE RESULTADO",
+                      "RESULTADO PRELIMINAR",
                       style: TextStyle(
                         color: Color(0xFF29445D),
                         fontSize: 12,
@@ -65,7 +65,7 @@ mixin EstadisticasOperativoViewMixin on OpServicioUrbanoPageBase {
                     SizedBox(height: 1),
 
                     Text(
-                      "Resultados registrados durante el operativo",
+                      "Resultados preliminares registrados durante el operativo",
                       style: TextStyle(
                         color: Color(0xFF8493A1),
                         fontSize: 10,
@@ -394,7 +394,7 @@ mixin EstadisticasOperativoViewMixin on OpServicioUrbanoPageBase {
 
               Expanded(
                 child: Text(
-                  "RESULTADOS DEL OPERATIVO",
+                  "RESULTADOS PRELIMINARES DEL OPERATIVO",
                   style: TextStyle(
                     color: Color(0xFF52687C),
                     fontSize: 12,
