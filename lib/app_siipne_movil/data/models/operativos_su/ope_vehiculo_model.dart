@@ -290,8 +290,9 @@ class DatosConsultaDuplicadoOperativo {
   String distrito;
   String circuito;
   String subcircuito;
+  String fecha;
 
-  DatosConsultaDuplicadoOperativo({required this.idHdrEvento, required this.zona, required this.subzona, required this.distrito, required this.circuito, required this.subcircuito});
+  DatosConsultaDuplicadoOperativo({required this.idHdrEvento, required this.zona, required this.subzona, required this.distrito, required this.circuito, required this.subcircuito, required this.fecha});
 
   factory DatosConsultaDuplicadoOperativo.fromJson(Map<String, dynamic> json) => DatosConsultaDuplicadoOperativo(
     idHdrEvento: _intVehiculo(json['idHdrEvento']),
@@ -300,11 +301,12 @@ class DatosConsultaDuplicadoOperativo {
     distrito: _stringVehiculo(json['distrito']),
     circuito: _stringVehiculo(json['circuito']),
     subcircuito: _stringVehiculo(json['subcircuito']),
+    fecha: _stringVehiculo(json['fecha']),
   );
 
-  factory DatosConsultaDuplicadoOperativo.empty() => DatosConsultaDuplicadoOperativo(idHdrEvento: 0, zona: '', subzona: '', distrito: '', circuito: '', subcircuito: '');
+  factory DatosConsultaDuplicadoOperativo.empty() => DatosConsultaDuplicadoOperativo(idHdrEvento: 0, zona: '', subzona: '', distrito: '', circuito: '', subcircuito: '',fecha:'');
 
   bool get existe => idHdrEvento > 0;
 
-  Map<String, dynamic> toJson() => {'idHdrEvento': idHdrEvento, 'zona': zona, 'subzona': subzona, 'distrito': distrito, 'circuito': circuito, 'subcircuito': subcircuito};
+  Map<String, dynamic> toJson() => {'idHdrEvento': idHdrEvento, 'zona': zona, 'subzona': subzona, 'distrito': distrito, 'circuito': circuito, 'subcircuito': subcircuito,'fecha':fecha};
 }
