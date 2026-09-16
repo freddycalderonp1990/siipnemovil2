@@ -646,12 +646,11 @@
       final VariablesResultado? variable = variableResultadoSeleccionada.value;
 
       if (variable == null || variable.idVariable <= 0) {
-        mensajeErrorActualizaResultado = 'Seleccione una variable de resultado.';
+        mensajeErrorActualizaResultado = 'Seleccione un resultado preliminar';
         return false;
       }
 
       final int idVariableNueva = variable.idVariable;
-
       /*
        * Si el resultado elegido es exactamente el mismo
        * con el cual se insertó originalmente el registro,

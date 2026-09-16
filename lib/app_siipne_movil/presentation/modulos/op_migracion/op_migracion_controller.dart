@@ -384,7 +384,7 @@ class OpMigracionController extends GetxController {
 
     if (idVariableResultado <= 0) {
       mensajeErrorConsulta =
-      'Seleccione una variable de resultado antes de consultar.';
+      'Seleccione un resultado preliminar.';
       return false;
     }
 

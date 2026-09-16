@@ -178,7 +178,7 @@ class DatosVehiculoSiipneData {
   String tipoVehiculo;
   int idGenServicio;
   String descServicio;
-
+  String fechaMatricula;
   String fuente;
   String msjSwAnt;
 
@@ -207,7 +207,9 @@ class DatosVehiculoSiipneData {
     required this.idGenServicio,
     required this.descServicio,
     required this.fuente,
-    required this.msjSwAnt
+    required this.msjSwAnt,
+    required this.fechaMatricula
+
   });
 
   factory DatosVehiculoSiipneData.fromJson(Map<String, dynamic> json) {
@@ -234,6 +236,7 @@ class DatosVehiculoSiipneData {
       descServicio: ParseModel.parseToString(json["descServicio"]),
       fuente: ParseModel.parseToString(json["fuente"]),
       msjSwAnt: ParseModel.parseToString(json["msjSwAnt"]),
+      fechaMatricula: ParseModel.parseToString(json["fechaMatricula"]),
     );
   }
 
@@ -260,7 +263,8 @@ class DatosVehiculoSiipneData {
       idGenServicio: 0,
       descServicio: '',
       fuente: '',
-      msjSwAnt: ''
+      msjSwAnt: '',
+      fechaMatricula: ''
     );
   }
 

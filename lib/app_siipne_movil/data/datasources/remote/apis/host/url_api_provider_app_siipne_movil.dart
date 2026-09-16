@@ -159,6 +159,14 @@ class UrlApiProviderAppCenso {
 
       switch (metodoHttp) {
         case 'POST':
+          print('════════════════════════════════════════');
+          print('🌐 API REQUEST');
+          print('➡️ MÉTODO: POST');
+          print('➡️ URL: $uri');
+          print('➡️ HEADERS: $headers');
+          print('➡️ BODY: ${jsonEncode(body)}');
+          print('════════════════════════════════════════');
+
           response = await client
               .post(
             uri,
@@ -166,6 +174,19 @@ class UrlApiProviderAppCenso {
             body: jsonEncode(body),
           )
               .timeout(tiempoEspera);
+
+
+
+          print('════════════════════════════════════════');
+          print('📥 API RESPONSE');
+          print('⬅️ STATUS CODE: ${response.statusCode}');
+          print('⬅️ URL: ${response.request?.url}');
+          print('⬅️ RESPONSE: ${response.body}');
+          print('════════════════════════════════════════');
+
+
+
+
           break;
 
         case 'PUT':

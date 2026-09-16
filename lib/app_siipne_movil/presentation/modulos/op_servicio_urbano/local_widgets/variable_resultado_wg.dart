@@ -127,7 +127,7 @@ mixin VariableResultadoViewMixin on OpServicioUrbanoPageBase {
 
                 Expanded(
                   child: Text(
-                    "VARIABLE DE RESULTADO",
+                    "RESULTADO PRELIMINAR",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(

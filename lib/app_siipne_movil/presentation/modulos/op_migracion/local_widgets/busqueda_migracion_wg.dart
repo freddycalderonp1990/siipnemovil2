@@ -219,7 +219,7 @@ mixin BusquedaMigracionViewMixin on OpMigracionPageBase {
       value: controller.variableResultadoSeleccionada.value,
       isExpanded: true,
       decoration: _decoracionCampo(
-        label: 'VARIABLE DE RESULTADO',
+        label: 'RESULTADO PRELIMINAR',
         hint: 'Seleccione la clasificación',
         icono: Icons.fact_check_outlined,
       ),
