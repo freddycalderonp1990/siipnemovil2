@@ -158,7 +158,10 @@ class UrlApiProviderAppCenso {
       late http.Response response;
 
       switch (metodoHttp) {
+
         case 'POST':
+          final stopwatch = Stopwatch()..start();
+
           print('════════════════════════════════════════');
           print('🌐 API REQUEST');
           print('➡️ MÉTODO: POST');
@@ -167,28 +170,37 @@ class UrlApiProviderAppCenso {
           print('➡️ BODY: ${jsonEncode(body)}');
           print('════════════════════════════════════════');
 
-          response = await client
-              .post(
-            uri,
-            headers: headers,
-            body: jsonEncode(body),
-          )
-              .timeout(tiempoEspera);
+          try {
+            response = await client
+                .post(
+              uri,
+              headers: headers,
+              body: jsonEncode(body),
+            )
+                .timeout(tiempoEspera);
 
+            stopwatch.stop();
 
+            print('════════════════════════════════════════');
+            print('📥 API RESPONSE');
+            print('⬅️ STATUS CODE: ${response.statusCode}');
+            print('⬅️ URL: ${response.request?.url}');
+            print('⏱️ TIEMPO RESPUESTA: ${stopwatch.elapsedMilliseconds} ms');
+            print('⏱️ TIEMPO RESPUESTA: ${stopwatch.elapsed.inMilliseconds / 1000} s');
+            log('⬅️ RESPONSE: ${response.body}');
+            print('════════════════════════════════════════');
+          } catch (e) {
+            stopwatch.stop();
 
-          print('════════════════════════════════════════');
-          print('📥 API RESPONSE');
-          print('⬅️ STATUS CODE: ${response.statusCode}');
-          print('⬅️ URL: ${response.request?.url}');
-          print('⬅️ RESPONSE: ${response.body}');
-          print('════════════════════════════════════════');
+            print('════════════════════════════════════════');
+            print('❌ API ERROR');
+            print('❌ ERROR: $e');
+            print('⏱️ TIEMPO HASTA ERROR: ${stopwatch.elapsedMilliseconds} ms');
+            print('════════════════════════════════════════');
 
-
-
-
+            rethrow;
+          }
           break;
-
         case 'PUT':
           response = await client
               .put(
