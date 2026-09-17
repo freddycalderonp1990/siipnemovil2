@@ -1413,10 +1413,6 @@
         final DataConsultaPersona persona = await siipneMovilUseCase
             .consultarPersona(request: request);
 
-        debugPrint('RESPUESTA PERSONA VEHÍCULO RECIBIDA');
-
-        debugPrint('PERSONA: ${persona.toJson()}');
-
         FocusManager.instance.primaryFocus?.unfocus();
 
         if (documentosPersonasVehiculoRegistradas.contains(
@@ -1486,6 +1482,8 @@
         return false;
       } finally {
         consultandoPersonaVehiculo.value = false;
+        peticionServerState.value = false;
+        paginaPersonasVehiculoLoading.value = false;
       }
     }
 
@@ -2106,6 +2104,8 @@
       }
 
       consultandoAntecedentesPersona.value = true;
+      peticionServerState.value = true;
+      paginaPersonasVehiculoLoading.value = true;
 
       try {
         debugPrint('==========================================');
@@ -2146,6 +2146,8 @@
         return false;
       } finally {
         consultandoAntecedentesPersona.value = false;
+        peticionServerState.value = false;
+        paginaPersonasVehiculoLoading.value = false;
       }
     }
 
