@@ -52,11 +52,14 @@ class OpServicioUrbanoPage extends OpServicioUrbanoPageBase
     final double teclado = MediaQuery.of(context).viewInsets.bottom;
 
     return Obx(() {
+      final bool esPersona = controller.selectPerson.value;
+      final bool esVehiculo = controller.selectVehiculo.value;
+
       Widget resultado = estadoInicial();
 
-      if (controller.selectPerson.value) {
+      if (esPersona) {
         resultado = muestraDatosPersona();
-      } else if (controller.selectVehiculo.value) {
+      } else if (esVehiculo) {
         resultado = muestraDatosVehiculo();
       }
 

@@ -65,9 +65,9 @@ mixin TipoConsultaViewMixin on OpServicioUrbanoPageBase {
                 Expanded(
                   child: botonConsulta(
                     seleccionado: controller.selectVehiculo.value,
-                    titulo: "VEHÍCULO",
+                    titulo: "VEHÍCULO / MOTOS",
                     subtitulo: "Número de placa",
-                    detalle: "CONSULTA AUTOMOTOR",
+                    detalle: "CONSULTA DE VEHÍCULOS Y MOTOS",
                     icono: Icons.directions_car_filled_rounded,
                     onTap: controller.seleccionarVehiculo,
                   ),
@@ -159,14 +159,15 @@ mixin TipoConsultaViewMixin on OpServicioUrbanoPageBase {
                       children: [
                         Text(
                           titulo,
-                          maxLines: 1,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             color: seleccionado
                                 ? Colors.white
                                 : const Color(0xFF253E55),
-                            fontSize: 14,
+                            fontSize: 13,
                             fontWeight: FontWeight.w900,
+                            height: 1.1,
                           ),
                         ),
 
