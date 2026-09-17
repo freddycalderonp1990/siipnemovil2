@@ -14,6 +14,8 @@ class ImputTextWidget extends StatefulWidget {
   final TextEditingController? controller;
   final TextInputType keyboardType;
   final ValueChanged<String>? onChanged;
+  final TextCapitalization textCapitalization;
+  final List<TextInputFormatter>? inputFormatters;
 
   final String imgString;
   final int? minLines;
@@ -39,6 +41,8 @@ class ImputTextWidget extends StatefulWidget {
     this.minLines,
     this.maxLines,
     this.focusNode,
+    this.textCapitalization = TextCapitalization.none,
+    this.inputFormatters,
   }) : super(key: key);
 
   @override
@@ -198,7 +202,8 @@ class _ImputTextWidgetState extends State<ImputTextWidget> {
       focusNode: widget.focusNode,
       cursorColor: AppColors.colorAzul,
       decoration: getDecorationTxt(),
-
+      textCapitalization: widget.textCapitalization,
+      inputFormatters: widget.inputFormatters,
       minLines: widget.minLines,
       maxLines: widget.maxLines,
     );
@@ -216,6 +221,8 @@ class _ImputTextWidgetState extends State<ImputTextWidget> {
       maxLength: widget.maxLength,
       cursorColor: AppColors.colorAzul,
       decoration: getDecorationTxt(),
+      textCapitalization: widget.textCapitalization,
+      inputFormatters: widget.inputFormatters,
       minLines: widget.minLines,
       maxLines: widget.maxLines,
       focusNode: widget.focusNode,
@@ -234,6 +241,21 @@ class _ImputTextWidgetState extends State<ImputTextWidget> {
       focusNode: widget.focusNode,
       cursorColor: AppColors.colorAzul,
       decoration: getDecorationTxtPass(),
+      textCapitalization: widget.textCapitalization,
+      inputFormatters: widget.inputFormatters,
+    );
+  }
+}
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
     );
   }
 }

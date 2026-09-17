@@ -12,6 +12,9 @@ class BusquedaTipoOperativoWg extends StatelessWidget {
   final double anchoPorcentaje;
   final TextEditingController controller;
   final FocusNode? focusNode;
+  final TextCapitalization textCapitalization;
+  final List<TextInputFormatter>? inputFormatters;
+  final FormFieldValidator<String>? validar;
 
   const BusquedaTipoOperativoWg({
     this.onTap,
@@ -26,6 +29,9 @@ class BusquedaTipoOperativoWg extends StatelessWidget {
     this.tipo = 'N',
     required ValueKey<String> key,
     this.focusNode,
+    this.textCapitalization = TextCapitalization.none,
+    this.inputFormatters,
+    this.validar,
   }) : super(key: key);
 
   @override
@@ -55,7 +61,9 @@ class BusquedaTipoOperativoWg extends StatelessWidget {
                 activar: true,
                 label: title,
                 fonSize: responsive.diagonalP(2),
-                validar: (value) {
+                textCapitalization: textCapitalization,
+                inputFormatters: inputFormatters,
+                validar: validar ?? (value) {
                   if (value == null || value.toString().trim().isEmpty) {
                     return msjError;
                   }

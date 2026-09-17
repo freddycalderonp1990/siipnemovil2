@@ -441,7 +441,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
               controller: controller.controllerCedulaVehiculo,
               enabled: !cargando,
               keyboardType: TextInputType.number,
-              maxLength: 20,
+              maxLength: 10,
               textInputAction: TextInputAction.search,
               scrollPadding: const EdgeInsets.only(bottom: 140),
               onTap: () {

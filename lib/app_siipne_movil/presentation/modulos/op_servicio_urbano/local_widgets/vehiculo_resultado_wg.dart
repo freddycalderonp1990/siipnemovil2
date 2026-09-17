@@ -420,7 +420,7 @@ mixin VehiculoResultadoViewMixin on OpServicioUrbanoPageBase {
       anchoPorcentaje: 100,
       myKey: keyCedulaVehiculo,
       controller: controller.controllerCedulaVehiculo,
-      maxLength: 20,
+      maxLength: 10,
       icono: const Icon(Icons.badge_outlined, color: AppColors.colorIcons),
       keyboardType: TextInputType.number,
       title: controller.tipoPersonaVehiculo.value == 'CONDUCTOR'
