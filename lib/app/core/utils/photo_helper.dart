@@ -256,17 +256,26 @@ class PhotoHelper {
   }
 
   static Uint8List? convertStringToUint8List(String? fotoString) {
+    if (fotoString == null || fotoString.trim().isEmpty) return null;
+
     try {
-      Uint8List? imgDecode = null;
-      if (fotoString != null && fotoString != '') {
-        final decodedBytes = base64Decode(
-          fotoString.toString().split(',').last,
-        );
-        imgDecode = decodedBytes;
+      String limpio = fotoString.trim();
+
+      // Manejar prefijo Data URI (e.g. data:image/jpeg;base64,...)
+      if (limpio.contains(',')) {
+        limpio = limpio.split(',').last;
       }
-      return imgDecode;
+
+      // Limpiar caracteres no deseados
+      limpio = limpio
+          .replaceAll('\n', '')
+          .replaceAll('\r', '')
+          .replaceAll(' ', '');
+
+      // Normalizar padding si es necesario
+      return base64Decode(base64.normalize(limpio));
     } catch (e) {
-      log('Error al convertir imagen en ${e}');
+      log('Error al convertir imagen Base64: $e');
       return null;
     }
   }

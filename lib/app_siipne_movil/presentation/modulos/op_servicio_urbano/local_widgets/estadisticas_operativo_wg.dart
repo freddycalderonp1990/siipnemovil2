@@ -592,7 +592,7 @@ mixin EstadisticasOperativoViewMixin on OpServicioUrbanoPageBase {
                         tieneAlertas ? "CON NOVEDAD" : "SIN NOVEDAD",
                         style: TextStyle(
                           color: colorAlerta.withOpacity(.75),
-                          fontSize: 6.5,
+                          fontSize: 8,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -695,7 +695,7 @@ mixin EstadisticasOperativoViewMixin on OpServicioUrbanoPageBase {
                 "UBICACIÓN DEL OPERATIVO",
                 style: TextStyle(
                   color: Color(0xFF52687C),
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.w900,
                 ),
               ),
@@ -741,7 +741,7 @@ mixin EstadisticasOperativoViewMixin on OpServicioUrbanoPageBase {
                   titulo,
                   style: const TextStyle(
                     color: Color(0xFF464749),
-                    fontSize: 9,
+                    fontSize: 11,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
@@ -754,7 +754,7 @@ mixin EstadisticasOperativoViewMixin on OpServicioUrbanoPageBase {
                   valor.trim().isEmpty ? "NO REGISTRADO" : valor.trim(),
                   style: const TextStyle(
                     color: Color(0xFF405A72),
-                    fontSize: 9,
+                    fontSize: 11,
                     fontWeight: FontWeight.w700,
                     height: 1.25,
                   ),

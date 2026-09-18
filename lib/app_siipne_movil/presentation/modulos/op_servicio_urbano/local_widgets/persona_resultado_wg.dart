@@ -2,34 +2,32 @@ part of '../../pages.dart';
 
 mixin PersonaResultadoViewMixin on OpServicioUrbanoPageBase {
   Widget muestraDatosPersona() {
-    return Obx(() {
-      if (controller.dataPersona.isEmpty) {
-        return estadoConsulta(
-          icono: Icons.person_search_outlined,
-          titulo: "CONSULTA DE PERSONAS",
-          descripcion:
-              "Ingrese un documento para visualizar la información del ciudadano.",
-        );
-      }
-
-      return Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(5, 2, 5, 8),
-            child: DesingBusquedaPorCedulaWidget(
-              widgetAntesNuevaConsulta: resultadoConsultaVariable(),
-              onPressedAceptar: () {
-                nuevaConsultaPersona();
-              },
-              onPressedAntecedentes: () {
-                mostrarAntecedentesPersona();
-              },
-              dataPersona: controller.dataPersona,
-            ),
-          ),
-        ],
+    if (controller.dataPersona.isEmpty) {
+      return estadoConsulta(
+        icono: Icons.person_search_outlined,
+        titulo: "CONSULTA DE PERSONAS",
+        descripcion:
+            "Ingrese un documento para visualizar la información del ciudadano.",
       );
-    });
+    }
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(5, 2, 5, 8),
+          child: DesingBusquedaPorCedulaWidget(
+            widgetAntesNuevaConsulta: resultadoConsultaVariable(),
+            onPressedAceptar: () {
+              nuevaConsultaPersona();
+            },
+            onPressedAntecedentes: () {
+              mostrarAntecedentesPersona();
+            },
+            dataPersona: controller.dataPersona,
+          ),
+        ),
+      ],
+    );
   }
   // ============================================================
   // ANTECEDENTES PERSONA

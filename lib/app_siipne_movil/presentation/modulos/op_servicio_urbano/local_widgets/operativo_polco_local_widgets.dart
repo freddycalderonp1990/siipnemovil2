@@ -2,18 +2,18 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:get/get.dart';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 
 import '../../../../../app/core/app_config.dart';
 import '../../../../../app/core/utils/photo_helper.dart';
 import '../../../../../app/core/utils/responsiveUtil.dart';
-import '../../../../../app/core/utils/utilidadesUtil.dart';
 import '../../../../../app/core/values/app_colors.dart';
 import '../../../../../app/presentation/widgets/custom_app_widgets.dart';
 import '../../../../core/values/app_siipne_movil_images.dart';
 import '../../../../data/models/models_siipne_movil.dart';
-import 'btnIconOperativoWidget.dart';
 import 'colors_local.dart';
 
 part 'btn_tipo_operativo_wg.dart';

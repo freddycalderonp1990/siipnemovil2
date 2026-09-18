@@ -175,7 +175,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                   "VEHÍCULO CONSULTADO",
                   style: TextStyle(
                     color: Color(0xCCFFFFFF),
-                    fontSize: 6.5,
+                    fontSize: 11,
                     fontWeight: FontWeight.w800,
                     letterSpacing: .25,
                   ),
@@ -203,39 +203,8 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Color(0xE6FFFFFF),
-                    fontSize: 7.4,
+                    fontSize: 10,
                     fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(width: 6),
-
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(.14),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              children: [
-                const Text(
-                  "HDR",
-                  style: TextStyle(
-                    color: Color(0xBFFFFFFF),
-                    fontSize: 5.3,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-
-                Text(
-                  "#${controller.idHdrEventoResumVehiculo}",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 6.3,
-                    fontWeight: FontWeight.w900,
                   ),
                 ),
               ],
@@ -472,7 +441,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
               controller: controller.controllerCedulaVehiculo,
               enabled: !cargando,
               keyboardType: TextInputType.number,
-              maxLength: 20,
+              maxLength: 10,
               textInputAction: TextInputAction.search,
               scrollPadding: const EdgeInsets.only(bottom: 140),
               onTap: () {
@@ -1364,7 +1333,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                 "DISTRIBUCIÓN DE PERSONAS",
                 style: TextStyle(
                   color: Color(0xFF52687C),
-                  fontSize: 8,
+                  fontSize: 12,
                   fontWeight: FontWeight.w900,
                 ),
               ),
@@ -1473,7 +1442,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                       // =================================================
 
                       Container(
-                        width: 112,
+                        width: 220,
                         height: 23,
                         decoration: const BoxDecoration(
                           color: Color(0xFF195BA6),
@@ -1499,7 +1468,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                               "FRENTE DEL VEHÍCULO",
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 5.6,
+                                fontSize: 11,
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: .25,
                               ),

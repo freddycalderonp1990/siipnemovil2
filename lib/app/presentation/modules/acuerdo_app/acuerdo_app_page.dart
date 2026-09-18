@@ -494,6 +494,22 @@ class AcuerdoAppPage extends GetView<AcuerdoAppController> {
   // ============================================================
 
   Future<void> _confirmarAceptacion() async {
+    // ============================================================
+    // 1. PRIMERO CAPTURA DE FIRMA
+    // ============================================================
+    final Uint8List? firma = await DialogoFirmaWidget.mostrar();
+
+    if (firma == null) {
+      /*
+       * Si cancela la firma o cierra el diálogo, 
+       * NO procedemos con el registro.
+       */
+      return;
+    }
+
+    // ============================================================
+    // 2. LUEGO CONFIRMACIÓN TEXTUAL
+    // ============================================================
     final bool? confirmar = await Get.dialog<bool>(
       AlertDialog(
         backgroundColor: Colors.white,
@@ -505,9 +521,7 @@ class AcuerdoAppPage extends GetView<AcuerdoAppController> {
               color: Color(0xFF0D4C9C),
               size: 25,
             ),
-
             SizedBox(width: 9),
-
             Expanded(
               child: Text(
                 "CONFIRMAR ACEPTACIÓN",
@@ -530,7 +544,6 @@ class AcuerdoAppPage extends GetView<AcuerdoAppController> {
             onPressed: () => Get.back(result: false),
             child: const Text("CANCELAR"),
           ),
-
           ElevatedButton.icon(
             onPressed: () => Get.back(result: true),
             icon: const Icon(Icons.check_circle_rounded, size: 17),
@@ -547,7 +560,7 @@ class AcuerdoAppPage extends GetView<AcuerdoAppController> {
 
     if (confirmar != true) return;
 
-    final bool resultado = await controller.registrarAcuerdo();
+    final bool resultado = await controller.registrarAcuerdo(firma: firma);
 
     if (!resultado) {
       _mostrarError(

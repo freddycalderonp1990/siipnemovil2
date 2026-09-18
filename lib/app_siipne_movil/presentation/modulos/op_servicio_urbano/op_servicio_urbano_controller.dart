@@ -86,19 +86,51 @@
         variableResultadoSeleccionada.value?.desHdrTipoResum.trim() ?? '';
 
     List<VariablesResultado> get variablesResultadoPersona {
-      return variablesResultado.where((VariablesResultado item) {
+      final List<VariablesResultado> lista =
+          variablesResultado.where((VariablesResultado item) {
         final String tipo = item.tipoConsulta.trim().toUpperCase();
 
         return tipo == 'T' || tipo == 'P';
       }).toList();
+
+      // PRIORIZAR "PERSONAS REGISTRADAS"
+      final int index = lista.indexWhere((item) {
+        final String desc = item.desHdrTipoResum.trim().toUpperCase();
+        return desc == 'PERSONAS REGISTRADAS' || desc == 'PERSONA REGISTRADA';
+      });
+
+      if (index > 0) {
+        final VariablesResultado item = lista.removeAt(index);
+        lista.insert(0, item);
+      }
+
+      return lista;
     }
 
     List<VariablesResultado> get variablesResultadoVehiculo {
-      return variablesResultado.where((VariablesResultado item) {
+      final List<VariablesResultado> lista =
+          variablesResultado.where((VariablesResultado item) {
         final String tipo = item.tipoConsulta.trim().toUpperCase();
 
         return tipo == 'T' || tipo == 'V';
       }).toList();
+
+      // PRIORIZAR "VEHICULO REVISADOS"
+      final int index = lista.indexWhere((item) {
+        final String desc = item.desHdrTipoResum.trim().toUpperCase();
+        return desc == 'VEHICULO REVISADOS' ||
+            desc == 'VEHÍCULOS REVISADOS' ||
+            desc == 'VEHICULOS REVISADOS' ||
+            desc == 'VEHICULO REVISADO' ||
+            desc == 'VEHÍCULO REVISADO';
+      });
+
+      if (index > 0) {
+        final VariablesResultado item = lista.removeAt(index);
+        lista.insert(0, item);
+      }
+
+      return lista;
     }
 
     List<VariablesResultado> get variablesResultadoConsultaActual {
@@ -1413,10 +1445,6 @@
         final DataConsultaPersona persona = await siipneMovilUseCase
             .consultarPersona(request: request);
 
-        debugPrint('RESPUESTA PERSONA VEHÍCULO RECIBIDA');
-
-        debugPrint('PERSONA: ${persona.toJson()}');
-
         FocusManager.instance.primaryFocus?.unfocus();
 
         if (documentosPersonasVehiculoRegistradas.contains(
@@ -1486,6 +1514,8 @@
         return false;
       } finally {
         consultandoPersonaVehiculo.value = false;
+        peticionServerState.value = false;
+        paginaPersonasVehiculoLoading.value = false;
       }
     }
 
@@ -2106,6 +2136,8 @@
       }
 
       consultandoAntecedentesPersona.value = true;
+      peticionServerState.value = true;
+      paginaPersonasVehiculoLoading.value = true;
 
       try {
         debugPrint('==========================================');
@@ -2146,6 +2178,8 @@
         return false;
       } finally {
         consultandoAntecedentesPersona.value = false;
+        peticionServerState.value = false;
+        paginaPersonasVehiculoLoading.value = false;
       }
     }
 
