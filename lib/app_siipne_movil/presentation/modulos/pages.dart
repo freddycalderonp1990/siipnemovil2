@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:get/get.dart' hide Transition;
+import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../../app/core/utils/responsiveUtil.dart';
@@ -16,6 +18,7 @@ import '../../../app/core/values/app_images.dart';
 import '../../../app/domain/enums/enums.dart';
 import '../../../app/presentation/widgets/custom_app_widgets.dart';
 import '../../../app/presentation/widgets/img_perfil_redonda.dart';
+import '../../../feactures/user/domain/entities/user.dart';
 import '../../../feactures/pushNotification/services/bloc/notifications_bloc.dart';
 
 import '../../core/utils/operativo_qr_util.dart';

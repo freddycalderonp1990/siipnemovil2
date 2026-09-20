@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:siipnemovil_v2/app/presentation/widgets/custom_app_widgets.dart';
 import 'package:local_auth/local_auth.dart';
