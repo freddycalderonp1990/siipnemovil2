@@ -31,13 +31,13 @@
     <key>NSFaceIDUsageDescription</key>
     <string>SIIPNE Móvil utiliza Face ID para verificar la identidad del usuario y brindar mayor seguridad en el acceso al sistema.</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>SIIPNE Móvil necesita acceder a su ubicación para georreferenciar los operativos, registrar el lugar donde se realizan las actividades y obtener la altitud correspondiente.</string>
+    <string>SIIPNE Móvil necesita acceder a su ubicación para georreferenciar los operativos, registrar el lugar donde se realizan las actividades.</string>
     <key>NSLocationAlwaysUsageDescription</key>
-    <string>SIIPNE Móvil necesita acceder a su ubicación para georreferenciar los operativos y registrar la ubicación y altitud de las actividades realizadas.</string>
+    <string>SIIPNE Móvil necesita acceder a su ubicación para georreferenciar los operativos y registrar la ubicación de las actividades realizadas.</string>
     <key>NSLocationUsageDescription</key>
-    <string>SIIPNE Móvil necesita acceder a su ubicación para georreferenciar los operativos y registrar la ubicación y altitud de las actividades realizadas.</string>
+    <string>SIIPNE Móvil necesita acceder a su ubicación para georreferenciar los operativos y registrar la ubicación de las actividades realizadas.</string>
     <key>NSLocationWhenInUseUsageDescription</key>
-    <string>SIIPNE Móvil necesita acceder a su ubicación para georreferenciar los operativos y registrar la ubicación y altitud de las actividades realizadas.</string>
+    <string>SIIPNE Móvil necesita acceder a su ubicación para georreferenciar los operativos y registrar la ubicación de las actividades realizadas.</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>SIIPNE Móvil necesita acceder a la galería para seleccionar fotografías y registrarlas como parte de las novedades durante los operativos.</string>
     <key>ITSAppUsesNonExemptEncryption</key>

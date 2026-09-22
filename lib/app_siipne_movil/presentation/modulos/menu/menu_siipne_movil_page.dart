@@ -16,15 +16,6 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) return;
-
-      context.read<NotificationsBloc>().requestPermission(
-        appName: NamApps.SiipneMovil,
-        idGenUsuario: controller.user.idGenUsuario,
-      );
-    });
   }
 
   @override
@@ -1091,7 +1082,7 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
                     "#${data.idHdrEvento}",
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 9.5,
+                      fontSize: 13,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -1120,7 +1111,7 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: Color(0xFF27445F),
-                      fontSize: 8.5,
+                      fontSize: 10,
                       fontWeight: FontWeight.w900,
                       height: 1.15,
                     ),
@@ -1182,15 +1173,8 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
                                         )
                                       else
                                         const Icon(Icons.picture_as_pdf_rounded,
-                                            size: 14),
-                                      const SizedBox(width: 4),
-                                      const Text(
-                                        "PDF",
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w900,
-                                        ),
-                                      ),
+                                            size: 20),
+
                                     ],
                                   ),
                                 ),
@@ -1242,15 +1226,7 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
                                           ),
                                         )
                                       else
-                                        const Icon(Icons.share_rounded, size: 14),
-                                      const SizedBox(width: 4),
-                                      const Text(
-                                        "WHATSAPP",
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w900,
-                                        ),
-                                      ),
+                                        const Icon(Icons.share_rounded, size: 20),
                                     ],
                                   ),
                                 ),
@@ -1287,9 +1263,9 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: Color(0xFF63778A),
-                fontSize: 6.7,
+                fontSize: 10,
                 fontWeight: FontWeight.w600,
-                height: 1.15,
+                height: 1.5,
               ),
             ),
           ),
@@ -1415,14 +1391,17 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
                           ),
 
                           IconButton(
-                            tooltip: "Cerrar",
-                            onPressed: () {
-                              Navigator.of(dialogContext).pop();
+                            tooltip: "Compartir Reporte",
+                            onPressed: () async {
+                              await Share.shareXFiles(
+                                [XFile(path)],
+                                text: 'Reporte de Operativo #${operativo.idHdrEvento}',
+                              );
                             },
                             icon: const Icon(
-                              Icons.close_rounded,
+                              Icons.share_rounded,
                               color: Colors.white,
-                              size: 24,
+                              size: 22,
                             ),
                           ),
                         ],
