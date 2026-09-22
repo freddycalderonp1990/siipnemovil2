@@ -66,7 +66,25 @@ class GpsBloc extends Bloc<GpsEvent, GpsState> {
   }
 
   Future<void> askGpsAccess() async {
+    final before = await Permission.location.status;
+
+    print('====================================');
+    print('PERMISO ANTES: $before');
+    print('isGranted: ${before.isGranted}');
+    print('isDenied: ${before.isDenied}');
+    print('isPermanentlyDenied: ${before.isPermanentlyDenied}');
+    print('isRestricted: ${before.isRestricted}');
+    print('====================================');
+
     final status = await Permission.location.request();
+
+    print('====================================');
+    print('PERMISO DESPUÉS: $status');
+    print('isGranted: ${status.isGranted}');
+    print('isDenied: ${status.isDenied}');
+    print('isPermanentlyDenied: ${status.isPermanentlyDenied}');
+    print('isRestricted: ${status.isRestricted}');
+    print('====================================');
 
     switch (status) {
       case PermissionStatus.granted:

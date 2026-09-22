@@ -51,8 +51,8 @@
           if (value == null || value.trim().isEmpty) {
             return "Ingrese una placa válida";
           }
-          if (value.trim().length != 7) {
-            return "La placa debe tener 7 dígitos";
+          if (value.trim().length < 6) {
+            return "La placa debe tener mínimo 6 dígitos";
           }
           return null;
         },
@@ -301,7 +301,7 @@
         },
       );
 
-      await Future.delayed(const Duration(milliseconds: 450));
+      await Future.delayed(const Duration(milliseconds: 100));
 
       if (Get.context != null && Navigator.of(Get.context!).canPop()) {
         Navigator.of(Get.context!).pop();

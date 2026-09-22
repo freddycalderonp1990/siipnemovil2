@@ -9,6 +9,8 @@ class DesingDatosVehiculoWg extends StatelessWidget {
   final VoidCallback? onPressedNewConsulta;
   final Widget? widgetAntesNuevaConsulta;
 
+
+
   const DesingDatosVehiculoWg({
     Key? key,
     required this.data,
@@ -258,6 +260,9 @@ class DesingDatosVehiculoWg extends StatelessWidget {
   Widget _datosPropietario() {
     final DatospropietarioData p = data.datospropietario.data;
 
+
+
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(9, 8, 9, 9),
@@ -335,6 +340,8 @@ class DesingDatosVehiculoWg extends StatelessWidget {
                     ),
                     if (_tieneFechaDefuncionPropietario(p.fechaDefuncion)) ...[
                       const SizedBox(height: 6),
+
+
 
                       _fechaDefuncionPropietario(p.fechaDefuncion),
 

@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Siipnemovil V2</string>
+	<string>Siipne Móvil 2</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -26,6 +26,22 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+    <key>NSCameraUsageDescription</key>
+    <string>SIIPNE Móvil necesita acceder a la cámara para tomar fotografías y registrar novedades durante los operativos.</string>
+    <key>NSFaceIDUsageDescription</key>
+    <string>SIIPNE Móvil utiliza Face ID para verificar la identidad del usuario y brindar mayor seguridad en el acceso al sistema.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>SIIPNE Móvil necesita acceder a su ubicación para georreferenciar los operativos, registrar el lugar donde se realizan las actividades y obtener la altitud correspondiente.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>SIIPNE Móvil necesita acceder a su ubicación para georreferenciar los operativos y registrar la ubicación y altitud de las actividades realizadas.</string>
+    <key>NSLocationUsageDescription</key>
+    <string>SIIPNE Móvil necesita acceder a su ubicación para georreferenciar los operativos y registrar la ubicación y altitud de las actividades realizadas.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>SIIPNE Móvil necesita acceder a su ubicación para georreferenciar los operativos y registrar la ubicación y altitud de las actividades realizadas.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>SIIPNE Móvil necesita acceder a la galería para seleccionar fotografías y registrarlas como parte de las novedades durante los operativos.</string>
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

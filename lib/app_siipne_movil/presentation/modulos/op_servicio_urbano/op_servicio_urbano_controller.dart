@@ -1163,7 +1163,8 @@
 
         dataVehiculo.assignAll(<DataVehiculo>[data]);
 
-        _mostrarAlertaVehiculoConsultado(data);
+        _mostrarAlertasVehiculo(data);
+
 
         /*
          * Guardamos la variable técnica con la cual
@@ -1962,31 +1963,62 @@
       return true;
     }
 
-    void _mostrarAlertaVehiculoConsultado(DataVehiculo data) {
+    void _mostrarAlertasVehiculo(DataVehiculo data) {
       final DatosConsultaDuplicadoOperativo duplicado =
           data.datosConsultaDuplicadoOperativo;
 
-      if (duplicado.idHdrEvento <= 0) return;
+      final bool vehiculoDuplicado = duplicado.idHdrEvento > 0;
+      final bool alertaMatricula =
+          data.datospropietario.data.alertaMatricula;
 
-      final List<String> ubicacion = <String>[
-        duplicado.zona.trim(),
-        duplicado.subzona.trim(),
-        duplicado.distrito.trim(),
-        duplicado.circuito.trim(),
-        duplicado.subcircuito.trim(),
+      // Si no existe ninguna alerta, no mostrar nada.
+      if (!vehiculoDuplicado && !alertaMatricula) return;
 
-      ].where((String valor) => valor.isNotEmpty).toList();
+      final List<String> alertas = <String>[];
 
-      final String placa = data.datosVehiculo.data.placa.trim();
+      // --------------------------------------------------
+      // ALERTA: VEHÍCULO YA CONSULTADO
+      // --------------------------------------------------
+      if (vehiculoDuplicado) {
+        final List<String> ubicacion = <String>[
+          duplicado.zona.trim(),
+          duplicado.subzona.trim(),
+          duplicado.distrito.trim(),
+          duplicado.circuito.trim(),
+          duplicado.subcircuito.trim(),
+        ].where((String valor) => valor.isNotEmpty).toList();
 
+        final String placa = data.datosVehiculo.data.placa.trim();
+
+        alertas.add(
+          "VEHÍCULO CONSULTADO\n"
+              "El vehículo${placa.isNotEmpty ? ' con placa $placa' : ''} "
+              "ya fue consultado en otro operativo."
+              "${ubicacion.isNotEmpty ? '\n\nUbicación registrada:\n${ubicacion.join(' · ')}' : ''}"
+              "${duplicado.fecha.trim().isNotEmpty ? '\n\nFecha de consulta:\n${duplicado.fecha.trim()}' : ''}",
+        );
+      }
+
+      // --------------------------------------------------
+      // ALERTA: MATRÍCULA
+      // --------------------------------------------------
+      if (alertaMatricula) {
+        alertas.add(
+          "ADVERTENCIA DE MATRÍCULA\n"
+              "${data.datospropietario.data.mensajeMatricula}",
+        );
+      }
+
+      // --------------------------------------------------
+      // MOSTRAR UNA SOLA ALERTA
+      // --------------------------------------------------
       DialogosAwesome.getWarning(
-        title: "VEHÍCULO CONSULTADO",
-        descripcion:
-        "El vehículo${placa.isNotEmpty ? ' con placa $placa' : ''} ya fue consultado en otro operativo."
-            "${ubicacion.isNotEmpty ? '\n\nUbicación registrada:\n${ubicacion.join(' · ')}' : ''}"
-        "${ubicacion.isNotEmpty ? '\n\nFecha Consulta:\n${duplicado.fecha.trim()}' : ''}",
+        title: "ADVERTENCIAS DEL VEHÍCULO",
+        descripcion: alertas.join("\n\n────────────────────\n\n"),
       );
     }
+
+
     // ============================================================
     // CONSULTAR RESUMEN DEL OPERATIVO
     // ============================================================
