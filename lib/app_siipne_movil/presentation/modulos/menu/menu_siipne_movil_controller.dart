@@ -30,8 +30,10 @@ class MenuSiipneMovilController extends GetxController {
 
   final RxBool consultandoOperativos = false.obs;
   final RxBool descargandoPdf = false.obs;
+  final RxBool compartiendoWhatsapp = false.obs;
 
   final RxnInt idOperativoDescargando = RxnInt();
+  final RxnInt idOperativoCompartiendo = RxnInt();
 
   late final Rx<DateTime> fechaInicio;
   late final Rx<DateTime> fechaFin;
@@ -272,6 +274,17 @@ class MenuSiipneMovilController extends GetxController {
       return false;
     }
 
+    // VALIDACIÓN DE RANGO MÁXIMO DE 10 DÍAS
+    final int diferenciaDias =
+        fechaFin.value.difference(fechaInicio.value).inDays;
+
+    if (diferenciaDias > 10) {
+      mensajeErrorOperativos =
+          'El rango de búsqueda no puede superar los 10 días.';
+
+      return false;
+    }
+
     return true;
   }
 
@@ -410,6 +423,97 @@ class MenuSiipneMovilController extends GetxController {
     } finally {
       descargandoPdf.value = false;
       idOperativoDescargando.value = null;
+    }
+  }
+
+  // ============================================================
+  // WHATSAPP
+  // ============================================================
+
+  Future<void> compartirOperativoWhatsapp(DataOperativosUsuario op) async {
+    if (compartiendoWhatsapp.value || descargandoPdf.value) {
+      return;
+    }
+
+    compartiendoWhatsapp.value = true;
+    idOperativoCompartiendo.value = op.idHdrEvento;
+
+    try {
+      final ResultadosOperativo resultado = await siipneMovilUseCase
+          .getDatosResultadosOperativo(
+            request: ResultadosOperativoRequest(idHdrEvento: op.idHdrEvento),
+          );
+
+      if (resultado.idHdrEvento <= 0) {
+        throw Exception('El servidor no devolvió resultados válidos.');
+      }
+
+      final DateTime now = DateTime.now();
+      final String fecha = DateFormat('dd/MM/yyyy').format(now);
+      final String hora = DateFormat('HH:mm').format(now);
+
+      final int h = now.hour;
+      String saludo = "buenos días";
+      if (h >= 12 && h < 18) {
+        saludo = "buenas tardes";
+      } else if (h >= 18 || h < 6) {
+        saludo = "buenas noches";
+      }
+
+      final String nombreOp = resultado.tipoOperativo.trim().isEmpty
+          ? "OPERATIVO"
+          : resultado.tipoOperativo.trim();
+
+      final String idOp = resultado.codigoEvento.trim().isEmpty
+          ? resultado.idHdrEvento.toString()
+          : resultado.codigoEvento.trim();
+
+      String buffer = "🚨🚔*POLICÍA NACIONAL DEL ECUADOR* 🚔🚨\n\n";
+      buffer += "Zona: ${resultado.zona.trim()}\n";
+      buffer += "Subzona: ${resultado.subzona.trim()}\n";
+      buffer += "Distrito: ${resultado.distrito.trim()}\n";
+      buffer += "Circuito: ${resultado.circuito.trim()}\n";
+      buffer += "Subcircuito: ${resultado.subcircuito.trim()}\n";
+      buffer += "FECHA: $fecha\n";
+      buffer += "HORA: $hora\n\n";
+
+      buffer += "📋 *DATOS DEL OPERATIVO*\n";
+      buffer += "· Operativo Nro. $idOp\n";
+      buffer += "· Tipo: $nombreOp\n\n";
+
+      buffer += "📊 *ESTADÍSTICAS*\n";
+      buffer += "· Consultas Realizadas: ${resultado.totalConsultas}\n";
+      buffer += "· Personas: ${resultado.totalPersonas} (${resultado.totalAlertasPersona} Alertas)\n";
+      buffer += "· Vehículos: ${resultado.totalVehiculos} (${resultado.totalAlertasVehiculo} Alertas)\n";
+      buffer += "· Conductores: ${resultado.totalConductores}\n";
+      buffer += "· Ocupantes: ${resultado.totalOcupantes}\n\n";
+
+      final variables = resultado.variablesResultado
+          .where((v) => v.cantidad > 0)
+          .toList();
+
+      if (variables.isNotEmpty) {
+        buffer += "📋 *RESULTADOS PRELIMINARES*\n";
+        for (final varRes in variables) {
+          buffer += "· ${varRes.desHdrTipoResum.trim().toUpperCase()}: ${varRes.cantidad}\n";
+        }
+        buffer += "\n";
+      }
+
+      buffer += "Atte.\n";
+      buffer += "${user.gradoSiglas.trim()} ${user.nombres.trim()}\n";
+      buffer += "Técnico ${user.unidad.trim()}";
+
+      await Share.share(buffer);
+    } catch (e) {
+      debugPrint('ERROR COMPARTIENDO WHATSAPP: $e');
+      DialogosAwesome.getError(
+        title: "REPORTE NO DISPONIBLE",
+        descripcion: "No fue posible generar el reporte para compartir.",
+      );
+    } finally {
+      compartiendoWhatsapp.value = false;
+      idOperativoCompartiendo.value = null;
     }
   }
 

@@ -8,3 +8,4 @@ flutter build apk --release --obfuscate --split-debug-info=build/debug-info
 
 abrir emulador ios
 open -a DeviceHub
+

@@ -206,6 +206,20 @@ mixin ResumenOperativoViewMixin on OpServicioUrbanoPageBase {
           ),
 
           IconButton(
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            padding: EdgeInsets.zero,
+            onPressed: () => _compartirResumenWhatsapp(resultado),
+            icon: const Icon(
+              Icons.share_rounded,
+              color: Color(0xFF25D366),
+              size: 22,
+            ),
+            tooltip: "Compartir por WhatsApp",
+          ),
+
+          const SizedBox(width: 4),
+
+          IconButton(
             constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
             padding: EdgeInsets.zero,
             onPressed: () => Navigator.of(dialogContext).pop(),
@@ -218,6 +232,74 @@ mixin ResumenOperativoViewMixin on OpServicioUrbanoPageBase {
         ],
       ),
     );
+  }
+
+  // ============================================================
+  // COMPARTIR POR WHATSAPP
+  // ============================================================
+
+  void _compartirResumenWhatsapp(ResultadosOperativo resultado) async {
+    final DateTime now = DateTime.now();
+    final String fecha = DateFormat('dd/MM/yyyy').format(now);
+    final String hora = DateFormat('HH:mm').format(now);
+
+    final int h = now.hour;
+    String saludo = "buenos días";
+    if (h >= 12 && h < 18) {
+      saludo = "buenas tardes";
+    } else if (h >= 18 || h < 6) {
+      saludo = "buenas noches";
+    }
+
+    // Nombre del operativo sin el contenido "Realiza"
+    final String nombreOp = resultado.tipoOperativo.trim().isEmpty
+        ? "OPERATIVO"
+        : resultado.tipoOperativo.trim();
+
+    final String idOp = resultado.codigoEvento.trim().isEmpty
+        ? resultado.idHdrEvento.toString()
+        : resultado.codigoEvento.trim();
+
+    final UserEntities user = controller.user;
+
+    String buffer = "🚨🚔*POLICÍA NACIONAL DEL ECUADOR* 🚔🚨\n\n";
+    buffer += "Zona: ${resultado.zona.trim()}\n";
+    buffer += "Subzona: ${resultado.subzona.trim()}\n";
+    buffer += "Distrito: ${resultado.distrito.trim()}\n";
+    buffer += "Circuito: ${resultado.circuito.trim()}\n";
+    buffer += "Subcircuito: ${resultado.subcircuito.trim()}\n";
+    buffer += "FECHA: $fecha\n";
+    buffer += "HORA: $hora\n\n";
+
+    buffer += "Permiso mi Coronel, señores servidores policiales Directivos me permito poner en su conocimiento que "
+        "se ha realizado el Operativo con las siguientes novedades\n\n";
+
+    buffer += "📋 *DATOS DEL OPERATIVO*\n";
+    buffer += "· Operativo Nro. $idOp\n";
+    buffer += "· Tipo: $nombreOp\n\n";
+
+    buffer += "📊 *ESTADÍSTICAS*\n";
+    buffer += "· Consultas Realizadas: ${resultado.totalConsultas}\n";
+    buffer += "· Personas: ${resultado.totalPersonas} (${resultado.totalAlertasPersona} Alertas)\n";
+    buffer += "· Vehículos: ${resultado.totalVehiculos} (${resultado.totalAlertasVehiculo} Alertas)\n\n";
+
+    final variables = resultado.variablesResultado
+        .where((v) => v.cantidad > 0)
+        .toList();
+
+    if (variables.isNotEmpty) {
+      buffer += "📋 *RESULTADOS PRELIMINARES*\n";
+      for (final varRes in variables) {
+        buffer += "· ${varRes.desHdrTipoResum.trim().toUpperCase()}: ${varRes.cantidad}\n";
+      }
+      buffer += "\n";
+    }
+
+    buffer += "Atte.\n";
+    buffer += "${user.gradoSiglas.trim()} ${user.nombres.trim()}\n";
+    buffer += "Técnico ${user.funcion.trim()}";
+
+    await Share.share(buffer);
   }
 
   Widget avisoFinalizacionResumen() {
