@@ -1,1 +1,0 @@
-# Reglas personalizadas de ProGuard/R8

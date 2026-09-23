@@ -47,12 +47,7 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
       primary: false,
       physics: const NeverScrollableScrollPhysics(),
 
-      padding: EdgeInsets.fromLTRB(
-        responsive.anchoP(1),
-        responsive.altoP(.4),
-        responsive.anchoP(1),
-        responsive.altoP(.8),
-      ),
+
 
       itemCount: dataPersona.length,
 
