@@ -61,8 +61,13 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   }
 
   Future<void> _checkPermissionStatus() async {
-    final settings = await messaging.getNotificationSettings();
-    add(NotificationStatusChanged(_mapStatus(settings.authorizationStatus)));
+    try {
+      final settings = await messaging.getNotificationSettings();
+      add(NotificationStatusChanged(_mapStatus(settings.authorizationStatus)));
+    } catch (e) {
+      // Si falla, asumimos que no está determinado para permitir pedirlo
+      add(const NotificationStatusChanged(NotificationPermissionStatus.notDetermined));
+    }
   }
 
   NotificationPermissionStatus _mapStatus(AuthorizationStatus status) {

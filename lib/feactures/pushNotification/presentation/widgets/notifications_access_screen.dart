@@ -21,6 +21,10 @@ class NotificationsAccessScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<NotificationsBloc, NotificationsState>(
       builder: (context, state) {
+        if (state.status == NotificationPermissionStatus.checking) {
+          return const SizedBox.shrink();
+        }
+
         if (state.status == NotificationPermissionStatus.authorized) {
           return contenido;
         }

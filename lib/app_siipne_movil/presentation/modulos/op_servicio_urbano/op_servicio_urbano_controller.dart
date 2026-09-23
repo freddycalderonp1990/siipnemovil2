@@ -206,6 +206,9 @@
 
     final RxBool consultandoPersonaVehiculo = false.obs;
 
+    final RxBool conductorRegistradoEnBaseDeDatos = false.obs;
+    final Rxn<ConductorVehiculo> conductorDesdeBase = Rxn<ConductorVehiculo>();
+
     /*
      * Compatibilidad con código anterior.
      */
@@ -1064,63 +1067,52 @@
     // CONSULTAR VEHÍCULO
     // ============================================================
 
-    Future<bool> consultarVehiculoPorPlaca({
-      required GlobalKey<FormState> key,
-    }) async {
-      if (peticionServerState.value) {
-        return false;
-      }
+    Future<bool> consultarVehiculoPorPlaca({required GlobalKey<FormState> key}) async {
+      if (peticionServerState.value || isClosed) return false;
 
       mensajeErrorConsulta = '';
       mensajeErrorActualizaResultado = '';
 
       final bool isValid = key.currentState?.validate() ?? false;
-
       if (!isValid) {
         debugPrint('CONSULTA VEHÍCULO -> FORMULARIO INVÁLIDO');
         return false;
       }
-
       if (idHdrEventoActual.value <= 0) {
-        mensajeErrorConsulta =
-            'No existe un operativo válido para realizar la consulta.';
+        mensajeErrorConsulta = 'No existe un operativo válido para realizar la consulta.';
         return false;
       }
 
       final String placa = controllerPlaca.text.trim().toUpperCase();
-
       if (placa.isEmpty) {
         mensajeErrorConsulta = 'Ingrese una placa válida.';
         return false;
       }
 
-      final List<VariablesResultado> variablesDisponibles =
-          variablesResultadoVehiculo;
-
-      /*
-       * Se utiliza la primera variable para mantener
-       * intacta la inserción actual.
-       */
-      final int idVariable = variablesDisponibles.isNotEmpty
-          ? variablesDisponibles.first.idVariable
-          : 0;
-
+      final List<VariablesResultado> variablesDisponibles = variablesResultadoVehiculo;
+      final int idVariable = variablesDisponibles.isNotEmpty ? variablesDisponibles.first.idVariable : 0;
       if (idVariable <= 0) {
-        mensajeErrorConsulta =
-            'No existen variables configuradas para la consulta de vehículo.';
+        mensajeErrorConsulta = 'No existen variables configuradas para la consulta de vehículo.';
         return false;
       }
 
+      DataVehiculo? vehiculoParaAdvertencia;
+      FocusManager.instance.primaryFocus?.unfocus();
       peticionServerState.value = true;
 
       try {
-        final LocationBloc locationBloc = BlocProvider.of<LocationBloc>(
-          Get.context!,
-        );
+        final BuildContext? context = Get.context;
+        if (context == null || !context.mounted) {
+          mensajeErrorConsulta = 'No fue posible acceder a la pantalla del operativo.';
+          return false;
+        }
 
+        final LocationBloc locationBloc = BlocProvider.of<LocationBloc>(context);
         final LatLng pos = await locationBloc.getCurrentPosition();
+        if (isClosed) return false;
 
         final String ip = await DeviceInfoApp.getIp;
+        if (isClosed) return false;
 
         final ConsultarVehiculoRequest request = ConsultarVehiculoRequest(
           idOperativo: idHdrEventoActual.value,
@@ -1141,62 +1133,36 @@
         debugPrint('==========================================');
 
         dataVehiculo.clear();
-
         vehiculoRobado.value = false;
-
         idVariableInsertadaVehiculo = 0;
-
         _limpiarPersonasVehiculo();
 
-        final DataVehiculo data = await siipneMovilUseCase.consultarVehiculo(
-          request: request,
-        );
+        final DataVehiculo data = await siipneMovilUseCase.consultarVehiculo(request: request);
+        if (isClosed) return false;
 
         if (!data.datosVehiculo.success) {
-          mensajeErrorConsulta =
-              'No se obtuvieron datos válidos para el vehículo consultado.';
-
+          mensajeErrorConsulta = 'No se obtuvieron datos válidos para el vehículo consultado.';
           ocultarBtnBuscarVehiculo.value = false;
-
           return false;
         }
 
         dataVehiculo.assignAll(<DataVehiculo>[data]);
-
-        _mostrarAlertasVehiculo(data);
-
-
-        /*
-         * Guardamos la variable técnica con la cual
-         * se insertó el registro.
-         */
         idVariableInsertadaVehiculo = idVariable;
-
-        /*
-         * Después de consultar queda disponible
-         * para que el usuario seleccione el resultado.
-         */
         variableResultadoSeleccionada.value = variablesDisponibles.first;
-
         placaConsultadaAnterior = placaConsultada;
-
         placaConsultada = placa;
-
         vehiculoRobado.value = data.restriccionPj.data.robado;
-
         ocultarBtnBuscarVehiculo.value = true;
-
         controllerPlaca.clear();
 
         if (vehiculoRobado.value) {
           try {
-            await UtilidadesUtil.playAudio(
-              nameAudio: AppSiipneMovilImages.audio_Alerta,
-            );
+            await UtilidadesUtil.playAudio(nameAudio: AppSiipneMovilImages.audio_Alerta);
           } catch (e) {
             debugPrint('No fue posible reproducir el audio de alerta: $e');
           }
         }
+        if (isClosed) return false;
 
         debugPrint('==========================================');
         debugPrint('CONSULTA VEHÍCULO CORRECTA');
@@ -1204,22 +1170,36 @@
         debugPrint('VARIABLE INSERCIÓN: $idVariableInsertadaVehiculo');
         debugPrint('==========================================');
 
+        // La advertencia se muestra después de retirar la carga.
+        vehiculoParaAdvertencia = data;
         return true;
       } catch (e, stackTrace) {
-        mensajeErrorConsulta = UrlApiProviderAppCenso.mensajeException(
-          e,
-          fallback: 'No fue posible realizar la consulta del vehículo.',
-        );
-
-        ocultarBtnBuscarVehiculo.value = false;
-
-        debugPrint('ERROR CONSULTA VEHÍCULO: $mensajeErrorConsulta');
-
+        if (!isClosed) {
+          mensajeErrorConsulta = UrlApiProviderAppCenso.mensajeException(
+            e,
+            fallback: 'No fue posible realizar la consulta del vehículo.',
+          );
+          ocultarBtnBuscarVehiculo.value = false;
+          debugPrint('ERROR CONSULTA VEHÍCULO: $mensajeErrorConsulta');
+        }
         debugPrint('$stackTrace');
-
         return false;
       } finally {
-        peticionServerState.value = false;
+        if (!isClosed) {
+          peticionServerState.value = false;
+          final DataVehiculo? dataAdvertencia = vehiculoParaAdvertencia;
+          if (dataAdvertencia != null) {
+            try {
+              await WidgetsBinding.instance.endOfFrame;
+              if (!isClosed) {
+                _mostrarAlertasVehiculo(dataAdvertencia);
+              }
+            } catch (e, stackTrace) {
+              debugPrint('ERROR MOSTRANDO ADVERTENCIA VEHÍCULO: $e');
+              debugPrint('$stackTrace');
+            }
+          }
+        }
       }
     }
 
@@ -1405,6 +1385,7 @@
           : 0;
 
       consultandoPersonaVehiculo.value = true;
+      paginaPersonasVehiculoLoading.value = true;
 
       try {
         debugPrint('==========================================');
@@ -1589,7 +1570,7 @@
     // COMPATIBILIDAD PANEL ANTERIOR
     // ============================================================
 
-    void abrirRegistroOcupantes() {
+    void abrirRegistroOcupantes() async {
       if (peticionServerState.value || dataVehiculo.isEmpty) {
         return;
       }
@@ -1601,13 +1582,60 @@
         return;
       }
 
+      await consultarExistenciaConductor();
+
       mostrarPanelOcupantes.value = true;
 
-      tipoPersonaVehiculo.value = dataPersona_conductor.isEmpty
-          ? 'CONDUCTOR'
-          : 'OCUPANTE';
-
       controllerCedulaVehiculo.clear();
+    }
+
+    Future<void> consultarExistenciaConductor() async {
+      if (dataVehiculo.isEmpty) return;
+
+      final String placa =
+          dataVehiculo.first.datosVehiculo.data.placa.trim().toUpperCase();
+      if (placa.isEmpty) return;
+
+      peticionServerState.value = true;
+      paginaPersonasVehiculoLoading.value = true;
+
+      try {
+        conductorRegistradoEnBaseDeDatos.value = false;
+
+        final ConductorVehiculoRequest request = ConductorVehiculoRequest(
+          idHdrEvento: idHdrEventoActual.value,
+          placa: placa,
+        );
+
+        final ConductorVehiculo resultado =
+            await siipneMovilUseCase.getDatosConductorVehiculo(
+          request: request,
+        );
+
+        if (resultado.cedula.isNotEmpty && resultado.cedula != "0") {
+          // Si el servidor confirma que ya existe un conductor, forzamos modo OCUPANTE.
+          conductorRegistradoEnBaseDeDatos.value = true;
+          conductorDesdeBase.value = resultado;
+          tipoPersonaVehiculo.value = 'OCUPANTE';
+
+          debugPrint('CONDUCTOR YA REGISTRADO EN BASE: ${resultado.conductor}');
+        } else {
+          // Si no hay conductor en base, verificamos la lista local.
+          conductorRegistradoEnBaseDeDatos.value = false;
+          conductorDesdeBase.value = null;
+          tipoPersonaVehiculo.value =
+              dataPersona_conductor.isEmpty ? 'CONDUCTOR' : 'OCUPANTE';
+        }
+      } catch (e) {
+        debugPrint('ERROR CONSULTANDO EXISTENCIA CONDUCTOR: $e');
+        conductorRegistradoEnBaseDeDatos.value = false;
+        // Ante error, comportamiento por defecto basado en lista local.
+        tipoPersonaVehiculo.value =
+            dataPersona_conductor.isEmpty ? 'CONDUCTOR' : 'OCUPANTE';
+      } finally {
+        peticionServerState.value = false;
+        paginaPersonasVehiculoLoading.value = false;
+      }
     }
 
     void cerrarRegistroOcupantes() {
@@ -1786,7 +1814,8 @@
       /*
        * NO limpiar información consultada.
        */
-      tipoPersonaVehiculo.value = dataPersona_conductor.isEmpty
+      tipoPersonaVehiculo.value = (dataPersona_conductor.isEmpty &&
+              !conductorRegistradoEnBaseDeDatos.value)
           ? 'CONDUCTOR'
           : 'OCUPANTE';
     }

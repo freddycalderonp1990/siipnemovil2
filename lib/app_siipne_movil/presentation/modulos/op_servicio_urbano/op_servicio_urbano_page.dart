@@ -50,23 +50,19 @@ class OpServicioUrbanoPage extends OpServicioUrbanoPageBase
 
   Widget _contenido(BuildContext context) {
     final double teclado = MediaQuery.of(context).viewInsets.bottom;
-
     return Obx(() {
       final bool esPersona = controller.selectPerson.value;
       final bool esVehiculo = controller.selectVehiculo.value;
-
-      Widget resultado = estadoInicial();
-
+      final Widget resultado;
       if (esPersona) {
         resultado = muestraDatosPersona();
       } else if (esVehiculo) {
         resultado = muestraDatosVehiculo();
+      } else {
+        resultado = estadoInicial();
       }
-
       return ListView(
-        physics: const BouncingScrollPhysics(
-          parent: AlwaysScrollableScrollPhysics(),
-        ),
+        physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         padding: EdgeInsets.fromLTRB(0, 0, 0, teclado + 25),
         children: [
@@ -74,12 +70,7 @@ class OpServicioUrbanoPage extends OpServicioUrbanoPageBase
           const SizedBox(height: 1),
           tipoDeConsulta(),
           const SizedBox(height: 5),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 250),
-            switchInCurve: Curves.easeOut,
-            switchOutCurve: Curves.easeIn,
-            child: busquedaTipoOperativo(),
-          ),
+          busquedaTipoOperativo(),
           const SizedBox(height: 6),
           resultado,
           const SizedBox(height: 15),

@@ -19,3 +19,4 @@ part 'get_movimientos_migratorios_request.dart';
 part 'get_visa_extranjero_request.dart';
 part 'get_visas_electronicas_request.dart';
 part 'registro_consulta_migracion_request.dart';
+part 'conductorVehiculoRequest.dart';

@@ -1,6 +1,7 @@
 part of 'notifications_bloc.dart';
 
 enum NotificationPermissionStatus {
+  checking,
   notDetermined,
   authorized,
   denied,
@@ -11,7 +12,7 @@ class NotificationsState extends Equatable {
   final NotificationPermissionStatus status;
 
   const NotificationsState({
-    this.status = NotificationPermissionStatus.notDetermined,
+    this.status = NotificationPermissionStatus.checking,
   });
 
   NotificationsState copyWith({
