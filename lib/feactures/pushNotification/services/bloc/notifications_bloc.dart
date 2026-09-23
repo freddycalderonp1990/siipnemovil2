@@ -44,14 +44,44 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   final FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-  NotificationsBloc() : super(NotificationsInitial()) {
+  NotificationsBloc() : super(const NotificationsState()) {
     print("NotificationsBloc inicializado...");
+
+    on<NotificationStatusChanged>((event, emit) {
+      emit(state.copyWith(status: event.status));
+    });
+
+    _checkPermissionStatus();
 
     _onForegroundMessage();
 
     FirebaseMessaging.onMessageOpenedApp.listen(_onMessageOpenedApp);
 
     _listenTokenRefresh();
+  }
+
+  Future<void> _checkPermissionStatus() async {
+    try {
+      final settings = await messaging.getNotificationSettings();
+      add(NotificationStatusChanged(_mapStatus(settings.authorizationStatus)));
+    } catch (e) {
+      // Si falla, asumimos que no está determinado para permitir pedirlo
+      add(const NotificationStatusChanged(NotificationPermissionStatus.notDetermined));
+    }
+  }
+
+  NotificationPermissionStatus _mapStatus(AuthorizationStatus status) {
+    switch (status) {
+      case AuthorizationStatus.authorized:
+        return NotificationPermissionStatus.authorized;
+      case AuthorizationStatus.denied:
+        return NotificationPermissionStatus.denied;
+      case AuthorizationStatus.provisional:
+        return NotificationPermissionStatus.provisional;
+      case AuthorizationStatus.notDetermined:
+      default:
+        return NotificationPermissionStatus.notDetermined;
+    }
   }
 
   void _listenTokenRefresh() {
@@ -79,6 +109,8 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     await LocalNotification.requestPermissionLocalNotifications();
 
     print("Authorization Status: ${settings.authorizationStatus}");
+
+    add(NotificationStatusChanged(_mapStatus(settings.authorizationStatus)));
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       // ✅ OK

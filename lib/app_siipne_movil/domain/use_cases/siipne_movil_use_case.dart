@@ -106,4 +106,10 @@ class SiipneMovilUseCase {
   }) async {
     return await repository.getDatosAntecedentes(request: request);
   }
+
+  Future<ConductorVehiculo> getDatosConductorVehiculo({
+    required ConductorVehiculoRequest request,
+  }) async {
+    return await repository.getDatosConductorVehiculo(request: request);
+  }
 }

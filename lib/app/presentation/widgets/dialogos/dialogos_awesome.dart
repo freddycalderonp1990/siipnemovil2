@@ -531,7 +531,7 @@ class DialogosAwesome {
                 const SizedBox(width: 5),
                 Flexible(
                   child: Text(
-                    'CANAL SEGURO  ·  REGISTRO AUDITABLE',
+                    'REGISTRO AUDITABLE',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(

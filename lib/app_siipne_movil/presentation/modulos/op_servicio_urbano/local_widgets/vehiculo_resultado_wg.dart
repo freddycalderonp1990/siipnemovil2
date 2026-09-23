@@ -565,7 +565,7 @@ mixin VehiculoResultadoViewMixin on OpServicioUrbanoPageBase {
     );
   }
 
-  void abrirPersonasVehiculo() {
+  void abrirPersonasVehiculo() async {
     if (controller.dataVehiculo.isEmpty) {
       DialogosAwesome.getWarning(
         title: "VEHÍCULO REQUERIDO",
@@ -584,10 +584,16 @@ mixin VehiculoResultadoViewMixin on OpServicioUrbanoPageBase {
       return;
     }
 
+    /*
+     * Consultamos al servidor si este vehículo ya posee
+     * un conductor registrado en el operativo actual.
+     */
+    await controller.consultarExistenciaConductor();
+
     controller.prepararPantallaPersonasVehiculo();
 
     Get.to(
-      () => OpVehiculoPersonasPage(),
+      () => const OpVehiculoPersonasPage(),
       duration: const Duration(milliseconds: 280),
     );
   }
