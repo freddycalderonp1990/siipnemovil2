@@ -39,6 +39,12 @@ class DesingRestriccionVehiculoWg extends StatelessWidget {
 
     final int cantidad = data.data.cantidadRestricciones;
 
+    final bool tieneUnaRestriccion =
+        cantidad == 1 && data.data.restricciones.isNotEmpty;
+
+    final bool tieneVariasRestricciones =
+        cantidad > 1 && data.data.restricciones.isNotEmpty;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
@@ -207,9 +213,18 @@ class DesingRestriccionVehiculoWg extends StatelessWidget {
           ),
 
           // ============================================================
-          // CANTIDAD
+          // UNA SOLA RESTRICCIÓN
           // ============================================================
-          if (cantidad > 0) ...[
+          if (tieneUnaRestriccion) ...[
+            const SizedBox(height: 9),
+
+            _cardRestriccionPrincipal(data.data.restricciones.first),
+          ],
+
+          // ============================================================
+          // VARIAS RESTRICCIONES - RESUMEN
+          // ============================================================
+          if (tieneVariasRestricciones) ...[
             const SizedBox(height: 9),
 
             Container(
@@ -255,7 +270,7 @@ class DesingRestriccionVehiculoWg extends StatelessWidget {
                         const SizedBox(height: 2),
 
                         Text(
-                          '$cantidad registro${cantidad == 1 ? '' : 's'} encontrado${cantidad == 1 ? '' : 's'}',
+                          '$cantidad registros encontrados',
                           style: const TextStyle(
                             color: textoOscuro,
                             fontSize: 10,
@@ -287,14 +302,12 @@ class DesingRestriccionVehiculoWg extends StatelessWidget {
                 ],
               ),
             ),
-          ],
 
-          // ============================================================
-          // BOTÓN VER TODAS
-          // ============================================================
-          if (cantidad > 1) ...[
             const SizedBox(height: 9),
 
+            // ==========================================================
+            // VER TODAS
+            // ==========================================================
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -319,6 +332,160 @@ class DesingRestriccionVehiculoWg extends StatelessWidget {
               ),
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  // ================================================================
+  // CARD PARA UNA SOLA RESTRICCIÓN
+  // ================================================================
+  static Widget _cardRestriccionPrincipal(RestriccionPjDetalle restriccion) {
+    final String estado = restriccion.estado.trim().toUpperCase();
+
+    final bool esAlerta = estado == 'ROBADO' || estado == 'ALERTA';
+
+    final Color principal = esAlerta
+        ? const Color(0xFFB42318)
+        : const Color(0xFF16834B);
+
+    final Color fondo = esAlerta
+        ? const Color(0xFFFFF6F5)
+        : const Color(0xFFF2FAF5);
+
+    final Color borde = esAlerta
+        ? const Color(0xFFE9B7B2)
+        : const Color(0xFFB9DCC8);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(11),
+      decoration: BoxDecoration(
+        color: fondo,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: borde, width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ============================================================
+          // CABECERA
+          // ============================================================
+          Row(
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: principal.withOpacity(.10),
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                child: Icon(
+                  esAlerta
+                      ? Icons.warning_amber_rounded
+                      : Icons.verified_user_rounded,
+                  color: principal,
+                  size: 19,
+                ),
+              ),
+
+              const SizedBox(width: 9),
+
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'DETALLE DE LA RESTRICCIÓN',
+                      style: TextStyle(
+                        color: Color(0xFF183B56),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: .2,
+                      ),
+                    ),
+
+                    const SizedBox(height: 2),
+
+                    Text(
+                      estado.isNotEmpty ? estado : 'RESTRICCIÓN REGISTRADA',
+                      style: TextStyle(
+                        color: principal,
+                        fontSize: 8,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                decoration: BoxDecoration(
+                  color: principal,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  esAlerta ? 'ALERTA' : 'NORMAL',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 7,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: .3,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 9),
+
+          // ============================================================
+          // DATOS
+          // ============================================================
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: principal.withOpacity(.13)),
+            ),
+            child: Column(
+              children: [
+                if (restriccion.fechaIncidente.trim().isNotEmpty)
+                  _DatoRestriccionDialogo(
+                    icono: Icons.calendar_month_rounded,
+                    titulo: 'FECHA DEL INCIDENTE',
+                    valor: restriccion.fechaIncidente.trim(),
+                    principal: principal,
+                  ),
+
+                if (restriccion.fechaIncidente.trim().isNotEmpty &&
+                    restriccion.direccion.trim().isNotEmpty)
+                  const SizedBox(height: 8),
+
+                if (restriccion.direccion.trim().isNotEmpty)
+                  _DatoRestriccionDialogo(
+                    icono: Icons.location_on_rounded,
+                    titulo: 'DIRECCIÓN DEL INCIDENTE',
+                    valor: restriccion.direccion.trim(),
+                    principal: principal,
+                  ),
+
+                if (restriccion.empresa.trim().isNotEmpty) ...[
+                  const SizedBox(height: 8),
+
+                  _DatoRestriccionDialogo(
+                    icono: Icons.account_balance_rounded,
+                    titulo: 'ENTIDAD REGISTRANTE',
+                    valor: restriccion.empresa.trim(),
+                    principal: principal,
+                  ),
+                ],
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -445,7 +612,7 @@ class DesingRestriccionVehiculoWg extends StatelessWidget {
   }
 
   // ================================================================
-  // CARD DE CADA RESTRICCIÓN
+  // CARD DE CADA RESTRICCIÓN DEL DIÁLOGO
   // ================================================================
   static Widget _cardRestriccionDialogo(
     RestriccionPjDetalle restriccion,
@@ -479,7 +646,7 @@ class DesingRestriccionVehiculoWg extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ============================================================
-          // CABECERA DE LA RESTRICCIÓN
+          // CABECERA
           // ============================================================
           Row(
             children: [
@@ -550,7 +717,7 @@ class DesingRestriccionVehiculoWg extends StatelessWidget {
           const SizedBox(height: 9),
 
           // ============================================================
-          // INFORMACIÓN DE LA RESTRICCIÓN
+          // INFORMACIÓN
           // ============================================================
           Container(
             width: double.infinity,
