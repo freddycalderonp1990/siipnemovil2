@@ -31,6 +31,7 @@ class SiipneMovilApiConstantes {
   static const SIIPNE_MOVIL_GET_DATOS_EXTRANJERO_DOCUMENTO = "v1-get-datos-extranjero-documento";
   static const SIIPNE_MOVIL_GET_DATOS_VISAS_ELECTRONICAS = "v1-get-datos-visas-electronicas";
   static const SIIPNE_MOVIL_GET_DATOS_REGISTRO_CONSULTA_MIGRACION = "v1-get-datos-registro-consulta-migracion";
+  static const SIIPNE_MOVIL_GET_CONSULTA_CONDUCTOR= "v1-get-consulta-conductor";
 
 
 

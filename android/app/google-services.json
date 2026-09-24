@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "862175613623",
+    "project_id": "crypto-2025-jp",
+    "storage_bucket": "crypto-2025-jp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:862175613623:android:74488488c466b0747bf332",
+        "android_client_info": {
+          "package_name": "ecuador.policianacional.dntic.siipnemovil_v2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgzOlXeav_XMKw3mXPxx6OkhQuFFmwnVY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

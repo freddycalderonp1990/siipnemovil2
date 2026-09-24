@@ -16,15 +16,6 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) return;
-
-      context.read<NotificationsBloc>().requestPermission(
-        appName: NamApps.SiipneMovil,
-        idGenUsuario: controller.user.idGenUsuario,
-      );
-    });
   }
 
   @override
@@ -1091,7 +1082,7 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
                     "#${data.idHdrEvento}",
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 9.5,
+                      fontSize: 13,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -1120,7 +1111,7 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: Color(0xFF27445F),
-                      fontSize: 8.5,
+                      fontSize: 10,
                       fontWeight: FontWeight.w900,
                       height: 1.15,
                     ),
@@ -1138,50 +1129,113 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
 
                   const Spacer(),
 
-                  SizedBox(
-                    width: double.infinity,
-                    height: 35,
-                    child: Obx(() {
-                      final bool cargando =
-                          controller.descargandoPdf.value &&
-                              controller.idOperativoDescargando.value ==
-                                  data.idHdrEvento;
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 32,
+                          child: Obx(() {
+                            final bool cargando =
+                                controller.descargandoPdf.value &&
+                                    controller.idOperativoDescargando.value ==
+                                        data.idHdrEvento;
 
-                      return ElevatedButton.icon(
-                        onPressed: controller.descargandoPdf.value
-                            ? null
-                            : () => _abrirPdf(data),
-                        icon: cargando
-                            ? const SizedBox(
-                          width: 14,
-                          height: 14,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                            : const Icon(
-                          Icons.picture_as_pdf_rounded,
-                          size: 16,
+                            return ElevatedButton(
+                              onPressed: controller.descargandoPdf.value ||
+                                      controller.compartiendoWhatsapp.value
+                                  ? null
+                                  : () => _abrirPdf(data),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFB42318),
+                                foregroundColor: Colors.white,
+                                disabledBackgroundColor: const Color(0xFFCC8C87),
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: Center(
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      if (cargando)
+                                        const SizedBox(
+                                          width: 12,
+                                          height: 12,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      else
+                                        const Icon(Icons.picture_as_pdf_rounded,
+                                            size: 20),
+
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
                         ),
-                        label: Text(
-                          cargando ? "CARGANDO" : "VER PDF",
-                          style: const TextStyle(
-                            fontSize: 7.5,
-                            fontWeight: FontWeight.w900,
-                          ),
+                      ),
+                      const SizedBox(width: 5),
+                      Expanded(
+                        child: SizedBox(
+                          height: 32,
+                          child: Obx(() {
+                            final bool cargando =
+                                controller.compartiendoWhatsapp.value &&
+                                    controller.idOperativoCompartiendo.value ==
+                                        data.idHdrEvento;
+
+                            return ElevatedButton(
+                              onPressed: controller.descargandoPdf.value ||
+                                      controller.compartiendoWhatsapp.value
+                                  ? null
+                                  : () => controller
+                                      .compartirOperativoWhatsapp(data),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF25D366),
+                                foregroundColor: Colors.white,
+                                disabledBackgroundColor: const Color(0xFF8FD6A4),
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: Center(
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      if (cargando)
+                                        const SizedBox(
+                                          width: 12,
+                                          height: 12,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      else
+                                        const Icon(Icons.share_rounded, size: 20),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
                         ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFB42318),
-                          foregroundColor: Colors.white,
-                          disabledBackgroundColor: const Color(0xFFCC8C87),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(9),
-                          ),
-                        ),
-                      );
-                    }),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -1209,9 +1263,9 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: Color(0xFF63778A),
-                fontSize: 6.7,
+                fontSize: 10,
                 fontWeight: FontWeight.w600,
-                height: 1.15,
+                height: 1.5,
               ),
             ),
           ),
@@ -1337,14 +1391,17 @@ class _MenuSiipneMovilPageState extends State<MenuSiipneMovilPage> {
                           ),
 
                           IconButton(
-                            tooltip: "Cerrar",
-                            onPressed: () {
-                              Navigator.of(dialogContext).pop();
+                            tooltip: "Compartir Reporte",
+                            onPressed: () async {
+                              await Share.shareXFiles(
+                                [XFile(path)],
+                                text: 'Reporte de Operativo #${operativo.idHdrEvento}',
+                              );
                             },
                             icon: const Icon(
-                              Icons.close_rounded,
+                              Icons.share_rounded,
                               color: Colors.white,
-                              size: 24,
+                              size: 22,
                             ),
                           ),
                         ],

@@ -8,7 +8,7 @@
           anchoPorcentaje: 95,
           myKey: keyCedula,
           controller: controller.controllerCedula,
-          maxLength: 20,
+          maxLength: 10,
           icono: const Icon(Icons.badge_outlined, color: AppColors.colorIcons),
           keyboardType: TextInputType.number,
           title: "Nro. Documento",
@@ -42,6 +42,20 @@
         ),
         maxLength: 7,
         keyboardType: TextInputType.text,
+        textCapitalization: TextCapitalization.characters,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
+          UpperCaseTextFormatter(),
+        ],
+        validar: (value) {
+          if (value == null || value.trim().isEmpty) {
+            return "Ingrese una placa válida";
+          }
+          if (value.trim().length < 6) {
+            return "La placa debe tener mínimo 6 dígitos";
+          }
+          return null;
+        },
         onTap: confirmarBusquedaVehiculo,
         focusNode: controller.focusPlaca,
       );
@@ -287,7 +301,7 @@
         },
       );
 
-      await Future.delayed(const Duration(milliseconds: 450));
+      await Future.delayed(const Duration(milliseconds: 100));
 
       if (Get.context != null && Navigator.of(Get.context!).canPop()) {
         Navigator.of(Get.context!).pop();

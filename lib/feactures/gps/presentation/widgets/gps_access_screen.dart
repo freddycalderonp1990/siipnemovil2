@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/core/utils/responsiveUtil.dart';
-import '../../../../app/core/values/app_images.dart';
-
 import '../../../../app/domain/enums/enums.dart';
-import '../../../../app/presentation/widgets/custom_app_widgets.dart';
+import '../../../pushNotification/presentation/widgets/notifications_access_screen.dart';
 import '../bloc/gps/gps_bloc.dart';
 import '../location/location_bloc.dart';
 
@@ -36,7 +34,10 @@ class GpsAccessScreen extends StatelessWidget {
                 return _GpsLoadingWidget();
               }
 
-              return contenido;
+              return NotificationsAccessScreen(
+                contenido: contenido,
+                namApps: namApps,
+              );
             },
           );
         }

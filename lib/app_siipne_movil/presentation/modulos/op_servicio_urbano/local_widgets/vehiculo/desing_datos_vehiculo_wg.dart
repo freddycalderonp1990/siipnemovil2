@@ -9,6 +9,8 @@ class DesingDatosVehiculoWg extends StatelessWidget {
   final VoidCallback? onPressedNewConsulta;
   final Widget? widgetAntesNuevaConsulta;
 
+
+
   const DesingDatosVehiculoWg({
     Key? key,
     required this.data,
@@ -258,6 +260,9 @@ class DesingDatosVehiculoWg extends StatelessWidget {
   Widget _datosPropietario() {
     final DatospropietarioData p = data.datospropietario.data;
 
+
+
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(9, 8, 9, 9),
@@ -335,6 +340,8 @@ class DesingDatosVehiculoWg extends StatelessWidget {
                     ),
                     if (_tieneFechaDefuncionPropietario(p.fechaDefuncion)) ...[
                       const SizedBox(height: 6),
+
+
 
                       _fechaDefuncionPropietario(p.fechaDefuncion),
 
@@ -639,7 +646,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
   // ============================================================
 
   Widget _fotoPropietarioGrande(String fotoBase64) {
-    final String foto = fotoBase64.trim();
+    final Uint8List? bytes = PhotoHelper.convertStringToUint8List(fotoBase64);
 
     Widget placeholder() {
       return Container(
@@ -671,39 +678,28 @@ class DesingDatosVehiculoWg extends StatelessWidget {
       );
     }
 
-    if (foto.isEmpty) {
-      return contenedor(placeholder());
-    }
-
-    try {
-      String limpio = foto;
-
-      if (limpio.contains(',')) {
-        limpio = limpio.split(',').last;
-      }
-
-      limpio = limpio
-          .replaceAll('\n', '')
-          .replaceAll('\r', '')
-          .replaceAll(' ', '');
-
-      final bytes = base64Decode(limpio);
-
-      return contenedor(
-        Image.memory(
-          bytes,
-          width: double.infinity,
-          height: double.infinity,
-          fit: BoxFit.cover,
-          gaplessPlayback: true,
-          errorBuilder: (_, __, ___) {
-            return placeholder();
-          },
-        ),
-      );
-    } catch (_) {
-      return contenedor(placeholder());
-    }
+    return GestureDetector(
+      onTap: bytes == null
+          ? null
+          : () {
+              DialogosDesingWidget.getDialogoXImgMemory(
+                title: 'FOTOGRAFÍA DEL PROPIETARIO',
+                imgMemory: bytes,
+              );
+            },
+      child: contenedor(
+        bytes != null
+            ? Image.memory(
+                bytes,
+                width: double.infinity,
+                height: double.infinity,
+                fit: BoxFit.cover,
+                gaplessPlayback: true,
+                errorBuilder: (_, __, ___) => placeholder(),
+              )
+            : placeholder(),
+      ),
+    );
   }
 
   // ============================================================

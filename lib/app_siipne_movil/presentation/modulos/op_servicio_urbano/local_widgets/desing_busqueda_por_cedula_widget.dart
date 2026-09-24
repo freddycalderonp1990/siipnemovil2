@@ -47,12 +47,7 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
       primary: false,
       physics: const NeverScrollableScrollPhysics(),
 
-      padding: EdgeInsets.fromLTRB(
-        responsive.anchoP(1),
-        responsive.altoP(.4),
-        responsive.anchoP(1),
-        responsive.altoP(.8),
-      ),
+
 
       itemCount: dataPersona.length,
 
@@ -1498,7 +1493,7 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
                   icono: Icons.warning_amber_rounded,
                   positivo: ant.infracciones.cantidad == "0",
                   onTap: () {
-                    // _mostrarDialogoInfracciones(ant);
+                    _mostrarDialogoInfracciones(ant);
                   },
                 ),
               ),
@@ -1511,6 +1506,9 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
                   valor: "${ant.restricciones.length}",
                   icono: Icons.block_rounded,
                   positivo: ant.restricciones.isEmpty,
+                  onTap: () {
+                    _mostrarDialogoRestricciones(ant);
+                  },
                 ),
               ),
             ],
@@ -1809,32 +1807,6 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
               fontWeight: FontWeight.w800,
             ),
           ),
-
-          /*  if(onTap!=null)...[
-            const SizedBox(height:2),
-
-            const Row(
-              mainAxisAlignment:MainAxisAlignment.center,
-              children:[
-                Text(
-                  "VER DETALLE",
-                  style:TextStyle(
-                    color:Color(0xFF607589),
-                    fontSize:5.5,
-                    fontWeight:FontWeight.w900,
-                  ),
-                ),
-
-                SizedBox(width:2),
-
-                Icon(
-                  Icons.chevron_right_rounded,
-                  color:Color(0xFF607589),
-                  size:11,
-                ),
-              ],
-            ),
-          ],*/
         ],
       ),
     );
@@ -2271,4 +2243,235 @@ class _DatoAntItem {
     required this.titulo,
     required this.valor,
   });
+}
+
+void _mostrarDialogoRestricciones(DataAnt ant) {
+  final BuildContext? context = Get.context;
+
+  if (context == null) return;
+
+  final bool tieneRestricciones = ant.restricciones.isNotEmpty;
+
+  showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    useSafeArea: true,
+    barrierColor: Colors.black.withOpacity(.68),
+    builder: (dialogContext) {
+      final double alto = MediaQuery.sizeOf(dialogContext).height;
+
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        child: Container(
+          width: double.infinity,
+          constraints: BoxConstraints(maxHeight: alto * .78),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF5F7FA),
+            borderRadius: BorderRadius.circular(22),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(.22),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(22),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // ==============================================
+                // HEADER
+                // ==============================================
+
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(13, 11, 6, 11),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: tieneRestricciones
+                          ? const [Color(0xFFB42318), Color(0xFF7A1710)]
+                          : const [Color(0xFF238457), Color(0xFF176A45)],
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(.14),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          tieneRestricciones
+                              ? Icons.block_rounded
+                              : Icons.verified_rounded,
+                          color: Colors.white,
+                          size: 23,
+                        ),
+                      ),
+
+                      const SizedBox(width: 9),
+
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "RESTRICCIONES ANT",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: .25,
+                              ),
+                            ),
+
+                            const SizedBox(height: 1),
+
+                            Text(
+                              tieneRestricciones
+                                  ? "INFORMACIÓN REGISTRADA"
+                                  : "SIN RESTRICCIONES REGISTRADAS",
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(.82),
+                                fontSize: 7.5,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      IconButton(
+                        constraints: const BoxConstraints(
+                          minWidth: 34,
+                          minHeight: 34,
+                        ),
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          Navigator.of(dialogContext).pop();
+                        },
+                        icon: const Icon(
+                          Icons.close_rounded,
+                          color: Colors.white,
+                          size: 21,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // ==============================================
+                // CONTENIDO
+                // ==============================================
+                Flexible(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      children: [
+                        if (tieneRestricciones) ...[
+                          ...ant.restricciones.map((restriccion) {
+                            return Container(
+                              width: double.infinity,
+                              margin: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(13),
+                                border: Border.all(color: const Color(0xFFE6C0BD)),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(
+                                    Icons.info_outline_rounded,
+                                    color: Color(0xFFB42318),
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      restriccion.toString(),
+                                      style: const TextStyle(
+                                        color: Color(0xFF4C3634),
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ] else ...[
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.check_circle_outline_rounded,
+                                  color: const Color(0xFF198754).withOpacity(.5),
+                                  size: 48,
+                                ),
+                                const SizedBox(height: 10),
+                                const Text(
+                                  "No se registran restricciones vigentes.",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0xFF718496),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+
+                        const SizedBox(height: 11),
+
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.of(dialogContext).pop();
+                            },
+                            icon: const Icon(Icons.check_rounded, size: 18),
+                            label: const Text(
+                              "CERRAR",
+                              style: TextStyle(
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size.fromHeight(44),
+                              backgroundColor: const Color(0xFF195BA6),
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
 }

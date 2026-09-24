@@ -28,3 +28,4 @@ part'operativo_migracion/movimientos_migratorios_model.dart';
 part'operativo_migracion/visa_extranjero_model.dart';
 part'operativo_migracion/visas_electronicas_model.dart';
 part'operativo_migracion/registro_consulta_migracion_model.dart';
+part 'conductor_vehiculo_model.dart';

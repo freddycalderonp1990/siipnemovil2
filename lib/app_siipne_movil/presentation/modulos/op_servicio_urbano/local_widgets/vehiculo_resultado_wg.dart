@@ -2,32 +2,30 @@ part of '../../pages.dart';
 
 mixin VehiculoResultadoViewMixin on OpServicioUrbanoPageBase {
   Widget muestraDatosVehiculo() {
-    return Obx(() {
-      if (controller.dataVehiculo.isEmpty) {
-        return estadoConsulta(
-          icono: Icons.directions_car_outlined,
-          titulo: "CONSULTA DE VEHÍCULOS",
-          descripcion:
-              "Ingrese una placa para visualizar la información del vehículo.",
-        );
-      }
-
-      return Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(6, 3, 6, 15),
-            child: DesingDatosVehiculoWg(
-              data: controller.dataVehiculo.first,
-              widgetAntesNuevaConsulta: resultadoConsultaVariable(),
-              onPressedNewConsulta: () {
-                nuevaConsultaVehiculo();
-              },
-              onPressedOcupantes: abrirPersonasVehiculo,
-            ),
-          ),
-        ],
+    if (controller.dataVehiculo.isEmpty) {
+      return estadoConsulta(
+        icono: Icons.directions_car_outlined,
+        titulo: "CONSULTA DE VEHÍCULOS",
+        descripcion:
+            "Ingrese una placa para visualizar la información del vehículo.",
       );
-    });
+    }
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(6, 3, 6, 15),
+          child: DesingDatosVehiculoWg(
+            data: controller.dataVehiculo.first,
+            widgetAntesNuevaConsulta: resultadoConsultaVariable(),
+            onPressedNewConsulta: () {
+              nuevaConsultaVehiculo();
+            },
+            onPressedOcupantes: abrirPersonasVehiculo,
+          ),
+        ),
+      ],
+    );
   }
 
   // ============================================================
@@ -422,7 +420,7 @@ mixin VehiculoResultadoViewMixin on OpServicioUrbanoPageBase {
       anchoPorcentaje: 100,
       myKey: keyCedulaVehiculo,
       controller: controller.controllerCedulaVehiculo,
-      maxLength: 20,
+      maxLength: 10,
       icono: const Icon(Icons.badge_outlined, color: AppColors.colorIcons),
       keyboardType: TextInputType.number,
       title: controller.tipoPersonaVehiculo.value == 'CONDUCTOR'
@@ -567,7 +565,7 @@ mixin VehiculoResultadoViewMixin on OpServicioUrbanoPageBase {
     );
   }
 
-  void abrirPersonasVehiculo() {
+  void abrirPersonasVehiculo() async {
     if (controller.dataVehiculo.isEmpty) {
       DialogosAwesome.getWarning(
         title: "VEHÍCULO REQUERIDO",
@@ -586,10 +584,16 @@ mixin VehiculoResultadoViewMixin on OpServicioUrbanoPageBase {
       return;
     }
 
+    /*
+     * Consultamos al servidor si este vehículo ya posee
+     * un conductor registrado en el operativo actual.
+     */
+    await controller.consultarExistenciaConductor();
+
     controller.prepararPantallaPersonasVehiculo();
 
     Get.to(
-      () => OpVehiculoPersonasPage(),
+      () => const OpVehiculoPersonasPage(),
       duration: const Duration(milliseconds: 280),
     );
   }

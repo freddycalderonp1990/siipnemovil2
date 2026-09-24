@@ -15,13 +15,27 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusDocumento = FocusNode();
 
-  int? _detalleVisibleId;
-
   @override
   void initState() {
     super.initState();
     controller = Get.find<OpServicioUrbanoController>();
     _focusDocumento.addListener(_onFocusDocumento);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (controller.conductorRegistradoEnBaseDeDatos.value) {
+        // Un pequeño delay asegura que la transición de la pantalla haya terminado
+        // y el diálogo aparezca correctamente sobre ella.
+        await Future.delayed(const Duration(milliseconds: 600));
+        if (!mounted) return;
+
+        DialogosAwesome.getInformation(
+          title: "CONDUCTOR IDENTIFICADO",
+          descripcion:
+              "Se ha detectado un conductor previamente registrado para este vehículo. "
+              "Proceda a registrar únicamente a los acompañantes u ocupantes.",
+        );
+      }
+    });
   }
 
   @override
@@ -62,11 +76,9 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
 
   @override
   Widget build(BuildContext context) {
-    final double teclado = MediaQuery.of(context).viewInsets.bottom;
-
     return WorkAreaPageSiipneMovilWidget(
       showGps: true,
-      mostrarBtnAtras: true,
+      mostrarBtnAtras: false,
       contenidoExpandido: true,
       title: "PERSONAS DEL VEHÍCULO",
       peticionServer: controller.paginaPersonasVehiculoLoading,
@@ -93,7 +105,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
             parent: AlwaysScrollableScrollPhysics(),
           ),
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          padding: EdgeInsets.fromLTRB(7, 7, 7, teclado + 28),
+          padding: const EdgeInsets.fromLTRB(7, 7, 7, 20),
           children: [
             _cabeceraVehiculo(vehiculo),
 
@@ -118,8 +130,6 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
               conductorRegistrado: conductorRegistrado,
               cantidadOcupantes: cantidadOcupantes,
             ),
-
-            const SizedBox(height: 20),
           ],
         );
       }),
@@ -175,7 +185,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                   "VEHÍCULO CONSULTADO",
                   style: TextStyle(
                     color: Color(0xCCFFFFFF),
-                    fontSize: 6.5,
+                    fontSize: 11,
                     fontWeight: FontWeight.w800,
                     letterSpacing: .25,
                   ),
@@ -203,7 +213,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Color(0xE6FFFFFF),
-                    fontSize: 7.4,
+                    fontSize: 10,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -211,34 +221,27 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
             ),
           ),
 
-          const SizedBox(width: 6),
+          const SizedBox(width: 8),
 
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(.14),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              children: [
-                const Text(
-                  "HDR",
-                  style: TextStyle(
-                    color: Color(0xBFFFFFFF),
-                    fontSize: 5.3,
-                    fontWeight: FontWeight.w700,
-                  ),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => Get.back(),
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(.15),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white.withOpacity(.20)),
                 ),
-
-                Text(
-                  "#${controller.idHdrEventoResumVehiculo}",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 6.3,
-                    fontWeight: FontWeight.w900,
-                  ),
+                child: const Icon(
+                  Icons.check_circle_outline_rounded,
+                  color: Colors.white,
+                  size: 24,
                 ),
-              ],
+              ),
             ),
           ),
         ],
@@ -289,12 +292,19 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
           Row(
             children: [
               Expanded(
-                child: _estadoPersona(
-                  icon: Icons.person_pin_rounded,
-                  titulo: "CONDUCTOR",
-                  detalle: conductorRegistrado ? "REGISTRADO" : "PENDIENTE",
-                  activo: conductorRegistrado,
-                ),
+                child: Obx(() {
+                  final bool conductorEnBase =
+                      controller.conductorRegistradoEnBaseDeDatos.value;
+                  final bool registrado =
+                      conductorRegistrado || conductorEnBase;
+
+                  return _estadoPersona(
+                    icon: Icons.person_pin_rounded,
+                    titulo: "CONDUCTOR",
+                    detalle: registrado ? "REGISTRADO" : "PENDIENTE",
+                    activo: registrado,
+                  );
+                }),
               ),
 
               const SizedBox(width: 6),
@@ -429,37 +439,75 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
 
           const SizedBox(height: 7),
 
-          Row(
-            children: [
-              Expanded(
-                child: _botonTipo(
-                  titulo: conductorRegistrado ? "CONDUCTOR ✓" : "CONDUCTOR",
-                  icon: Icons.person_pin_rounded,
-                  seleccionado: esConductor,
-                  habilitado: !conductorRegistrado,
-                  onTap: () {
-                    controller.seleccionarTipoPersonaVehiculo("CONDUCTOR");
-                  },
+          Obx(() {
+            final bool yaExisteEnBase =
+                controller.conductorRegistradoEnBaseDeDatos.value;
+
+            if (yaExisteEnBase) {
+              return Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEAF7F0),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFB5DFC5)),
                 ),
-              ),
-
-              const SizedBox(width: 6),
-
-              Expanded(
-                child: _botonTipo(
-                  titulo: "OCUPANTE",
-                  icon: Icons.airline_seat_recline_normal_rounded,
-                  seleccionado: !esConductor,
-                  habilitado: true,
-                  onTap: () {
-                    controller.seleccionarTipoPersonaVehiculo("OCUPANTE");
-                  },
+                child: const Row(
+                  children: [
+                    Icon(Icons.check_circle_rounded,
+                        color: Color(0xFF198754), size: 16),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        "CONDUCTOR YA REGISTRADO. PROCEDA CON LOS OCUPANTES.",
+                        style: TextStyle(
+                          color: Color(0xFF176F47),
+                          fontSize: 8,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
+              );
+            }
 
-          const SizedBox(height: 8),
+            return Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: _botonTipo(
+                        titulo:
+                            conductorRegistrado ? "CONDUCTOR ✓" : "CONDUCTOR",
+                        icon: Icons.person_pin_rounded,
+                        seleccionado: esConductor,
+                        habilitado: !conductorRegistrado,
+                        onTap: () {
+                          controller
+                              .seleccionarTipoPersonaVehiculo("CONDUCTOR");
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: _botonTipo(
+                        titulo: "OCUPANTE",
+                        icon: Icons.airline_seat_recline_normal_rounded,
+                        seleccionado: !esConductor,
+                        habilitado: true,
+                        onTap: () {
+                          controller.seleccionarTipoPersonaVehiculo("OCUPANTE");
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+              ],
+            );
+          }),
 
           _variableResultadoPersona(),
 
@@ -472,7 +520,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
               controller: controller.controllerCedulaVehiculo,
               enabled: !cargando,
               keyboardType: TextInputType.number,
-              maxLength: 20,
+              maxLength: 10,
               textInputAction: TextInputAction.search,
               scrollPadding: const EdgeInsets.only(bottom: 140),
               onTap: () {
@@ -1278,21 +1326,130 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
     }
 
     if (persona != null && mounted) {
-      setState(() {
-        _detalleVisibleId = persona!.idHdrEventoResum;
-      });
+      _mostrarDialogoDetallePersona(persona, eraConductor ? "CONDUCTOR" : "OCUPANTE");
 
-      await Future.delayed(const Duration(milliseconds: 150));
+      controller.controllerCedulaVehiculo.clear();
 
-      if (_scrollController.hasClients) {
-        await _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 350),
-          curve: Curves.easeOut,
-        );
+      if (eraConductor) {
+        controller.tipoPersonaVehiculo.value = "OCUPANTE";
       }
     }
   }
+
+  void _mostrarDialogoDetallePersona(DataConsultaPersona persona, String rol) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      useSafeArea: true,
+      barrierColor: Colors.black.withOpacity(.70),
+      builder: (dialogContext) {
+        final double alto = MediaQuery.sizeOf(dialogContext).height;
+
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 18),
+          child: Container(
+            width: double.infinity,
+            constraints: BoxConstraints(maxHeight: alto * .88),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF4F7FA),
+              borderRadius: BorderRadius.circular(22),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(.25),
+                  blurRadius: 25,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(22),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.fromLTRB(14, 11, 7, 11),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Color(0xFF195BA6), Color(0xFF0D4C9C)],
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(.14),
+                            borderRadius: BorderRadius.circular(11),
+                          ),
+                          child: const Icon(
+                            Icons.person_search_rounded,
+                            color: Colors.white,
+                            size: 23,
+                          ),
+                        ),
+                        const SizedBox(width: 9),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "DETALLE DE PERSONA",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                              Text(
+                                rol.toUpperCase(),
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(.85),
+                                  fontSize: 8.5,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.of(dialogContext).pop(),
+                          icon: const Icon(Icons.close_rounded,
+                              color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        children: [
+                          DesingBusquedaPorCedulaWidget(
+                            dataPersona: [persona],
+                            onPressedAceptar: () {
+                              Navigator.of(dialogContext).pop();
+                            },
+                            onPressedAntecedentes: () {
+                              _mostrarAntecedentesPersonaVehiculo(persona, rol);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
 
   // ============================================================
   // PERSONAS REGISTRADAS
@@ -1307,39 +1464,35 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
       return _sinPersonas();
     }
 
-    final List<DataConsultaPersona> personas = <DataConsultaPersona>[];
+    final List<Map<String, dynamic>> gridItems = [];
 
-    final List<String> titulos = <String>[];
-
-    final List<bool> esConductor = <bool>[];
-
+    // CASO 1: Conductor registrado localmente en la sesión actual
     if (conductorRegistrado) {
-      personas.add(controller.dataPersona_conductor.first);
-
-      titulos.add("CONDUCTOR");
-
-      esConductor.add(true);
+      gridItems.add({
+        "data": controller.dataPersona_conductor.first,
+        "titulo": "CONDUCTOR",
+        "esConductor": true,
+        "desdeBase": false,
+      });
+    }
+    // CASO 2: Conductor ya registrado previamente (Base de Datos)
+    else if (controller.conductorRegistradoEnBaseDeDatos.value &&
+        controller.conductorDesdeBase.value != null) {
+      gridItems.add({
+        "data": controller.conductorDesdeBase.value,
+        "titulo": "CONDUCTOR",
+        "esConductor": true,
+        "desdeBase": true,
+      });
     }
 
     for (int i = 0; i < cantidadOcupantes; i++) {
-      personas.add(controller.dataPersona_ocupantes[i]);
-
-      titulos.add("OCUPANTE ${i + 1}");
-
-      esConductor.add(false);
-    }
-
-    DataConsultaPersona? personaDetalle;
-    String tituloDetalle = '';
-
-    for (int i = 0; i < personas.length; i++) {
-      if (personas[i].idHdrEventoResum == _detalleVisibleId) {
-        personaDetalle = personas[i];
-
-        tituloDetalle = titulos[i];
-
-        break;
-      }
+      gridItems.add({
+        "data": controller.dataPersona_ocupantes[i],
+        "titulo": "OCUPANTE ${i + 1}",
+        "esConductor": false,
+        "desdeBase": false,
+      });
     }
 
     return Column(
@@ -1364,7 +1517,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                 "DISTRIBUCIÓN DE PERSONAS",
                 style: TextStyle(
                   color: Color(0xFF52687C),
-                  fontSize: 8,
+                  fontSize: 12,
                   fontWeight: FontWeight.w900,
                 ),
               ),
@@ -1388,7 +1541,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                   const SizedBox(width: 3),
 
                   Text(
-                    "${personas.length}",
+                    "${gridItems.length}",
                     style: const TextStyle(
                       color: Color(0xFF195BA6),
                       fontSize: 7,
@@ -1473,7 +1626,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                       // =================================================
 
                       Container(
-                        width: 112,
+                        width: 220,
                         height: 23,
                         decoration: const BoxDecoration(
                           color: Color(0xFF195BA6),
@@ -1499,7 +1652,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                               "FRENTE DEL VEHÍCULO",
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 5.6,
+                                fontSize: 11,
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: .25,
                               ),
@@ -1516,7 +1669,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                       GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: personas.length,
+                        itemCount: gridItems.length,
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
@@ -1525,23 +1678,25 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                               childAspectRatio: .90,
                             ),
                         itemBuilder: (BuildContext context, int index) {
-                          final DataConsultaPersona data = personas[index];
+                          final Map<String, dynamic> item = gridItems[index];
+
+                          if (item["desdeBase"] == true) {
+                            return _asientoConductorDesdeBase(
+                              titulo: item["titulo"],
+                              data: item["data"] as ConductorVehiculo,
+                            );
+                          }
 
                           return _asientoPersonaVehiculo(
-                            titulo: titulos[index],
-                            data: data,
-                            conductor: esConductor[index],
-                            seleccionado:
-                                _detalleVisibleId == data.idHdrEventoResum,
+                            titulo: item["titulo"],
+                            data: item["data"] as DataConsultaPersona,
+                            conductor: item["esConductor"],
+                            seleccionado: false,
                             onTap: () {
-                              setState(() {
-                                if (_detalleVisibleId ==
-                                    data.idHdrEventoResum) {
-                                  _detalleVisibleId = null;
-                                } else {
-                                  _detalleVisibleId = data.idHdrEventoResum;
-                                }
-                              });
+                              _mostrarDialogoDetallePersona(
+                                item["data"] as DataConsultaPersona,
+                                item["titulo"],
+                              );
                             },
                           );
                         },
@@ -1553,67 +1708,6 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
             ),
           ),
         ),
-
-        // ======================================================
-        // DETALLE PERSONA
-        // ======================================================
-        if (personaDetalle != null) ...[
-          const SizedBox(height: 9),
-
-          Row(
-            children: [
-              const Icon(
-                Icons.badge_outlined,
-                color: Color(0xFF195BA6),
-                size: 14,
-              ),
-
-              const SizedBox(width: 5),
-
-              Expanded(
-                child: Text(
-                  "DETALLE · $tituloDetalle",
-                  style: const TextStyle(
-                    color: Color(0xFF52687C),
-                    fontSize: 7.5,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ),
-
-              IconButton(
-                constraints: const BoxConstraints(minWidth: 30, minHeight: 30),
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  setState(() {
-                    _detalleVisibleId = null;
-                  });
-                },
-                icon: const Icon(
-                  Icons.keyboard_arrow_up_rounded,
-                  color: Color(0xFF718496),
-                  size: 20,
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 4),
-
-          DesingBusquedaPorCedulaWidget(
-            key: ValueKey("detalle_${personaDetalle.idHdrEventoResum}"),
-            dataPersona: <DataConsultaPersona>[personaDetalle],
-            onPressedAceptar: () {
-              _nuevaConsultaPersonaVehiculo();
-            },
-            onPressedAntecedentes: () {
-              _mostrarAntecedentesPersonaVehiculo(
-                personaDetalle!,
-                tituloDetalle,
-              );
-            },
-          ),
-        ],
       ],
     );
   }
@@ -1969,36 +2063,6 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
   }
 
   // ============================================================
-  // NUEVA CONSULTA
-  // ============================================================
-
-  Future<void> _nuevaConsultaPersonaVehiculo() async {
-    if (!mounted) return;
-
-    setState(() {
-      _detalleVisibleId = null;
-    });
-
-    controller.controllerCedulaVehiculo.clear();
-
-    /*
-     * Si ya existe conductor,
-     * automáticamente continuamos con ocupantes.
-     */
-    if (controller.dataPersona_conductor.isNotEmpty) {
-      controller.tipoPersonaVehiculo.value = "OCUPANTE";
-    }
-
-    await Future.delayed(const Duration(milliseconds: 120));
-
-    if (!mounted) return;
-
-    _focusDocumento.requestFocus();
-
-    await _mostrarCampoSobreTeclado();
-  }
-
-  // ============================================================
   // SIN PERSONAS
   // ============================================================
 
@@ -2108,6 +2172,120 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+  Widget _asientoConductorDesdeBase({
+    required String titulo,
+    required ConductorVehiculo data,
+  }) {
+    const Color colorRol = Color(0xFF195BA6);
+
+    return Container(
+      padding: const EdgeInsets.all(7),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEAF3FC),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: const Color(0xFF79A9D3),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(.035),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            decoration: BoxDecoration(
+              color: colorRol.withOpacity(.10),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.airline_seat_recline_extra_rounded,
+                  color: colorRol,
+                  size: 11,
+                ),
+                SizedBox(width: 3),
+                Flexible(
+                  child: Text(
+                    "CONDUCTOR",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: colorRol,
+                      fontSize: 6.2,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 7),
+          Expanded(
+            child: Center(
+              child: Container(
+                width: 68,
+                height: 75,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEAF2FA),
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: const Color(0xFFB8CDE0)),
+                ),
+                child: const Icon(Icons.person_rounded,
+                    color: Color(0xFF7796B3), size: 31),
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            data.conductor.trim().isEmpty ? "SIN NOMBRE" : data.conductor,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Color(0xFF29445D),
+              fontSize: 7.4,
+              fontWeight: FontWeight.w900,
+              height: 1.15,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFFEAF7F0),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.check_circle_rounded,
+                    color: Color(0xFF198754), size: 11),
+                SizedBox(width: 3),
+                Text(
+                  "YA REGISTRADO",
+                  style: TextStyle(
+                    color: Color(0xFF198754),
+                    fontSize: 5.8,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

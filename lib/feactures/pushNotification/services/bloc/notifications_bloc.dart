@@ -7,7 +7,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 
 import '../../../../app/core/utils/device_info_app.dart';
-import '../../../../app/core/utils/utilidadesUtil.dart';
+import 'dart:async';
 import '../../../../app/domain/enums/enums.dart';
 import '../../../../app/presentation/widgets/custom_app_widgets.dart';
 import '../../data/models/models_push_notification.dart';
@@ -44,14 +44,44 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   final FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-  NotificationsBloc() : super(NotificationsInitial()) {
+  NotificationsBloc() : super(const NotificationsState()) {
     print("NotificationsBloc inicializado...");
+
+    on<NotificationStatusChanged>((event, emit) {
+      emit(state.copyWith(status: event.status));
+    });
+
+    _checkPermissionStatus();
 
     _onForegroundMessage();
 
     FirebaseMessaging.onMessageOpenedApp.listen(_onMessageOpenedApp);
 
     _listenTokenRefresh();
+  }
+
+  Future<void> _checkPermissionStatus() async {
+    try {
+      final settings = await messaging.getNotificationSettings();
+      add(NotificationStatusChanged(_mapStatus(settings.authorizationStatus)));
+    } catch (e) {
+      // Si falla, asumimos que no está determinado para permitir pedirlo
+      add(const NotificationStatusChanged(NotificationPermissionStatus.notDetermined));
+    }
+  }
+
+  NotificationPermissionStatus _mapStatus(AuthorizationStatus status) {
+    switch (status) {
+      case AuthorizationStatus.authorized:
+        return NotificationPermissionStatus.authorized;
+      case AuthorizationStatus.denied:
+        return NotificationPermissionStatus.denied;
+      case AuthorizationStatus.provisional:
+        return NotificationPermissionStatus.provisional;
+      case AuthorizationStatus.notDetermined:
+      default:
+        return NotificationPermissionStatus.notDetermined;
+    }
   }
 
   void _listenTokenRefresh() {
@@ -79,6 +109,8 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     await LocalNotification.requestPermissionLocalNotifications();
 
     print("Authorization Status: ${settings.authorizationStatus}");
+
+    add(NotificationStatusChanged(_mapStatus(settings.authorizationStatus)));
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       // ✅ OK
@@ -254,13 +286,14 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
       print("Print error al insertar token en el server ${ex.toString()}");
     }
   }
-
+  StreamSubscription<RemoteMessage>? _foregroundSubscription;
   /// Mensajes recibidos en primer plano
   void _onForegroundMessage() {
-    print("Escuchando mensajes en primer plano...");
-    FirebaseMessaging.onMessage.listen(handleRemoteMessage);
+    if (_foregroundSubscription != null) return;
+    _foregroundSubscription = FirebaseMessaging.onMessage.listen(
+      handleRemoteMessage,
+    );
   }
-
   // Mensajes recibidos en minimizado
   void _onMessageOpenedApp(RemoteMessage message) {
     print("========= onMessageOpenedApp =========");
@@ -277,21 +310,29 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   }
 
   /// Manejo de mensajes en cualquier estado
-  void handleRemoteMessage(RemoteMessage message) {
-    print("MENSAJE RECIBIDO: ${message.data}");
-    print("messageId: ${message.messageId}");
-    print("collapseKey: ${message.collapseKey}");
-    print("contentAvailable: ${message.contentAvailable}");
+  void handleRemoteMessage(RemoteMessage message) async {
+    final tipo = message.data['tipo']?.toString();
 
-    final notification = NotificationModel.fromJson(message.data);
+    // Estas alertas las muestra exclusivamente OperativoPushService.
+    if (tipo == 'BOLETA' || tipo == 'VEHICULO_ROBADO') return;
 
-    print('accion: ${notification.accion}');
-    print('appName: ${notification.appName}');
-    print('idAccion: ${notification.idAccion}');
-    print('body: ${notification.body}');
-    print('title: ${notification.title}');
-    print('clickAction: ${notification.clickAction}');
-
-    LocalNotification.showLocalNotification(notification: notification);
+    try {
+      var notification = NotificationModel.fromJson(message.data);
+      notification = notification.copyWith(
+        title: message.notification?.title ?? notification.title,
+        body: message.notification?.body ?? notification.body,
+      );
+      await LocalNotification.showLocalNotification(
+        notification: notification,
+      );
+    } catch (e) {
+      print('[PUSH GENERAL] Error procesando notificación: $e');
+    }
+  }
+  @override
+  Future<void> close() async {
+    await _foregroundSubscription?.cancel();
+    _foregroundSubscription = null;
+    await super.close();
   }
 }

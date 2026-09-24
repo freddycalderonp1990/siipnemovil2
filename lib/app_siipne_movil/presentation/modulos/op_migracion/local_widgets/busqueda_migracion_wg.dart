@@ -644,7 +644,7 @@ mixin BusquedaMigracionViewMixin on OpMigracionPageBase {
                                   SizedBox(width: 5),
                                   Flexible(
                                     child: Text(
-                                      'CANAL SEGURO  ·  CONSULTA AUDITABLE',
+                                      'CONSULTA AUDITABLE',
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(

@@ -16,50 +16,38 @@ class OpServicioUrbanoPage extends OpServicioUrbanoPageBase
         VehiculoResultadoViewMixin,
         EstadosOperativoViewMixin {
   OpServicioUrbanoPage({super.key});
-
   @override
   final GlobalKey<FormState> keyPlaca = GlobalKey<FormState>();
-
   @override
   final GlobalKey<FormState> keyCedula = GlobalKey<FormState>();
-
   @override
   final GlobalKey<FormState> keyCedulaVehiculo = GlobalKey<FormState>();
-
   @override
   final GlobalKey<FormState> keyFinalizar = GlobalKey<FormState>();
-
   @override
-  Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      child: WorkAreaPageSiipneMovilWidget(
-        showGps: true,
-        mostrarBtnAtras: false,
-        contenidoExpandido: true,
-        title: null,
-        peticionServer: controller.peticionServerState,
-        contenido: Obx(
-          () => controller.datosOperativoValidos.value
-              ? _contenido(context)
-              : operativoInvalido(),
-        ),
+  Widget build(BuildContext context) => PopScope(
+    canPop: false,
+    child: WorkAreaPageSiipneMovilWidget(
+      showGps: true,
+      mostrarBtnAtras: false,
+      contenidoExpandido: true,
+      title: null,
+      peticionServer: controller.peticionServerState,
+      contenido: Obx(
+        () => controller.datosOperativoValidos.value
+            ? _contenido(context)
+            : operativoInvalido(),
       ),
-    );
-  }
-
+    ),
+  );
   Widget _contenido(BuildContext context) {
     final double teclado = MediaQuery.of(context).viewInsets.bottom;
-
     return Obx(() {
-      Widget resultado = estadoInicial();
-
-      if (controller.selectPerson.value) {
-        resultado = muestraDatosPersona();
-      } else if (controller.selectVehiculo.value) {
-        resultado = muestraDatosVehiculo();
-      }
-
+      final Widget resultado = controller.selectPerson.value
+          ? muestraDatosPersona()
+          : controller.selectVehiculo.value
+          ? muestraDatosVehiculo()
+          : estadoInicial();
       return ListView(
         physics: const BouncingScrollPhysics(
           parent: AlwaysScrollableScrollPhysics(),
@@ -71,12 +59,7 @@ class OpServicioUrbanoPage extends OpServicioUrbanoPageBase
           const SizedBox(height: 1),
           tipoDeConsulta(),
           const SizedBox(height: 5),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 250),
-            switchInCurve: Curves.easeOut,
-            switchOutCurve: Curves.easeIn,
-            child: busquedaTipoOperativo(),
-          ),
+          busquedaTipoOperativo(),
           const SizedBox(height: 6),
           resultado,
           const SizedBox(height: 15),

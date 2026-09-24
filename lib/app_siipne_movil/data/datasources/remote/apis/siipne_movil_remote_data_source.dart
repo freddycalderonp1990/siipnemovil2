@@ -60,6 +60,9 @@ abstract class SiipneMovilRemoteDataSource {
   Future<DataAntecedentes> getDatosAntecedentes({
     required AntecedentesRequest request,
   });
+  Future<ConductorVehiculo> getDatosConductorVehiculo({
+    required ConductorVehiculoRequest request,
+  });
 }
 
 class SiipneMovilRemoteDataSourceImpl implements SiipneMovilRemoteDataSource {
@@ -310,4 +313,18 @@ class SiipneMovilRemoteDataSourceImpl implements SiipneMovilRemoteDataSource {
       return antecedentesModelFromJson(json).dataAntecedentes;
     });
   }
+  @override
+  Future<ConductorVehiculo> getDatosConductorVehiculo({
+    required ConductorVehiculoRequest request,
+  }) async {
+    Map<String, dynamic> body = HeadAppSiipneMovilRequest(
+      uri: SiipneMovilApiConstantes.SIIPNE_MOVIL_GET_CONSULTA_CONDUCTOR,
+      bodyRequest: request.toJson(),
+    ).toJson();
+    String json = await UrlApiProviderAppCenso.post(body: body);
+    return await ExceptionHelper.manejarErroresParseJsonException(() async {
+      return conductorVehiculoModelFromJson(json).conductorVehiculo;
+    });
+  }
+
 }

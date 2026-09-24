@@ -202,7 +202,7 @@ Al seleccionar la opción "ACEPTO", declaro que he leído, comprendido y acepto 
   // REGISTRAR ACUERDO
   // ============================================================
 
-  Future<bool> registrarAcuerdo() async {
+  Future<bool> registrarAcuerdo({Uint8List? firma}) async {
     if (procesandoAceptacion.value) return false;
     if (redireccionando.value) return false;
 
@@ -234,6 +234,9 @@ Al seleccionar la opción "ACEPTO", declaro que he leído, comprendido y acepto 
       debugPrint('ID PERSONA: ${user.idGenPersona}');
       debugPrint('ID USUARIO: ${user.idGenUsuario}');
       debugPrint('KEY: $_keyAcuerdo');
+      if (firma != null) {
+        debugPrint('FIRMA CAPTURADA: ${firma.length} bytes');
+      }
       debugPrint('==========================================');
 
       final Acuerdo acuerdo = await siipneMovilUseCase.insertaAcuerdo(
