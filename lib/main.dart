@@ -3,31 +3,29 @@ import 'dart:io';
 import 'package:app_mi_upc/app_mi_upc.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../app/di_app.dart';
-
 import 'app/core/app_config.dart';
-
 import 'app/core/seguridades/validate_SSL.dart';
 import 'app/main_app.dart';
-
 import 'app/presentation/routes/app_routes.dart';
-
 import 'feactures/gps/presentation/bloc/gps/gps_bloc.dart';
 import 'feactures/gps/presentation/location/location_bloc.dart';
 
-//librerias para notificaciones
-
+// Notificaciones.
 import 'package:firebase_core/firebase_core.dart';
-import 'feactures/pushNotification/data/models/models_push_notification.dart';
 import 'feactures/pushNotification/services/bloc/notifications_bloc.dart';
 import 'feactures/pushNotification/services/localNotification/local_notification.dart';
 import 'firebase_options.dart';
+import 'feactures/pushNotification/data/models/models_push_notification.dart';
+// Ajustar únicamente a la ubicación real de este archivo.
+import 'app_siipne_movil/presentation/modulos/op_servicio_urbano/operativo_push_service.dart';
 
-//solucion:OS Error:   CERTIFICATE_VERIFY_FAILED
+
+// Configuración original conservada.
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
@@ -37,20 +35,32 @@ class MyHttpOverrides extends HttpOverrides {
   }
 }
 
-// === Handler para notificaciones en segundo plano
+// Handler de notificaciones en segundo plano.
+@pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  // Mostrar notificación local si llega en background
-  if (message.notification != null) {
-    NotificationModel notification = NotificationModel.fromJson(message.data);
-
-    notification = notification.copyWith(
-      title:
-          '${message.notification?.title ?? ''} ${notification.appName ?? ''}',
-      body: message.notification?.body,
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
     );
+  }
 
-    await LocalNotification.showLocalNotification(notification: notification);
+  // Los mensajes con notification ya los muestra el sistema en background.
+  if (message.notification != null) return;
+
+  // OperativoPushService usa mensajes notification + data.
+  final tipo = message.data['tipo']?.toString();
+  if (tipo == 'BOLETA' || tipo == 'VEHICULO_ROBADO') return;
+
+  // Compatibilidad con mensajes antiguos que solo contienen data.
+  try {
+    final notification = NotificationModel.fromJson(message.data);
+    await LocalNotification.initializeLocalNotifications();
+    await LocalNotification.showLocalNotification(
+      notification: notification,
+      segundoPlano: true,
+    );
+  } catch (e) {
+    debugPrint('[PUSH BACKGROUND] Error: $e');
   }
 }
 
@@ -60,36 +70,64 @@ void main() async {
   DependencyInjectionApp();
 
   await dotenv.load(fileName: ".env");
-
   AppConfig.init();
 
   AppRoutesMiUpc.setNameMenu(name: "Home");
   AppRoutesMiUpc.setPageInicio(AppRoutes.SPLASH_APP);
 
   try {
-    //validamos si el certificado SSl corresponde al SIIPNE 3w
+    // Validación SSL original conservada.
     ValidateSSL validateSSL = ValidateSSL();
     await validateSSL.validarSSl();
   } catch (e) {
     print("error certificados $e");
   }
 
+  // Configuración de notificaciones.
   try {
-    // Inicializar Firebase
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    }
+    if (kDebugMode) {
+      debugPrint('[PUSH MAIN] Proyecto: ${Firebase.app().options.projectId}');
+    }
 
-    // Configurar handler en background
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    // Conservamos la inicialización del sistema existente.
+    try {
+      await LocalNotification.initializeLocalNotifications();
+      FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+      debugPrint('[PUSH MAIN] LocalNotification inicializado');
+    } catch (e, stackTrace) {
+      debugPrint('[PUSH MAIN] Error en LocalNotification: $e');
+      if (kDebugMode) debugPrint('$stackTrace');
+    }
 
-    // Inicializar notificaciones locales
-    await LocalNotification.initializeLocalNotifications();
+    if (OperativoPushService.instance.compatible) {
+      try {
+        final permiso = await FirebaseMessaging.instance.requestPermission(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+        debugPrint('[PUSH MAIN] Permiso: ${permiso.authorizationStatus}');
+      } catch (e, stackTrace) {
+        debugPrint('[PUSH MAIN] Error solicitando permisos: $e');
+        if (kDebugMode) debugPrint('$stackTrace');
+      }
 
-    // === Solicitar permisos de notificación (iOS + Android 13+) 👇
-    // await LocalNotification.requestPermissionLocalNotifications();
-  } catch (e) {
+      try {
+        await OperativoPushService.instance.inicializar();
+        debugPrint('[PUSH MAIN] OperativoPushService inicializado');
+      } catch (e, stackTrace) {
+        debugPrint('[PUSH MAIN] Error en OperativoPushService: $e');
+        if (kDebugMode) debugPrint('$stackTrace');
+      }
+    }
+  } catch (e, stackTrace) {
     print(" Error en Firebase Notificaciones: ${e.toString()}");
+    if (kDebugMode) debugPrint('$stackTrace');
   }
 
   runApp(
@@ -105,10 +143,8 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-
     return MainApp();
   }
 }

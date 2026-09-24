@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -50,19 +47,27 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCmchOg8UyVqoe6DIZx4cmwuxG3jheXuuU',
-    appId: '1:381747498680:android:9517cde8e20e0049506e4d',
-    messagingSenderId: '381747498680',
-    projectId: 'siipne-elecciones-y-censo',
-    storageBucket: 'siipne-elecciones-y-censo.firebasestorage.app',
+    apiKey: 'AIzaSyAgzOlXeav_XMKw3mXPxx6OkhQuFFmwnVY',
+    appId: '1:862175613623:android:74488488c466b0747bf332',
+    messagingSenderId: '862175613623',
+    projectId: 'crypto-2025-jp',
+    storageBucket: 'crypto-2025-jp.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAlDDGMrFrp7gInU3z0z7Sz-i9Mx8uvHVU',
-    appId: '1:381747498680:ios:4160030610113aa7506e4d',
-    messagingSenderId: '381747498680',
-    projectId: 'siipne-elecciones-y-censo',
-    storageBucket: 'siipne-elecciones-y-censo.firebasestorage.app',
-    iosBundleId: 'ecuador.policianacional.dntic.siipnemovil',
+    apiKey: 'AIzaSyABCua2weTxEOwu7INX7gb-saxV-bI8h3M',
+    appId: '1:862175613623:ios:a3f3f58e931e34d07bf332',
+    messagingSenderId: '862175613623',
+    projectId: 'crypto-2025-jp',
+    storageBucket: 'crypto-2025-jp.firebasestorage.app',
+    iosBundleId: 'ecuador.policianacional.dntic.siipnemovilV2',
+  );
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyAdX3UWjDVH92c411clFmRJQV6Gd9ZtQaM',
+    appId: '1:862175613623:web:026ef8494a9a6acb7bf332',
+    messagingSenderId: '862175613623',
+    projectId: 'crypto-2025-jp',
+    authDomain: 'crypto-2025-jp.firebaseapp.com',
+    storageBucket: 'crypto-2025-jp.firebasestorage.app',
+    measurementId: 'G-CD7TK5EFYL',
   );
 }
