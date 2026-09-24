@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:get/get.dart' hide Transition;
 import 'package:intl/intl.dart';
@@ -15,12 +15,12 @@ import 'package:country_utils/country_utils.dart';
 
 import '../../../app/core/values/app_colors.dart';
 import '../../../app/core/values/app_images.dart';
-import '../../../app/domain/enums/enums.dart';
+
 import '../../../app/presentation/widgets/custom_app_widgets.dart';
 import '../../../app/presentation/widgets/img_perfil_redonda.dart';
 import '../../../feactures/user/domain/entities/user.dart';
-import '../../../feactures/pushNotification/services/bloc/notifications_bloc.dart';
 
+import 'package:local_auth/local_auth.dart';
 import '../../core/utils/operativo_qr_util.dart';
 import '../../core/values/app_siipne_movil_images.dart';
 import '../../data/models/models_siipne_movil.dart';

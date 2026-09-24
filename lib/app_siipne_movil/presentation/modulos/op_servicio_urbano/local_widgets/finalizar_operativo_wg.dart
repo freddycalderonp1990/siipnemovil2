@@ -1,14 +1,15 @@
 part of '../../pages.dart';
 
 mixin FinalizarOperativoViewMixin on OpServicioUrbanoPageBase {
-  void mostrarFinalizarOperativo() {
+  Future<void> mostrarFinalizarOperativo() async {
     controller.limpiarClaveFinalizar();
-
     final BuildContext? context = Get.context;
-
     if (context == null) return;
 
-    showDialog<void>(
+    final bool mostrarBiometria = await _tieneBiometriaConfigurada();
+    if (!context.mounted) return;
+
+    await showDialog<void>(
       context: context,
       barrierDismissible: false,
       useSafeArea: true,
@@ -16,10 +17,7 @@ mixin FinalizarOperativoViewMixin on OpServicioUrbanoPageBase {
       builder: (dialogContext) {
         return Dialog(
           backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.symmetric(
-            horizontal: 18,
-            vertical: 20,
-          ),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
           child: Material(
             color: Colors.white,
             borderRadius: BorderRadius.circular(23),
@@ -30,7 +28,6 @@ mixin FinalizarOperativoViewMixin on OpServicioUrbanoPageBase {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   headerFinalizar(dialogContext),
-
                   Padding(
                     padding: const EdgeInsets.fromLTRB(15, 14, 15, 15),
                     child: Column(
@@ -52,9 +49,7 @@ mixin FinalizarOperativoViewMixin on OpServicioUrbanoPageBase {
                                 color: Color(0xFFB76832),
                                 size: 19,
                               ),
-
                               SizedBox(width: 7),
-
                               Expanded(
                                 child: Text(
                                   "Al finalizar el operativo se cerrará el registro de nuevas consultas. Esta acción requiere validar su identidad.",
@@ -69,39 +64,31 @@ mixin FinalizarOperativoViewMixin on OpServicioUrbanoPageBase {
                             ],
                           ),
                         ),
-
                         const SizedBox(height: 13),
-
                         opcionFinalizarClave(dialogContext),
-
-                        const SizedBox(height: 10),
-
-                        const Row(
-                          children: [
-                            Expanded(child: Divider()),
-
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 8),
-                              child: Text(
-                                "O",
-                                style: TextStyle(
-                                  color: Color(0xFF94A3B8),
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w800,
+                        if (mostrarBiometria) ...[
+                          const SizedBox(height: 10),
+                          const Row(
+                            children: [
+                              Expanded(child: Divider()),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Text(
+                                  "O",
+                                  style: TextStyle(
+                                    color: Color(0xFF94A3B8),
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w800,
+                                  ),
                                 ),
                               ),
-                            ),
-
-                            Expanded(child: Divider()),
-                          ],
-                        ),
-
-                        const SizedBox(height: 10),
-
-                        opcionFinalizarBiometria(dialogContext),
-
+                              Expanded(child: Divider()),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          opcionFinalizarBiometria(dialogContext),
+                        ],
                         const SizedBox(height: 12),
-
                         SizedBox(
                           width: double.infinity,
                           child: TextButton.icon(
@@ -468,5 +455,16 @@ mixin FinalizarOperativoViewMixin on OpServicioUrbanoPageBase {
       },
       btnCancelOnPress: () {},
     );
+  }
+  Future<bool> _tieneBiometriaConfigurada() async {
+    try {
+      final auth = LocalAuthentication();
+      if (!await auth.canCheckBiometrics) return false;
+      final disponibles = await auth.getAvailableBiometrics();
+      return disponibles.isNotEmpty;
+    } catch (e) {
+      debugPrint('No se pudo verificar la biometría: $e');
+      return false;
+    }
   }
 }
