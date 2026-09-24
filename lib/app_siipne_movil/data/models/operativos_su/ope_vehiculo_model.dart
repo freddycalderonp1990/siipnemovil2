@@ -429,43 +429,84 @@ class RestriccionPj {
 class RestriccionPjData {
   bool robado;
   String detBusqueda;
-  String empresa;
-  String direccion;
-  String fechaIncidente;
+  int cantidadRestricciones;
+  List<RestriccionPjDetalle> restricciones;
 
   RestriccionPjData({
     required this.robado,
     required this.detBusqueda,
-    required this.fechaIncidente,
-    required this.empresa,
-    required this.direccion,
+    required this.cantidadRestricciones,
+    required this.restricciones,
   });
 
   factory RestriccionPjData.fromJson(Map<String, dynamic> json) =>
       RestriccionPjData(
         robado: _boolVehiculo(json['robado']),
         detBusqueda: ParseModel.parseToString(json['detBusqueda']),
-        fechaIncidente: ParseModel.parseToString(json['fechaIncidente']),
-        empresa: ParseModel.parseToString(json['empresa']),
-        direccion: ParseModel.parseToString(json['direccion']),
+        cantidadRestricciones:
+        int.tryParse(json['cantidadRestricciones']?.toString() ?? '0') ?? 0,
+        restricciones: (json['restricciones'] as List<dynamic>? ?? [])
+            .map(
+              (item) => RestriccionPjDetalle.fromJson(
+            Map<String, dynamic>.from(item),
+          ),
+        )
+            .toList(),
       );
 
   factory RestriccionPjData.empty() => RestriccionPjData(
     robado: false,
     detBusqueda: '',
-    empresa: '',
-    direccion: '',
-    fechaIncidente: '',
+    cantidadRestricciones: 0,
+    restricciones: [],
   );
 
   Map<String, dynamic> toJson() => {
     'robado': robado,
     'detBusqueda': detBusqueda,
+    'cantidadRestricciones': cantidadRestricciones,
+    'restricciones': restricciones.map((e) => e.toJson()).toList(),
+  };
+}
+
+class RestriccionPjDetalle {
+  String fechaIncidente;
+  String empresa;
+  String direccion;
+  String estado;
+
+  RestriccionPjDetalle({
+    required this.fechaIncidente,
+    required this.empresa,
+    required this.direccion,
+    required this.estado,
+  });
+
+  factory RestriccionPjDetalle.fromJson(Map<String, dynamic> json) =>
+      RestriccionPjDetalle(
+        fechaIncidente:
+        ParseModel.parseToString(json['fechaIncidente']),
+        empresa: ParseModel.parseToString(json['empresa']),
+        direccion: ParseModel.parseToString(json['direccion']),
+        estado: ParseModel.parseToString(json['estado']),
+      );
+
+  factory RestriccionPjDetalle.empty() => RestriccionPjDetalle(
+    fechaIncidente: '',
+    empresa: '',
+    direccion: '',
+    estado: '',
+  );
+
+  Map<String, dynamic> toJson() => {
     'fechaIncidente': fechaIncidente,
     'empresa': empresa,
     'direccion': direccion,
+    'estado': estado,
   };
 }
+
+
 
 class DatosConsultaDuplicadoOperativo {
   int idHdrEvento;
