@@ -34,7 +34,7 @@ class LocalNotification {
 
   /// Inicializar notificaciones
   static Future<void> initializeLocalNotifications() async {
-    const androidInit = AndroidInitializationSettings('@drawable/ic_app');
+    const androidInit = AndroidInitializationSettings('ic_stat_operativo');
 
     const iosInit = DarwinInitializationSettings();
 
@@ -92,87 +92,70 @@ class LocalNotification {
   /// Mostrar notificación
   static Future<void> showLocalNotification({
     required NotificationModel notification,
+    bool segundoPlano = false,
   }) async {
-    Random random = Random();
-    var id = random.nextInt(1000000);
-    /*
-    SnackbarService.show(
-      titulo: title!=null?title:'No tilte',
-      subtitulo: body!=null?body:'No body',
-      imagenDerecha: "imgBase64",
+    final titulo = (notification.title ?? '').trim();
+    final mensaje = (notification.body ?? '').trim();
 
-    );*/
+    if (titulo.isEmpty && mensaje.isEmpty) {
+      debugPrint('[PUSH GENERAL] Notificación vacía descartada');
+      return;
+    }
 
-    /*  const androidDetails = AndroidNotificationDetails(
-      'default_channel_id', // 👈 obligatorio en Android 8+
-      'General Notifications', // 👈 nombre visible del canal
-      channelDescription: 'Canal de notificaciones por defecto',
-      importance: Importance.max,
-      priority: Priority.high,
-      playSound: true,
-      icon: '@mipmap/launcher_icon', // ✅ funciona seguro
-    );*/
-
-    // fix
-
-    final androidDetails = AndroidNotificationDetails(
-      'default_channel_id',
-      'General Notifications',
-      channelDescription: 'Canal de notificaciones por defecto',
-      importance: Importance.max,
-      priority: Priority.high,
-      playSound: true,
-      icon: '@drawable/ic_app',
-
-      styleInformation: BigTextStyleInformation(
-        notification.body ?? '',
-        contentTitle: notification.title,
-        summaryText: '',
-        htmlFormatBigText: true,
-        htmlFormatContentTitle: true,
+    final id = Random().nextInt(1000000);
+    final detalles = NotificationDetails(
+      android: AndroidNotificationDetails(
+        'default_channel_id',
+        'General Notifications',
+        channelDescription: 'Canal de notificaciones por defecto',
+        importance: Importance.max,
+        priority: Priority.high,
+        playSound: true,
+        icon: 'ic_stat_operativo',
+        styleInformation: BigTextStyleInformation(
+          mensaje,
+          contentTitle: titulo,
+          htmlFormatBigText: true,
+          htmlFormatContentTitle: true,
+        ),
+      ),
+      iOS: const DarwinNotificationDetails(
+        presentAlert: true,
+        presentSound: true,
       ),
     );
 
-    const iosDetails = DarwinNotificationDetails(
-      presentAlert: true,
-      presentSound: true,
-    );
+    if (!segundoPlano) {
+      try {
+        final guardar = Get.find<GuardarNotificacionRemotaUseCase>();
+        final localStore = Get.find<LocalStoreUseCase>();
+        final UserEntities user = await localStore.getUserModel();
+        await guardar(
+          notification: notification,
+          idGenUsuario: user.idGenUsuario,
+        );
+      } catch (e) {
+        debugPrint('[PUSH GENERAL] Error guardando notificación: $e');
+      }
 
-    final notificationDetails = NotificationDetails(
-      android: androidDetails,
-      iOS: iosDetails,
-    );
+      try {
+        await Get.find<NotificationService>().cargar();
+      } catch (e) {
+        debugPrint('[PUSH GENERAL] Error actualizando notificaciones: $e');
+      }
 
-    try {
-      final GuardarNotificacionRemotaUseCase guardarNotificacionRemotaUseCase =
-          Get.find<GuardarNotificacionRemotaUseCase>();
-
-      final LocalStoreUseCase _localStoreUseCase =
-          Get.find<LocalStoreUseCase>();
-
-      final UserEntities user = await _localStoreUseCase.getUserModel();
-
-      await guardarNotificacionRemotaUseCase(
-        notification: notification,
-        idGenUsuario: user.idGenUsuario,
+      DialogosAwesome.getInformation(
+        title: titulo,
+        descripcion: mensaje,
       );
-    } catch (e) {
-      debugPrint("Error guardando notificación: $e");
     }
 
-    await Get.find<NotificationService>().cargar();
-
-    DialogosAwesome.getInformation(
-      title: notification.title,
-      descripcion: notification.body,
-    );
-
     await _notificationsPlugin.show(
-      notificationDetails: notificationDetails,
-      payload: notificationModelToJson(notification),
       id: id,
-      title: notification.title,
-      body: notification.body,
+      title: titulo,
+      body: mensaje,
+      notificationDetails: detalles,
+      payload: notificationModelToJson(notification),
     );
   }
 }
