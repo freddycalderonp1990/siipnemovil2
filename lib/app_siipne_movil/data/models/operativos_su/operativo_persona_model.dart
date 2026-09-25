@@ -38,6 +38,7 @@ class DataConsultaPersona {
   final DatosAnt datosAnt;
   final int idGenPersona;
   final int idHdrEventoResum;
+  final bool consultado;
 
   DataConsultaPersona({
     required this.dataSiipne,
@@ -46,6 +47,7 @@ class DataConsultaPersona {
     required this.datosAnt,
     required this.idGenPersona,
     required this.idHdrEventoResum,
+    required this.consultado,
   });
 
   factory DataConsultaPersona.fromJson(Map<String, dynamic> json) =>
@@ -56,6 +58,7 @@ class DataConsultaPersona {
         datosAnt: DatosAnt.fromJson(json["datosAnt"] ?? {}),
         idGenPersona: ParseModel.parseToInt(json["idGenPersona"]),
         idHdrEventoResum: ParseModel.parseToInt(json["idHdrEventoResum"]),
+        consultado: ParseModel.parseToBool(json["consultado"])
       );
 
   Map<String, dynamic> toJson() => {

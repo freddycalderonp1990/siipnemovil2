@@ -375,4 +375,40 @@ class LoginController extends GetxController {
     _localStoreUseCase.setAppPageSelect(value.toString());
     Get.offAllNamed(AppRoutes.SPLASH_APP);
   }
+  Future<bool> biometriaConfiguradaEnApp() async {
+    try {
+      final bool configHuella =
+      await _localStoreUseCase.getConfigHuella();
+
+      if (!configHuella) {
+        debugPrint(
+          '[BIOMETRIA APP] Acceso biométrico NO configurado en SIIPNE Móvil',
+        );
+        return false;
+      }
+
+      final String user =
+      await _localStoreUseCase.getUser();
+
+      final String pass =
+      await _localStoreUseCase.getPass();
+
+      final bool tieneCredenciales =
+          user.trim().isNotEmpty &&
+              pass.trim().isNotEmpty;
+
+      debugPrint(
+        '[BIOMETRIA APP] '
+            'configHuella=$configHuella '
+            'credenciales=$tieneCredenciales',
+      );
+
+      return tieneCredenciales;
+    } catch (e) {
+      debugPrint(
+        '[BIOMETRIA APP] Error verificando configuración: $e',
+      );
+      return false;
+    }
+  }
 }

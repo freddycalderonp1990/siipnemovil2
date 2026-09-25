@@ -9,6 +9,7 @@ class ConsultarVehiculoRequest {
   final int idGenUsuario;
   final int idVariableResultado;
   final String userName;
+  final String realiza;
 
   ConsultarVehiculoRequest({
     required this.idOperativo,
@@ -18,7 +19,9 @@ class ConsultarVehiculoRequest {
     required this.ip,
     required this.idGenUsuario,
     required this.idVariableResultado,
-    required this.userName
+    required this.userName,
+    required this.realiza
+
   });
 
   /// Método para convertir el objeto a JSON
@@ -31,7 +34,8 @@ class ConsultarVehiculoRequest {
       "ip": ip,
       "idGenUsuario": idGenUsuario,
       "idVariableResultado": idVariableResultado,
-      "userName":userName
+      "userName":userName,
+      "realiza": realiza,
     };
   }
 }

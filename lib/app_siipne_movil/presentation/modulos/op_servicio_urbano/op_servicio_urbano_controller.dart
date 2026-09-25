@@ -163,6 +163,7 @@ class OpServicioUrbanoController extends GetxController {
   String placaConsultadaAnterior = '';
   String placaConsultada = '';
   int idHdrEventoResumPersona = 0;
+  bool consultaRepetida=false;
   int get idHdrEventoResumVehiculo {
     if (dataVehiculo.isEmpty) return 0;
     return dataVehiculo.first.idHdrEventoResum;
@@ -723,7 +724,9 @@ class OpServicioUrbanoController extends GetxController {
       );
       final LatLng pos = await locationBloc.getCurrentPosition();
       final String ip = await DeviceInfoApp.getIp;
+      String realiza = "Realiza: ${user.nombres}";
       final ConsultarPersonaRequest request = ConsultarPersonaRequest(
+        realiza: realiza,
         idOperativo: idHdrEventoActual.value,
         documento: cedula,
         latitud: pos.latitude,
@@ -732,6 +735,7 @@ class OpServicioUrbanoController extends GetxController {
         idGenUsuario: user.idGenUsuario,
         idVariableResultado: idVariable,
       );
+
       dataPersona.clear();
       tieneOrdenCaptura.value = false;
       idHdrEventoResumPersona = 0;
@@ -749,6 +753,14 @@ class OpServicioUrbanoController extends GetxController {
        * ID REAL DEL REGISTRO INSERTADO.
        */
       idHdrEventoResumPersona = data.idHdrEventoResum;
+      consultaRepetida=data.consultado;
+
+      if(consultaRepetida){
+
+        ocultarBtnBuscarPersona.value = false;
+        dataPersona.clear();
+        return false;
+      }
       /*
        * Guardamos la variable con la cual fue
        * insertado inicialmente.
@@ -872,7 +884,11 @@ class OpServicioUrbanoController extends GetxController {
       if (isClosed) return false;
       final String ip = await DeviceInfoApp.getIp;
       if (isClosed) return false;
+
+      String realiza = "Realiza: ${user.nombres}";
       final ConsultarVehiculoRequest request = ConsultarVehiculoRequest(
+        realiza: realiza,
+
         idOperativo: idHdrEventoActual.value,
         placa: placa,
         latitud: pos.latitude,
@@ -893,6 +909,7 @@ class OpServicioUrbanoController extends GetxController {
       idVariableInsertadaVehiculo = 0;
       _limpiarPersonasVehiculo();
       final DataVehiculo data = await siipneMovilUseCase.consultarVehiculo(request: request);
+
       if (isClosed) return false;
       if (!data.datosVehiculo.success) {
         mensajeErrorConsulta = 'No se obtuvieron datos válidos para el vehículo consultado.';
@@ -1100,7 +1117,9 @@ class OpServicioUrbanoController extends GetxController {
       final LocationBloc locationBloc = BlocProvider.of<LocationBloc>(context);
       final LatLng pos = await locationBloc.getCurrentPosition();
       final String ip = await DeviceInfoApp.getIp;
+      String realiza = "Realiza: ${user.nombres}";
       final ConsultarPersonaRequest request = ConsultarPersonaRequest(
+        realiza: realiza,
         idOperativo: idHdrEventoActual.value,
         documento: cedula,
         latitud: pos.latitude,
@@ -1302,43 +1321,7 @@ class OpServicioUrbanoController extends GetxController {
       return false;
     }
   }
-  // ============================================================
-  // BIOMETRÍA
-  // ============================================================
-  Future<bool> autenticarBiometriaFinalizar() async {
-    if (autenticandoBiometria.value) {
-      return false;
-    }
-    autenticandoBiometria.value = true;
-    try {
-      final LocalAuthentication auth = LocalAuthentication();
-      final bool soportado = await auth.isDeviceSupported();
-      if (!soportado) {
-        return false;
-      }
-      final bool disponible = await auth.canCheckBiometrics;
-      if (!disponible) {
-        return false;
-      }
-      final List<BiometricType> biometricos = await auth
-          .getAvailableBiometrics();
-      if (biometricos.isEmpty) {
-        return false;
-      }
-      return await auth.authenticate(
-        localizedReason:
-        'Confirme su identidad para finalizar el operativo ${idHdrEventoActual.value}',
-        biometricOnly: true,
-        persistAcrossBackgrounding: true,
-      );
-    } catch (e, stackTrace) {
-      debugPrint('ERROR BIOMETRÍA: $e');
-      debugPrint('$stackTrace');
-      return false;
-    } finally {
-      autenticandoBiometria.value = false;
-    }
-  }
+
   // ============================================================
   // FINALIZAR
   // ============================================================
@@ -1544,6 +1527,9 @@ class OpServicioUrbanoController extends GetxController {
     return true;
   }
   void _mostrarAlertasVehiculo(DataVehiculo data) {
+
+
+
     final DatosConsultaDuplicadoOperativo duplicado =
         data.datosConsultaDuplicadoOperativo;
     final bool vehiculoDuplicado = duplicado.idHdrEvento > 0;
@@ -1766,5 +1752,123 @@ class OpServicioUrbanoController extends GetxController {
     focusCedula.dispose();
     focusPlaca.dispose();
     super.onClose();
+  }
+// ============================================================
+// BIOMETRÍA
+// ============================================================
+
+  Future<bool> biometriaConfiguradaEnApp() async {
+    try {
+      return await loginController.biometriaConfiguradaEnApp();
+    } catch (e) {
+      debugPrint(
+        '[CIERRE BIOMETRIA] Error verificando configuración: $e',
+      );
+      return false;
+    }
+  }
+
+  Future<bool> autenticarBiometriaFinalizar() async {
+    if (autenticandoBiometria.value) return false;
+
+    // 1. La biometría debe estar habilitada DENTRO de SIIPNE Móvil.
+    final bool configuradaApp = await biometriaConfiguradaEnApp();
+
+    if (!configuradaApp) {
+      debugPrint(
+        '[CIERRE BIOMETRIA] No habilitada en preferencias de SIIPNE Móvil',
+      );
+      return false;
+    }
+
+    autenticandoBiometria.value = true;
+
+    try {
+      final LocalAuthentication auth = LocalAuthentication();
+
+      // 2. Validar soporte del dispositivo.
+      final bool soportado = await auth.isDeviceSupported();
+
+      if (!soportado) {
+        debugPrint(
+          '[CIERRE BIOMETRIA] Dispositivo sin soporte biométrico',
+        );
+        return false;
+      }
+
+      // 3. Validar disponibilidad biométrica.
+      final bool disponible = await auth.canCheckBiometrics;
+
+      if (!disponible) {
+        debugPrint(
+          '[CIERRE BIOMETRIA] Biometría no disponible',
+        );
+        return false;
+      }
+
+      // 4. Verificar que exista biometría registrada.
+      final List<BiometricType> biometricos =
+      await auth.getAvailableBiometrics();
+
+      if (biometricos.isEmpty) {
+        debugPrint(
+          '[CIERRE BIOMETRIA] No existen biométricos registrados',
+        );
+        return false;
+      }
+
+      debugPrint('==========================================');
+      debugPrint('AUTENTICACIÓN BIOMÉTRICA PARA CIERRE');
+      debugPrint('CONFIGURADA EN APP: SI');
+      debugPrint('DISPOSITIVO SOPORTADO: SI');
+      debugPrint('BIOMÉTRICOS: $biometricos');
+      debugPrint('OPERATIVO: ${idHdrEventoActual.value}');
+      debugPrint('==========================================');
+
+      final bool autenticado = await auth.authenticate(
+        localizedReason:
+        'Confirme su identidad para finalizar el operativo '
+            '${idHdrEventoActual.value}',
+        biometricOnly: true,
+        persistAcrossBackgrounding: true,
+      );
+
+      if (!autenticado) {
+        debugPrint(
+          '[CIERRE BIOMETRIA] Autenticación no completada',
+        );
+        return false;
+      }
+
+      debugPrint(
+        '[CIERRE BIOMETRIA] Identidad confirmada correctamente',
+      );
+
+      return true;
+    } on LocalAuthException catch (e) {
+      // Cancelar el diálogo biométrico NO es un error del sistema.
+      if (e.code == LocalAuthExceptionCode.userCanceled) {
+        debugPrint(
+          '[CIERRE BIOMETRIA] Autenticación cancelada por el usuario',
+        );
+        return false;
+      }
+
+      debugPrint(
+        '[CIERRE BIOMETRIA] LocalAuthException: '
+            '${e.code} - ${e.description}',
+      );
+
+      return false;
+    } catch (e, stackTrace) {
+      debugPrint(
+        '[CIERRE BIOMETRIA] Error inesperado: $e',
+      );
+      debugPrint('$stackTrace');
+
+      return false;
+    } finally {
+      autenticandoBiometria.value = false;
+    }
   }
 }

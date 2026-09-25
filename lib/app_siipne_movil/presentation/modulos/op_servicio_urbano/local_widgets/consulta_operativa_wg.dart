@@ -164,6 +164,14 @@
             key: keyCedula,
           );
 
+          if(controller.consultaRepetida){
+            DialogosAwesome.getInformation(
+              title: "CONSULTA NO REALIZADA",
+              descripcion:  "La persona ya fue consultada anteriormente durante este mismo operativo.",
+            );
+            return ;
+          }
+
           if (!resultado) {
             DialogosAwesome.getError(
               title: "CONSULTA NO REALIZADA",

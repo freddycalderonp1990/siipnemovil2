@@ -657,9 +657,11 @@ class OpMigracionController extends GetxController {
     mensajeErrorFuentesPersona = '';
     peticionServerState.value = true;
     try {
+      String realiza = "Realiza: ${user.nombres}";
       final DataConsultaPersona resultado =
       await siipneMovilOpMigracionUseCase.consultarPersona(
         request: ConsultarPersonaRequest(
+          realiza: realiza,
           idOperativo: idHdrEventoActual.value,
           documento: numero,
           latitud: double.tryParse(_latitudConsulta) ?? 0,

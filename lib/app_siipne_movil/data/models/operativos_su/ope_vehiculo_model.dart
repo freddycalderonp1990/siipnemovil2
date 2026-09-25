@@ -29,7 +29,6 @@ Map<String, dynamic> _mapVehiculo(dynamic value) {
   return <String, dynamic>{};
 }
 
-
 bool _boolVehiculo(dynamic value, {bool defaultValue = false}) {
   if (value == null) return defaultValue;
   if (value is bool) return value;
@@ -54,7 +53,9 @@ class OpeVehiculoModel {
 
   factory OpeVehiculoModel.fromJson(Map<String, dynamic> json) =>
       OpeVehiculoModel(
-        statusCode: ParseModel.parseToInt(json['status_code'] ?? json['statusCode']),
+        statusCode: ParseModel.parseToInt(
+          json['status_code'] ?? json['statusCode'],
+        ),
         message: ParseModel.parseToString(json['message']),
         dataVehiculo: DataVehiculo.fromJson(
           _mapVehiculo(json['data'] ?? json['dataVehiculo']),
@@ -81,6 +82,7 @@ class DataVehiculo {
   Datospropietario datospropietario;
   RestriccionPj restriccionPj;
   int idHdrEventoResum;
+  final bool consultado;
   DatosConsultaDuplicadoOperativo datosConsultaDuplicadoOperativo;
 
   DataVehiculo({
@@ -89,6 +91,7 @@ class DataVehiculo {
     required this.restriccionPj,
     required this.idHdrEventoResum,
     required this.datosConsultaDuplicadoOperativo,
+    required this.consultado,
   });
 
   factory DataVehiculo.fromJson(Map<String, dynamic> json) => DataVehiculo(
@@ -102,6 +105,7 @@ class DataVehiculo {
       _mapVehiculo(json['restriccionPJ'] ?? json['restriccionPj']),
     ),
     idHdrEventoResum: ParseModel.parseToInt(json['idHdrEventoResum']),
+    consultado: ParseModel.parseToBool(json['consultado']),
     datosConsultaDuplicadoOperativo: DatosConsultaDuplicadoOperativo.fromJson(
       _mapVehiculo(json['datosConsultaDuplicadoOperativo']),
     ),
@@ -113,6 +117,7 @@ class DataVehiculo {
     restriccionPj: RestriccionPj.empty(),
     idHdrEventoResum: 0,
     datosConsultaDuplicadoOperativo: DatosConsultaDuplicadoOperativo.empty(),
+    consultado: false,
   );
 
   bool get consultaDuplicada => datosConsultaDuplicadoOperativo.existe;
@@ -214,26 +219,26 @@ class DatosVehiculoSiipneData {
   factory DatosVehiculoSiipneData.fromJson(Map<String, dynamic> json) =>
       DatosVehiculoSiipneData(
         idGenVehiculo: ParseModel.parseToInt(json['idGenVehiculo']),
-        idGenMarca:  ParseModel.parseToInt(json['idGenMarca']),
+        idGenMarca: ParseModel.parseToInt(json['idGenMarca']),
         marca: ParseModel.parseToString(json['marca']),
-        idGenModelo:  ParseModel.parseToInt(json['idGenModelo']),
+        idGenModelo: ParseModel.parseToInt(json['idGenModelo']),
         modelo: ParseModel.parseToString(json['modelo']),
-        idGenColor:  ParseModel.parseToInt(json['idGenColor']),
+        idGenColor: ParseModel.parseToInt(json['idGenColor']),
         color: ParseModel.parseToString(json['color']),
         color2: ParseModel.parseToString(json['color2']),
-        idGenCombus:  ParseModel.parseToInt(json['idGenCombus']),
+        idGenCombus: ParseModel.parseToInt(json['idGenCombus']),
         combustible: ParseModel.parseToString(json['combustible']),
         motor: ParseModel.parseToString(json['motor']),
         chasis: ParseModel.parseToString(json['chasis']),
         placa: ParseModel.parseToString(json['placa']),
         placaAnterior: ParseModel.parseToString(json['placaAnterior']),
         cilindraje: ParseModel.parseToString(json['cilindraje']),
-        anoFabricacion:  ParseModel.parseToInt(json['anoFabricacion']),
-        idGenClase:  ParseModel.parseToInt(json['idGenClase']),
+        anoFabricacion: ParseModel.parseToInt(json['anoFabricacion']),
+        idGenClase: ParseModel.parseToInt(json['idGenClase']),
         clase: ParseModel.parseToString(json['clase']),
-        idGenTipVehi:  ParseModel.parseToInt(json['idGenTipVehi']),
+        idGenTipVehi: ParseModel.parseToInt(json['idGenTipVehi']),
         tipoVehiculo: ParseModel.parseToString(json['tipoVehiculo']),
-        idGenServicio:  ParseModel.parseToInt(json['idGenServicio']),
+        idGenServicio: ParseModel.parseToInt(json['idGenServicio']),
         descServicio: ParseModel.parseToString(json['descServicio']),
         fuente: ParseModel.parseToString(json['fuente']),
         msjSwAnt: ParseModel.parseToString(json['msjSwAnt']),
@@ -354,7 +359,7 @@ class DatospropietarioData {
     required this.foto64,
     required this.fechaDefuncion,
     required this.mensajeMatricula,
-    required this.alertaMatricula
+    required this.alertaMatricula,
   });
 
   factory DatospropietarioData.fromJson(Map<String, dynamic> json) =>
@@ -366,7 +371,7 @@ class DatospropietarioData {
         telefono: ParseModel.parseToString(json['telefono']),
         correo: ParseModel.parseToString(json['correo']),
         foto64: ParseModel.parseToString(json['foto64']),
-        fechaDefuncion: ParseModel.parseToString(json['fechaDefuncion']), 
+        fechaDefuncion: ParseModel.parseToString(json['fechaDefuncion']),
         mensajeMatricula: ParseModel.parseToString(json['mensajeMatricula']),
         alertaMatricula: ParseModel.parseToBool(json['alertaMatricula']),
       );
@@ -381,7 +386,7 @@ class DatospropietarioData {
     foto64: '',
     fechaDefuncion: '',
     mensajeMatricula: '',
-    alertaMatricula: false
+    alertaMatricula: false,
   );
 
   Map<String, dynamic> toJson() => {
@@ -444,13 +449,13 @@ class RestriccionPjData {
         robado: _boolVehiculo(json['robado']),
         detBusqueda: ParseModel.parseToString(json['detBusqueda']),
         cantidadRestricciones:
-        int.tryParse(json['cantidadRestricciones']?.toString() ?? '0') ?? 0,
+            int.tryParse(json['cantidadRestricciones']?.toString() ?? '0') ?? 0,
         restricciones: (json['restricciones'] as List<dynamic>? ?? [])
             .map(
               (item) => RestriccionPjDetalle.fromJson(
-            Map<String, dynamic>.from(item),
-          ),
-        )
+                Map<String, dynamic>.from(item),
+              ),
+            )
             .toList(),
       );
 
@@ -484,8 +489,7 @@ class RestriccionPjDetalle {
 
   factory RestriccionPjDetalle.fromJson(Map<String, dynamic> json) =>
       RestriccionPjDetalle(
-        fechaIncidente:
-        ParseModel.parseToString(json['fechaIncidente']),
+        fechaIncidente: ParseModel.parseToString(json['fechaIncidente']),
         empresa: ParseModel.parseToString(json['empresa']),
         direccion: ParseModel.parseToString(json['direccion']),
         estado: ParseModel.parseToString(json['estado']),
@@ -505,8 +509,6 @@ class RestriccionPjDetalle {
     'estado': estado,
   };
 }
-
-
 
 class DatosConsultaDuplicadoOperativo {
   int idHdrEvento;
@@ -529,7 +531,7 @@ class DatosConsultaDuplicadoOperativo {
 
   factory DatosConsultaDuplicadoOperativo.fromJson(Map<String, dynamic> json) =>
       DatosConsultaDuplicadoOperativo(
-        idHdrEvento:  ParseModel.parseToInt(json['idHdrEvento']),
+        idHdrEvento: ParseModel.parseToInt(json['idHdrEvento']),
         zona: ParseModel.parseToString(json['zona']),
         subzona: ParseModel.parseToString(json['subzona']),
         distrito: ParseModel.parseToString(json['distrito']),

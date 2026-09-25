@@ -58,9 +58,6 @@ abstract class OpServicioUrbanoPageBase
   });
   void confirmarCerrarSesion();
   void mostrarFinalizarOperativo();
-  Widget headerFinalizar(BuildContext dialogContext);
-  Widget opcionFinalizarClave(BuildContext dialogContext);
-  Widget opcionFinalizarBiometria(BuildContext dialogContext);
   void confirmarFinalizacionDefinitiva();
   Future<void> mostrarPersonalOperativo();
   void dialogoPersonalOperativo(BuildContext context);
