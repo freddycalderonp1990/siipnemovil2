@@ -64,9 +64,26 @@ class InicioRapidoController extends GetxController {
   }
 
   Future<void> verificarSitieneBiometrico() async {
-    mostrarAccesoHuella.value = await BiometricUtil.checkAccesoBiometrico();
-  }
+    mostrarAccesoHuella.value = false;
 
+    final bool configHuella =
+    await _localStoreUseCase.getConfigHuella();
+
+    if (!configHuella) return;
+
+    final String user =
+    await _localStoreUseCase.getUser();
+
+    final String pass =
+    await _localStoreUseCase.getPass();
+
+    if (user.trim().isEmpty || pass.trim().isEmpty) return;
+
+    final bool disponible =
+    await BiometricUtil.checkAccesoBiometrico();
+
+    mostrarAccesoHuella.value = disponible;
+  }
   Future<void> login({required String user, required String pass}) async {
     peticionServerState.value = true;
 

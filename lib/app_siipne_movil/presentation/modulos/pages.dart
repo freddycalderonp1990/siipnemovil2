@@ -72,3 +72,4 @@ part 'op_migracion/local_widgets/acciones_migracion_wg.dart';
 
 part 'op_migracion/local_widgets/foto_visa_electronica_wg.dart';
 part 'op_migracion/local_widgets/selector_nacionalidad_migracion_wg.dart';
+part 'op_servicio_urbano/local_widgets/dialogo_cierre_operativo.dart';
