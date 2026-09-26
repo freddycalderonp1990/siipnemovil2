@@ -724,9 +724,9 @@ class OpServicioUrbanoController extends GetxController {
       );
       final LatLng pos = await locationBloc.getCurrentPosition();
       final String ip = await DeviceInfoApp.getIp;
-      String realiza = "Realiza: ${user.nombres}";
+      String consultadoPor = "Realiza: ${user.nombres}";
       final ConsultarPersonaRequest request = ConsultarPersonaRequest(
-        realiza: realiza,
+        consultadoPor: consultadoPor,
         idOperativo: idHdrEventoActual.value,
         documento: cedula,
         latitud: pos.latitude,
@@ -753,10 +753,9 @@ class OpServicioUrbanoController extends GetxController {
        * ID REAL DEL REGISTRO INSERTADO.
        */
       idHdrEventoResumPersona = data.idHdrEventoResum;
-      consultaRepetida=data.consultado;
+      consultaRepetida=data.consultaRepetida;
 
       if(consultaRepetida){
-
         ocultarBtnBuscarPersona.value = false;
         dataPersona.clear();
         return false;
@@ -885,9 +884,9 @@ class OpServicioUrbanoController extends GetxController {
       final String ip = await DeviceInfoApp.getIp;
       if (isClosed) return false;
 
-      String realiza = "Realiza: ${user.nombres}";
+      String consultadoPor = "Realiza: ${user.nombres}";
       final ConsultarVehiculoRequest request = ConsultarVehiculoRequest(
-        realiza: realiza,
+        consultadoPor: consultadoPor,
 
         idOperativo: idHdrEventoActual.value,
         placa: placa,
@@ -1117,9 +1116,9 @@ class OpServicioUrbanoController extends GetxController {
       final LocationBloc locationBloc = BlocProvider.of<LocationBloc>(context);
       final LatLng pos = await locationBloc.getCurrentPosition();
       final String ip = await DeviceInfoApp.getIp;
-      String realiza = "Realiza: ${user.nombres}";
+      String consultadoPor = "Realiza: ${user.nombres}";
       final ConsultarPersonaRequest request = ConsultarPersonaRequest(
-        realiza: realiza,
+        consultadoPor: consultadoPor,
         idOperativo: idHdrEventoActual.value,
         documento: cedula,
         latitud: pos.latitude,

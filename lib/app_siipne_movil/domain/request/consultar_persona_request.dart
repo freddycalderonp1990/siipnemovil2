@@ -10,7 +10,7 @@ class ConsultarPersonaRequest {
   final int idVariableResultado;
   final int hdrIdHdrResum;
   final String tipoRelacion;
-  final String realiza;
+  final String consultadoPor;
 
   ConsultarPersonaRequest({
     required this.idOperativo,
@@ -22,7 +22,7 @@ class ConsultarPersonaRequest {
     required this.idVariableResultado,
     this.hdrIdHdrResum = 0,
     this.tipoRelacion = '',
-    required this.realiza
+    required this.consultadoPor
   });
 
   Map<String, dynamic> toJson() {
@@ -34,7 +34,7 @@ class ConsultarPersonaRequest {
       "ip": ip,
       "idGenUsuario": idGenUsuario,
       "idVariableResultado": idVariableResultado,
-      "realiza": realiza,
+      "consultadoPor": consultadoPor,
     };
 
     if (hdrIdHdrResum > 0) {

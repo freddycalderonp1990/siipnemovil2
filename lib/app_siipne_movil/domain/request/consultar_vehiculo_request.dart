@@ -9,7 +9,7 @@ class ConsultarVehiculoRequest {
   final int idGenUsuario;
   final int idVariableResultado;
   final String userName;
-  final String realiza;
+  final String consultadoPor;
 
   ConsultarVehiculoRequest({
     required this.idOperativo,
@@ -20,7 +20,7 @@ class ConsultarVehiculoRequest {
     required this.idGenUsuario,
     required this.idVariableResultado,
     required this.userName,
-    required this.realiza
+    required this.consultadoPor
 
   });
 
@@ -35,7 +35,7 @@ class ConsultarVehiculoRequest {
       "idGenUsuario": idGenUsuario,
       "idVariableResultado": idVariableResultado,
       "userName":userName,
-      "realiza": realiza,
+      "realiza": consultadoPor,
     };
   }
 }

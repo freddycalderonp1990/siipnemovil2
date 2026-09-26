@@ -82,7 +82,7 @@ class DataVehiculo {
   Datospropietario datospropietario;
   RestriccionPj restriccionPj;
   int idHdrEventoResum;
-  final bool consultado;
+  final bool consultaRepetida;
   DatosConsultaDuplicadoOperativo datosConsultaDuplicadoOperativo;
 
   DataVehiculo({
@@ -91,7 +91,7 @@ class DataVehiculo {
     required this.restriccionPj,
     required this.idHdrEventoResum,
     required this.datosConsultaDuplicadoOperativo,
-    required this.consultado,
+    required this.consultaRepetida,
   });
 
   factory DataVehiculo.fromJson(Map<String, dynamic> json) => DataVehiculo(
@@ -105,7 +105,7 @@ class DataVehiculo {
       _mapVehiculo(json['restriccionPJ'] ?? json['restriccionPj']),
     ),
     idHdrEventoResum: ParseModel.parseToInt(json['idHdrEventoResum']),
-    consultado: ParseModel.parseToBool(json['consultado']),
+    consultaRepetida: ParseModel.parseToBool(json['consultaRepetida']),
     datosConsultaDuplicadoOperativo: DatosConsultaDuplicadoOperativo.fromJson(
       _mapVehiculo(json['datosConsultaDuplicadoOperativo']),
     ),
@@ -117,7 +117,7 @@ class DataVehiculo {
     restriccionPj: RestriccionPj.empty(),
     idHdrEventoResum: 0,
     datosConsultaDuplicadoOperativo: DatosConsultaDuplicadoOperativo.empty(),
-    consultado: false,
+    consultaRepetida: false,
   );
 
   bool get consultaDuplicada => datosConsultaDuplicadoOperativo.existe;
