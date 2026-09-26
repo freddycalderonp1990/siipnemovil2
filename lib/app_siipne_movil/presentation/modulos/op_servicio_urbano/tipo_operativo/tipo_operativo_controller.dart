@@ -188,7 +188,7 @@ LatLng pos = await locationBloc.getCurrentPosition();
 
 String ip = await DeviceInfoApp.getIp;
 
-String realiza = "Realiza: ${user.nombres}";
+String realiza = "${user.nombres}";
 
 CreateOperativoRequest request = CreateOperativoRequest(
 latitud: pos.latitude,

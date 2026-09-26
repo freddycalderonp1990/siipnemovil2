@@ -35,7 +35,7 @@ class ConsultarVehiculoRequest {
       "idGenUsuario": idGenUsuario,
       "idVariableResultado": idVariableResultado,
       "userName":userName,
-      "realiza": consultadoPor,
+      "consultadoPor": consultadoPor,
     };
   }
 }

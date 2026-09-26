@@ -724,7 +724,7 @@ class OpServicioUrbanoController extends GetxController {
       );
       final LatLng pos = await locationBloc.getCurrentPosition();
       final String ip = await DeviceInfoApp.getIp;
-      String consultadoPor = "Realiza: ${user.nombres}";
+      String consultadoPor = "${user.nombres}";
       final ConsultarPersonaRequest request = ConsultarPersonaRequest(
         consultadoPor: consultadoPor,
         idOperativo: idHdrEventoActual.value,
@@ -884,7 +884,7 @@ class OpServicioUrbanoController extends GetxController {
       final String ip = await DeviceInfoApp.getIp;
       if (isClosed) return false;
 
-      String consultadoPor = "Realiza: ${user.nombres}";
+      String consultadoPor = "${user.nombres}";
       final ConsultarVehiculoRequest request = ConsultarVehiculoRequest(
         consultadoPor: consultadoPor,
 
@@ -1116,7 +1116,7 @@ class OpServicioUrbanoController extends GetxController {
       final LocationBloc locationBloc = BlocProvider.of<LocationBloc>(context);
       final LatLng pos = await locationBloc.getCurrentPosition();
       final String ip = await DeviceInfoApp.getIp;
-      String consultadoPor = "Realiza: ${user.nombres}";
+      String consultadoPor = "${user.nombres}";
       final ConsultarPersonaRequest request = ConsultarPersonaRequest(
         consultadoPor: consultadoPor,
         idOperativo: idHdrEventoActual.value,
