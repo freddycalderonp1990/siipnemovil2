@@ -146,7 +146,7 @@ class SiipneMovilRepositoryImpl extends SiipneMovilRepository {
   }
 
   @override
-  Future<ConductorVehiculo> getDatosConductorVehiculo({required ConductorVehiculoRequest request}) async {
+  Future<ConductorVehiculo?> getDatosConductorVehiculo({required ConductorVehiculoRequest request}) async {
     return await siipneMovilRemoteDataSource.getDatosConductorVehiculo(
       request: request,
     );

@@ -60,6 +60,8 @@ abstract class OpServicioUrbanoPageBase
   void mostrarFinalizarOperativo();
   void confirmarFinalizacionDefinitiva();
   Future<void> mostrarPersonalOperativo();
+  Future<void> validarAlertasAntesFinalizar();
+  void mostrarAdvertenciaAlertasFinalizacion(ResultadosOperativo resultado);
   void dialogoPersonalOperativo(BuildContext context);
   Widget cardIntegranteOperativo({
     required Integrante integrante,

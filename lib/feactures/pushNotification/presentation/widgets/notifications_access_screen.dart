@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
-
 import '../../../../app/core/utils/responsiveUtil.dart';
 import '../../../../app/domain/enums/enums.dart';
 import '../../../../feactures/user/presentation/modules/controllers.dart';
@@ -20,12 +19,10 @@ class NotificationsAccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<NotificationsBloc, NotificationsState>(
+      buildWhen: (previous, current) => previous.status != current.status,
       builder: (context, state) {
-        if (state.status == NotificationPermissionStatus.checking) {
-          return const SizedBox.shrink();
-        }
-
-        if (state.status == NotificationPermissionStatus.authorized) {
+        if (state.status == NotificationPermissionStatus.authorized ||
+            state.status == NotificationPermissionStatus.checking) {
           return contenido;
         }
 
@@ -34,16 +31,15 @@ class NotificationsAccessScreen extends StatelessWidget {
           onPressed: () {
             final loginController = Get.find<LoginController>();
             context.read<NotificationsBloc>().requestPermission(
-                  appName: namApps,
-                  idGenUsuario: loginController.user.value.idGenUsuario,
-                );
+              appName: namApps,
+              idGenUsuario: loginController.user.value.idGenUsuario,
+            );
           },
         );
       },
     );
   }
 }
-
 class _MensajePermisoNotificaciones extends StatelessWidget {
   final VoidCallback onPressed;
   final NamApps namApps;

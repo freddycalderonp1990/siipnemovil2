@@ -169,7 +169,7 @@ class OpServicioUrbanoController extends GetxController {
     return dataVehiculo.first.idHdrEventoResum;
   }
   int get cantidadOcupantesVehiculo => dataPersona_ocupantes.length;
-  bool get tieneConductorVehiculo => dataPersona_conductor.isNotEmpty;
+  bool get tieneConductorVehiculo => conductorRegistradoEnBaseDeDatos.value;
   // ============================================================
   // FINALIZAR
   // ============================================================
@@ -972,24 +972,37 @@ class OpServicioUrbanoController extends GetxController {
   // NUEVA CONSULTA VEHÍCULO
   // ============================================================
   Future<bool> nuevaConsultaVehiculo() async {
-    if (peticionServerState.value || actualizandoResultado.value) {
-      return false;
-    }
+    if (peticionServerState.value || actualizandoResultado.value) return false;
+
+    mensajeErrorConsulta = '';
     mensajeErrorActualizaResultado = '';
     FocusManager.instance.primaryFocus?.unfocus();
-    /*
-     * Primero actualizamos la clasificación
-     * del vehículo actual.
-     */
-    if (dataVehiculo.isNotEmpty && idHdrEventoResumVehiculo > 0) {
+
+    if (dataVehiculo.isEmpty) {
+      mensajeErrorConsulta = 'No existe un vehículo consultado.';
+      return false;
+    }
+
+    final bool tieneConductor = await consultarExistenciaConductor();
+
+    if (!tieneConductor) {
+      if (mensajeErrorConsulta.trim().isEmpty) {
+        final String placa = dataVehiculo.first.datosVehiculo.data.placa.trim().toUpperCase();
+        mensajeErrorConsulta = placa.isEmpty
+            ? 'Debe registrar un conductor antes de realizar una nueva consulta.'
+            : 'El vehículo $placa no tiene un conductor registrado. Debe registrar un conductor antes de realizar una nueva consulta.';
+      }
+      return false;
+    }
+
+    if (idHdrEventoResumVehiculo > 0) {
       final bool actualizado = await actualizarResultadoRegistro(
         idHdrEventoResum: idHdrEventoResumVehiculo,
         idVariableOriginal: idVariableInsertadaVehiculo,
       );
-      if (!actualizado) {
-        return false;
-      }
+      if (!actualizado) return false;
     }
+
     controllerPlaca.clear();
     dataVehiculo.clear();
     idVariableInsertadaVehiculo = 0;
@@ -998,10 +1011,13 @@ class OpServicioUrbanoController extends GetxController {
     placaConsultadaAnterior = placaConsultada;
     placaConsultada = '';
     _limpiarPersonasVehiculo();
+
+    conductorRegistradoEnBaseDeDatos.value = false;
+    conductorDesdeBase.value = null;
+
     final List<VariablesResultado> variables = variablesResultadoVehiculo;
-    variableResultadoSeleccionada.value = variables.isNotEmpty
-        ? variables.first
-        : null;
+    variableResultadoSeleccionada.value = variables.isNotEmpty ? variables.first : null;
+
     solicitarFocoVehiculo();
     return true;
   }
@@ -1231,6 +1247,8 @@ class OpServicioUrbanoController extends GetxController {
     dataPersona_acompanante1.clear();
     dataPersona_acompanante2.clear();
     dataPersona_acompanante3.clear();
+    conductorRegistradoEnBaseDeDatos.value = false;
+    conductorDesdeBase.value = null;
     tipoPersonaVehiculo.value = 'CONDUCTOR';
     idHdrEventoResumPersona = 0;
   }
@@ -1250,42 +1268,53 @@ class OpServicioUrbanoController extends GetxController {
     mostrarPanelOcupantes.value = true;
     controllerCedulaVehiculo.clear();
   }
-  Future<void> consultarExistenciaConductor() async {
-    if (dataVehiculo.isEmpty) return;
-    final String placa =
-    dataVehiculo.first.datosVehiculo.data.placa.trim().toUpperCase();
-    if (placa.isEmpty) return;
+  Future<bool> consultarExistenciaConductor() async {
+    if (dataVehiculo.isEmpty) {
+      mensajeErrorConsulta = 'No existe un vehículo consultado.';
+      return false;
+    }
+
+    final String placa = dataVehiculo.first.datosVehiculo.data.placa.trim().toUpperCase();
+    if (placa.isEmpty) {
+      mensajeErrorConsulta = 'No fue posible determinar la placa del vehículo.';
+      return false;
+    }
+
     peticionServerState.value = true;
     paginaPersonasVehiculoLoading.value = true;
+    mensajeErrorConsulta = '';
+
     try {
       conductorRegistradoEnBaseDeDatos.value = false;
-      final ConductorVehiculoRequest request = ConductorVehiculoRequest(
-        idHdrEvento: idHdrEventoActual.value,
-        placa: placa,
+      conductorDesdeBase.value = null;
+
+      final ConductorVehiculo? resultado = await siipneMovilUseCase.getDatosConductorVehiculo(
+        request: ConductorVehiculoRequest(
+          idHdrEvento: idHdrEventoActual.value,
+          placa: placa,
+        ),
       );
-      final ConductorVehiculo resultado =
-      await siipneMovilUseCase.getDatosConductorVehiculo(
-        request: request,
-      );
-      if (resultado.cedula.isNotEmpty && resultado.cedula != "0") {
-        // Si el servidor confirma que ya existe un conductor, forzamos modo OCUPANTE.
-        conductorRegistradoEnBaseDeDatos.value = true;
-        conductorDesdeBase.value = resultado;
-        tipoPersonaVehiculo.value = 'OCUPANTE';
-        debugPrint('CONDUCTOR YA REGISTRADO EN BASE: ${resultado.conductor}');
-      } else {
-        // Si no hay conductor en base, verificamos la lista local.
-        conductorRegistradoEnBaseDeDatos.value = false;
-        conductorDesdeBase.value = null;
-        tipoPersonaVehiculo.value =
-        dataPersona_conductor.isEmpty ? 'CONDUCTOR' : 'OCUPANTE';
+
+      if (resultado == null || resultado.cedula.trim().isEmpty || resultado.cedula.trim() == '0') {
+        tipoPersonaVehiculo.value = 'CONDUCTOR';
+        debugPrint('CONDUCTOR SERVIDOR [$placa]: NO REGISTRADO');
+        return false;
       }
-    } catch (e) {
-      debugPrint('ERROR CONSULTANDO EXISTENCIA CONDUCTOR: $e');
+
+      conductorRegistradoEnBaseDeDatos.value = true;
+      conductorDesdeBase.value = resultado;
+      tipoPersonaVehiculo.value = 'OCUPANTE';
+
+      debugPrint('CONDUCTOR SERVIDOR [$placa]: ${resultado.cedula} - ${resultado.conductor}');
+      return true;
+    } catch (e, stackTrace) {
       conductorRegistradoEnBaseDeDatos.value = false;
-      // Ante error, comportamiento por defecto basado en lista local.
-      tipoPersonaVehiculo.value =
-      dataPersona_conductor.isEmpty ? 'CONDUCTOR' : 'OCUPANTE';
+      conductorDesdeBase.value = null;
+      tipoPersonaVehiculo.value = 'CONDUCTOR';
+      mensajeErrorConsulta = 'No fue posible verificar el conductor del vehículo. Intente nuevamente.';
+      debugPrint('ERROR CONSULTANDO CONDUCTOR [$placa]: $e');
+      debugPrint('$stackTrace');
+      return false;
     } finally {
       peticionServerState.value = false;
       paginaPersonasVehiculoLoading.value = false;
@@ -1377,17 +1406,11 @@ class OpServicioUrbanoController extends GetxController {
   // PERSONAS VEHÍCULO
   // ============================================================
   void prepararPantallaPersonasVehiculo() {
-    FocusManager.instance.primaryFocus?.unfocus();
     controllerCedulaVehiculo.clear();
-    consultandoPersonaVehiculo.value = false;
     paginaPersonasVehiculoLoading.value = false;
-    /*
-     * NO limpiar información consultada.
-     */
-    tipoPersonaVehiculo.value = (dataPersona_conductor.isEmpty &&
-        !conductorRegistradoEnBaseDeDatos.value)
-        ? 'CONDUCTOR'
-        : 'OCUPANTE';
+
+    tipoPersonaVehiculo.value =
+    conductorRegistradoEnBaseDeDatos.value ? 'OCUPANTE' : 'CONDUCTOR';
   }
   // ============================================================
   // CERRAR SESIÓN

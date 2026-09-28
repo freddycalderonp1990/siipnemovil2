@@ -66,7 +66,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  HttpOverrides.global = new MyHttpOverrides();
+  HttpOverrides.global = MyHttpOverrides();
   DependencyInjectionApp();
 
   await dotenv.load(fileName: ".env");
@@ -76,25 +76,23 @@ void main() async {
   AppRoutesMiUpc.setPageInicio(AppRoutes.SPLASH_APP);
 
   try {
-    // Validación SSL original conservada.
     ValidateSSL validateSSL = ValidateSSL();
     await validateSSL.validarSSl();
   } catch (e) {
-    print("error certificados $e");
+    debugPrint("error certificados $e");
   }
 
-  // Configuración de notificaciones.
   try {
     if (Firebase.apps.isEmpty) {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
     }
+
     if (kDebugMode) {
       debugPrint('[PUSH MAIN] Proyecto: ${Firebase.app().options.projectId}');
     }
 
-    // Conservamos la inicialización del sistema existente.
     try {
       await LocalNotification.initializeLocalNotifications();
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
@@ -106,18 +104,8 @@ void main() async {
 
     if (OperativoPushService.instance.compatible) {
       try {
-        final permiso = await FirebaseMessaging.instance.requestPermission(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
-        debugPrint('[PUSH MAIN] Permiso: ${permiso.authorizationStatus}');
-      } catch (e, stackTrace) {
-        debugPrint('[PUSH MAIN] Error solicitando permisos: $e');
-        if (kDebugMode) debugPrint('$stackTrace');
-      }
-
-      try {
+        // IMPORTANTE:
+        // Aquí NO se solicita permiso de notificaciones.
         await OperativoPushService.instance.inicializar();
         debugPrint('[PUSH MAIN] OperativoPushService inicializado');
       } catch (e, stackTrace) {
@@ -126,16 +114,16 @@ void main() async {
       }
     }
   } catch (e, stackTrace) {
-    print(" Error en Firebase Notificaciones: ${e.toString()}");
+    debugPrint("Error en Firebase Notificaciones: $e");
     if (kDebugMode) debugPrint('$stackTrace');
   }
 
   runApp(
     MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => GpsBloc()),
-        BlocProvider(create: (context) => LocationBloc()),
-        BlocProvider(create: (context) => NotificationsBloc()),
+        BlocProvider(create: (_) => GpsBloc()),
+        BlocProvider(create: (_) => LocationBloc()),
+        BlocProvider(create: (_) => NotificationsBloc()),
       ],
       child: MyApp(),
     ),

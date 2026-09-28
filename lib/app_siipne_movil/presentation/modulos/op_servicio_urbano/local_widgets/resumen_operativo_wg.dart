@@ -339,53 +339,57 @@ mixin ResumenOperativoViewMixin on OpServicioUrbanoPageBase {
       children: [
         Expanded(
           child: OutlinedButton.icon(
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-            },
+            onPressed: () => Navigator.of(dialogContext).pop(),
             icon: const Icon(Icons.arrow_back_rounded, size: 17),
-            label: const Text(
-              "VOLVER",
-              style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900),
-            ),
+            label: const Text("VOLVER", style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900)),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size(0, 47),
               foregroundColor: const Color(0xFF607589),
               side: const BorderSide(color: Color(0xFFC8D5E0)),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
         ),
-
         const SizedBox(width: 8),
-
         Expanded(
           child: ElevatedButton.icon(
             onPressed: () {
               Navigator.of(dialogContext).pop();
-
-              Future.delayed(const Duration(milliseconds: 150), () {
-                mostrarFinalizarOperativo();
-              });
+              Future.delayed(const Duration(milliseconds: 150), validarAlertasAntesFinalizar);
             },
             icon: const Icon(Icons.edgesensor_low_sharp, size: 18),
-            label: const Text(
-              "FINALIZAR",
-              style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900),
-            ),
+            label: const Text("FINALIZAR", style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900)),
             style: ElevatedButton.styleFrom(
               minimumSize: const Size(0, 47),
               backgroundColor: const Color(0xFFB42318),
               foregroundColor: Colors.white,
               elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
         ),
       ],
     );
+  }
+  Future<void> validarAlertasAntesFinalizar() async {
+    if (controller.isClosed) return;
+
+    final ResultadosOperativo? resultado = controller.resultadosOperativo.value;
+
+    if (resultado == null) {
+      mostrarFinalizarOperativo();
+      return;
+    }
+
+    final int alertasPersona = resultado.totalAlertasPersona;
+    final int alertasVehiculo = resultado.totalAlertasVehiculo;
+    final int totalAlertas = alertasPersona + alertasVehiculo;
+
+    if (totalAlertas <= 0) {
+      mostrarFinalizarOperativo();
+      return;
+    }
+
+    mostrarAdvertenciaAlertasFinalizacion(resultado);
   }
 }

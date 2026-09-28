@@ -53,8 +53,13 @@ mixin VehiculoResultadoViewMixin on OpServicioUrbanoPageBase {
 
   Future<void> nuevaConsultaVehiculo() async {
     final bool resultado = await controller.nuevaConsultaVehiculo();
+    if (resultado) return;
 
-    if (resultado) {
+    if (controller.mensajeErrorConsulta.trim().isNotEmpty) {
+      DialogosAwesome.getWarning(
+        title: "CONDUCTOR REQUERIDO",
+        descripcion: controller.mensajeErrorConsulta,
+      );
       return;
     }
 
@@ -332,7 +337,7 @@ mixin VehiculoResultadoViewMixin on OpServicioUrbanoPageBase {
           controller.tipoPersonaVehiculo.value == 'CONDUCTOR';
 
       final bool conductorYaRegistrado =
-          controller.dataPersona_conductor.isNotEmpty;
+          controller.conductorRegistradoEnBaseDeDatos.value;
 
       Widget boton({
         required String titulo,
@@ -565,13 +570,12 @@ mixin VehiculoResultadoViewMixin on OpServicioUrbanoPageBase {
     );
   }
 
-  void abrirPersonasVehiculo() async {
+  Future<void> abrirPersonasVehiculo() async {
     if (controller.dataVehiculo.isEmpty) {
       DialogosAwesome.getWarning(
         title: "VEHÍCULO REQUERIDO",
         descripcion: "Primero debe realizar la consulta de un vehículo.",
       );
-
       return;
     }
 
@@ -580,20 +584,23 @@ mixin VehiculoResultadoViewMixin on OpServicioUrbanoPageBase {
         title: "REGISTRO NO DISPONIBLE",
         descripcion: "El vehículo consultado no posee un identificador válido.",
       );
-
       return;
     }
 
-    /*
-     * Consultamos al servidor si este vehículo ya posee
-     * un conductor registrado en el operativo actual.
-     */
     await controller.consultarExistenciaConductor();
+
+    if (controller.mensajeErrorConsulta.trim().isNotEmpty) {
+      DialogosAwesome.getError(
+        title: "NO FUE POSIBLE VALIDAR",
+        descripcion: controller.mensajeErrorConsulta,
+      );
+      return;
+    }
 
     controller.prepararPantallaPersonasVehiculo();
 
     Get.to(
-      () => const OpVehiculoPersonasPage(),
+          () => const OpVehiculoPersonasPage(),
       duration: const Duration(milliseconds: 280),
     );
   }

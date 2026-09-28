@@ -67,4 +67,29 @@ class OpServicioUrbanoPage extends OpServicioUrbanoPageBase
       );
     });
   }
+  void mostrarAdvertenciaAlertasFinalizacion(ResultadosOperativo resultado) {
+    final int personas = resultado.totalAlertasPersona;
+    final int vehiculos = resultado.totalAlertasVehiculo;
+    final int total = personas + vehiculos;
+
+    DialogosAwesome.getWarningSiNo(
+      title: "ALERTAS PENDIENTES DE JUSTIFICACIÓN",
+      colorAccion: DialogosAwesome.colorError,
+      iconoAccion: Icons.warning_amber_rounded,
+      codigoEstado: 'SIIPNE MÓVIL // ALERTAS DEL OPERATIVO',
+      etiquetaDetalle: 'RECORDATORIO DE JUSTIFICACIÓN',
+      descripcion:
+      "Este operativo registra $total ${total == 1 ? 'alerta' : 'alertas'}.\n\n"
+          "Personas: $personas\n"
+          "Vehículos: $vehiculos\n\n"
+          "Usted tiene alertas de personas o vehículos en este operativo.\n\n"
+          "RECUERDE que dispone de 48 horas para realizar la justificación correspondiente.",
+      btnOkOnPress: () {
+        Future.delayed(const Duration(milliseconds: 150), () {
+          if (!controller.isClosed) mostrarFinalizarOperativo();
+        });
+      },
+      btnCancelOnPress: () {},
+    );
+  }
 }

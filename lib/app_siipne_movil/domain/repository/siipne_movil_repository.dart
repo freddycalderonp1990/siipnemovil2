@@ -60,7 +60,7 @@ abstract class SiipneMovilRepository {
   Future<DataAntecedentes> getDatosAntecedentes({
     required AntecedentesRequest request,
   });
-  Future<ConductorVehiculo> getDatosConductorVehiculo({
+  Future<ConductorVehiculo?> getDatosConductorVehiculo({
     required ConductorVehiculoRequest request,
   });
 }
