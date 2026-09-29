@@ -100,32 +100,75 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     required NamApps appName,
     required int idGenUsuario,
   }) async {
-    NotificationSettings settings = await messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+    try {
+      final actual = await messaging.getNotificationSettings();
 
-    await LocalNotification.requestPermissionLocalNotifications();
-
-    print("Authorization Status: ${settings.authorizationStatus}");
-
-    add(NotificationStatusChanged(_mapStatus(settings.authorizationStatus)));
-
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      // ✅ OK
-      await _getFCMtoken(
-        topics: topics,
-        appName: appName,
-        idGenUsuario: idGenUsuario,
+      print(
+        "[PUSH GENERAL] Estado actual: ${actual.authorizationStatus}",
       );
-    } else if (settings.authorizationStatus == AuthorizationStatus.denied) {
-      print("Usuario rechazó");
-      _mostrarMensajePermisoDenegado();
-    } else if (settings.authorizationStatus ==
-        AuthorizationStatus.notDetermined) {
-      // ⚠️ Aún no decide (raro después de pedir)
-      print("Usuario aún no decide");
+
+      if (actual.authorizationStatus == AuthorizationStatus.authorized ||
+          actual.authorizationStatus == AuthorizationStatus.provisional) {
+        add(
+          NotificationStatusChanged(
+            _mapStatus(actual.authorizationStatus),
+          ),
+        );
+
+        await _getFCMtoken(
+          topics: topics,
+          appName: appName,
+          idGenUsuario: idGenUsuario,
+        );
+
+        return;
+      }
+
+      if (actual.authorizationStatus == AuthorizationStatus.denied) {
+        add(
+          const NotificationStatusChanged(
+            NotificationPermissionStatus.denied,
+          ),
+        );
+
+        _mostrarMensajePermisoDenegado();
+        return;
+      }
+
+      final NotificationSettings settings =
+      await messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+
+      print(
+        "[PUSH GENERAL] Authorization Status: "
+            "${settings.authorizationStatus}",
+      );
+
+      add(
+        NotificationStatusChanged(
+          _mapStatus(settings.authorizationStatus),
+        ),
+      );
+
+      if (settings.authorizationStatus == AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional) {
+        await _getFCMtoken(
+          topics: topics,
+          appName: appName,
+          idGenUsuario: idGenUsuario,
+        );
+        return;
+      }
+
+      if (settings.authorizationStatus == AuthorizationStatus.denied) {
+        print("[PUSH GENERAL] Usuario rechazó notificaciones");
+        _mostrarMensajePermisoDenegado();
+      }
+    } catch (e) {
+      print("[PUSH GENERAL] Error solicitando permiso: $e");
     }
   }
 

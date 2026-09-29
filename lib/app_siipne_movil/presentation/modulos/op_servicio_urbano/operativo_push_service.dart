@@ -148,13 +148,16 @@ class OperativoPushService {
     if (idHdrEvento <= 0) {
       throw ArgumentError.value(idHdrEvento, 'idHdrEvento');
     }
+
     _deseado = idHdrEvento;
     _sesionResuelta = true;
     String etapa = 'inicialización';
 
     try {
       debugPrint('[PUSH] Iniciando operativo_$idHdrEvento');
+
       await inicializar();
+
       debugPrint('[PUSH] Inicialización completada');
 
       if (!compatible) {
@@ -162,16 +165,12 @@ class OperativoPushService {
         return;
       }
 
-      etapa = 'solicitud de permisos';
-      final permission = await FirebaseMessaging.instance.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
-      debugPrint('[PUSH] Permiso: ${permission.authorizationStatus}');
+      final settings =
+      await FirebaseMessaging.instance.getNotificationSettings();
 
-      if (permission.authorizationStatus == AuthorizationStatus.denied) {
-        estado.value = 'Permiso de notificaciones denegado';
+      if (settings.authorizationStatus != AuthorizationStatus.authorized &&
+          settings.authorizationStatus != AuthorizationStatus.provisional) {
+        estado.value = 'Notificaciones no autorizadas';
         return;
       }
 
@@ -183,7 +182,6 @@ class OperativoPushService {
       debugPrintStack(stackTrace: stackTrace);
     }
   }
-
   // Ejecutar al cerrar sesión o abandonar/finalizar el operativo, no al cerrar una vista.
   Future<void> salirOperativo() async {
     _deseado = 0;
@@ -303,27 +301,33 @@ class OperativoPushService {
   }
   Future<String?> obtenerTokenDispositivo() async {
     if (!compatible) return null;
+
     try {
       final messaging = FirebaseMessaging.instance;
-      final permiso = await messaging.requestPermission(
-        alert: true, badge: true, sound: true,
-      );
-      if (permiso.authorizationStatus == AuthorizationStatus.denied) {
-        estado.value = 'Permiso de notificaciones denegado';
+      final settings = await messaging.getNotificationSettings();
+
+      if (settings.authorizationStatus != AuthorizationStatus.authorized &&
+          settings.authorizationStatus != AuthorizationStatus.provisional) {
+        estado.value = 'Notificaciones no autorizadas';
         return null;
       }
+
       if (defaultTargetPlatform == TargetPlatform.iOS) {
         final apnsToken = await messaging.getAPNSToken();
+
         if (apnsToken == null) {
           estado.value = 'Esperando registro APNs; vuelva a intentar';
           return null;
         }
       }
+
       final token = await messaging.getToken();
+
       if (token == null || token.isEmpty) {
         estado.value = 'No se pudo obtener el token FCM';
         return null;
       }
+
       return token;
     } catch (e) {
       debugPrint('Error obteniendo token FCM: $e');
@@ -362,6 +366,43 @@ class OperativoPushService {
     } catch (e, stackTrace) {
       debugPrint('[PUSH PRUEBA] ERROR: $e');
       debugPrintStack(stackTrace: stackTrace);
+    }
+  }
+  Future<bool> solicitarPermisoNotificaciones() async {
+    if (!compatible) return true;
+
+    try {
+      final messaging = FirebaseMessaging.instance;
+      final actual = await messaging.getNotificationSettings();
+
+      if (actual.authorizationStatus == AuthorizationStatus.authorized ||
+          actual.authorizationStatus == AuthorizationStatus.provisional) {
+        return true;
+      }
+
+      if (actual.authorizationStatus == AuthorizationStatus.denied) {
+        estado.value = 'Permiso de notificaciones denegado';
+        return false;
+      }
+
+      final permission = await messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+
+      final autorizado =
+          permission.authorizationStatus == AuthorizationStatus.authorized ||
+              permission.authorizationStatus == AuthorizationStatus.provisional;
+
+      estado.value = autorizado
+          ? 'Notificaciones activadas'
+          : 'Permiso de notificaciones denegado';
+
+      return autorizado;
+    } catch (e) {
+      debugPrint('[PUSH] Error solicitando permiso: $e');
+      return false;
     }
   }
 }

@@ -2,14 +2,10 @@ part of '../pages.dart';
 
 class LoginPage extends GetView<LoginController> {
   const LoginPage({super.key});
-
-  static const Color _azulInstitucional = Color(0xFF195BA6);
   static const Color _azulOscuro = Color(0xFFCDCDCD);
 
   @override
   Widget build(BuildContext context) {
-    final ResponsiveUtil responsive = ResponsiveUtil();
-
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: _azulOscuro,
@@ -17,52 +13,110 @@ class LoginPage extends GetView<LoginController> {
         children: [
           _fondo(),
           _capaFondo(),
-
           SafeArea(
-            child: Column(
-              children: [
-                _barraSuperior(context),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final double width = constraints.maxWidth;
+                final double height = constraints.maxHeight;
 
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    keyboardDismissBehavior:
+                final bool telefonoPequeno = width < 380 || height < 700;
+                final bool tablet = width >= 600;
+                final bool pantallaGrande = width >= 900;
+
+                final double horizontalPadding = pantallaGrande
+                    ? 32
+                    : tablet
+                    ? 28
+                    : telefonoPequeno
+                    ? 14
+                    : 20;
+
+                return Column(
+                  children: [
+                    _barraSuperior(
+                      context,
+                      telefonoPequeno: telefonoPequeno,
+                      tablet: tablet,
+                    ),
+
+                    Expanded(
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        keyboardDismissBehavior:
                         ScrollViewKeyboardDismissBehavior.onDrag,
-                    padding: EdgeInsets.fromLTRB(
-                      responsive.anchoP(5),
-                      responsive.altoP(1),
-                      responsive.anchoP(5),
-                      responsive.altoP(2),
-                    ),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight:
-                            MediaQuery.of(context).size.height -
-                            MediaQuery.of(context).padding.top -
-                            MediaQuery.of(context).padding.bottom -
-                            responsive.altoP(15),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _encabezado(responsive),
-                          SizedBox(height: responsive.altoP(3)),
-                          _formulario(responsive),
-                          SizedBox(height: responsive.altoP(2.2)),
-                          _piePagina(),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+                        padding: EdgeInsets.fromLTRB(
+                          horizontalPadding,
+                          telefonoPequeno ? 4 : 10,
+                          horizontalPadding,
+                          telefonoPequeno ? 8 : 16,
+                        ),
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: telefonoPequeno
+                                ? 0
+                                : constraints.maxHeight -
+                                (pantallaGrande ? 145 : 125),
+                          ),
+                          child: Center(
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth: pantallaGrande
+                                    ? 620
+                                    : tablet
+                                    ? 560
+                                    : 500,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: telefonoPequeno
+                                    ? MainAxisAlignment.start
+                                    : MainAxisAlignment.center,
+                                children: [
+                                  _encabezado(
+                                    tablet: tablet,
+                                    pantallaGrande: pantallaGrande,
+                                    pantallaBaja: telefonoPequeno,
+                                  ),
 
-                _versionApp(context),
-              ],
+                                  SizedBox(
+                                    height: telefonoPequeno
+                                        ? 10
+                                        : pantallaGrande
+                                        ? 20
+                                        : 18,
+                                  ),
+
+                                  _formulario(
+                                    tablet: tablet,
+                                    pantallaGrande: pantallaGrande,
+                                    pantallaBaja: telefonoPequeno,
+                                  ),
+
+                                  SizedBox(
+                                    height: telefonoPequeno ? 10 : 16,
+                                  ),
+
+                                  _piePagina(
+                                    tablet: tablet,
+                                    pantallaBaja: telefonoPequeno,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    _versionApp(context),
+                  ],
+                );
+              },
             ),
           ),
 
           Obx(
-            () => CargandoWidget(
+                () => CargandoWidget(
               mostrar: controller.peticionServerState.value,
               titulo: 'VERIFICANDO CREDENCIALES',
               mensaje: 'Preparando los servicios institucionales...',
@@ -72,7 +126,6 @@ class LoginPage extends GetView<LoginController> {
       ),
     );
   }
-
   Widget _fondo() {
     return Positioned.fill(
       child: Image.asset(
@@ -100,127 +153,195 @@ class LoginPage extends GetView<LoginController> {
     );
   }
 
-  Widget _barraSuperior(BuildContext context) {
+  Widget _barraSuperior(
+      BuildContext context, {
+        required bool telefonoPequeno,
+        required bool tablet,
+      }) {
+    final double alturaLogo = tablet
+        ? 60
+        : telefonoPequeno
+        ? 46
+        : 54;
+
+    final double tamBoton = telefonoPequeno ? 38 : 42;
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
-      child: Row(
-        children: [
-          Expanded(
-            child: Align(
-              alignment: Alignment.center,
-              child: Image.asset(
-                AppImages.imgSiipneMovil,
-                height: 60,
-                fit: BoxFit.contain,
-                alignment: Alignment.center,
+      padding: EdgeInsets.fromLTRB(
+        telefonoPequeno ? 10 : 16,
+        telefonoPequeno ? 2 : 4,
+        telefonoPequeno ? 10 : 12,
+        0,
+      ),
+      child: SizedBox(
+        height: tablet
+            ? 66
+            : telefonoPequeno
+            ? 50
+            : 58,
+        child: Row(
+          children: [
+            SizedBox(width: tamBoton),
+            Expanded(
+              child: Center(
+                child: Image.asset(
+                  AppImages.imgSiipneMovil,
+                  height: alturaLogo,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
-          ),
-
-          Obx(
-            () => AnimatedSwitcher(
-              duration: const Duration(milliseconds: 220),
-              child: controller.mostrarBtnHome.value
-                  ? Material(
-                      key: const ValueKey('btnHome'),
-                      color: Colors.transparent,
-                      child: InkWell(
+            Obx(
+                  () => AnimatedSwitcher(
+                duration: const Duration(milliseconds: 220),
+                child: controller.mostrarBtnHome.value
+                    ? Material(
+                  key: const ValueKey('btnHome'),
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(13),
+                    onTap: () => controller.setAppPageSelect(
+                      PageAppsSelect.Bienvenida,
+                    ),
+                    child: Container(
+                      width: tamBoton,
+                      height: tamBoton,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(.12),
                         borderRadius: BorderRadius.circular(13),
-                        onTap: () => controller.setAppPageSelect(
-                          PageAppsSelect.Bienvenida,
-                        ),
-                        child: Container(
-                          width: 42,
-                          height: 42,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(.12),
-                            borderRadius: BorderRadius.circular(13),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(.18),
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.home_rounded,
-                            color: Colors.white,
-                            size: 22,
-                          ),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(.18),
                         ),
                       ),
-                    )
-                  : const SizedBox(
-                      key: ValueKey('sinBtnHome'),
-                      width: 42,
-                      height: 42,
+                      child: Icon(
+                        Icons.home_rounded,
+                        color: Colors.white,
+                        size: telefonoPequeno ? 20 : 22,
+                      ),
                     ),
+                  ),
+                )
+                    : SizedBox(
+                  key: const ValueKey('sinBtnHome'),
+                  width: tamBoton,
+                  height: tamBoton,
+                ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
+  Widget _encabezado({
+    required bool tablet,
+    required bool pantallaGrande,
+    required bool pantallaBaja,
+  }) {
+    final double escudo = pantallaBaja
+        ? 62
+        : pantallaGrande
+        ? 100
+        : tablet
+        ? 90
+        : 82;
 
-  Widget _encabezado(ResponsiveUtil responsive) {
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 430),
+      constraints: BoxConstraints(
+        maxWidth: tablet ? 500 : 430,
+      ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Image.asset(
             AppImages.escudopoliciaPlomo,
-            width: 90,
-            height: 90,
+            width: escudo,
+            height: escudo,
             fit: BoxFit.contain,
           ),
 
-          SizedBox(height: responsive.altoP(1.5)),
+          SizedBox(height: pantallaBaja ? 5 : 12),
 
-          const Text(
+          Text(
             'INICIO DE SESIÓN',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 23,
+              fontSize: pantallaBaja
+                  ? 19
+                  : tablet
+                  ? 24
+                  : 22,
               fontWeight: FontWeight.w800,
               letterSpacing: .5,
               height: 1.1,
             ),
           ),
 
-          const SizedBox(height: 7),
+          SizedBox(height: pantallaBaja ? 4 : 7),
 
           Text(
             'Ingrese sus credenciales institucionales para continuar',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white.withOpacity(.82),
-              fontSize: 13,
+              fontSize: pantallaBaja
+                  ? 11.5
+                  : tablet
+                  ? 14
+                  : 13,
               fontWeight: FontWeight.w400,
-              height: 1.35,
+              height: 1.3,
             ),
           ),
         ],
       ),
     );
   }
+  Widget _formulario({
+    required bool tablet,
+    required bool pantallaGrande,
+    required bool pantallaBaja,
+  }) {
+    final double anchoFormulario = pantallaGrande
+        ? 580
+        : tablet
+        ? 520
+        : 430;
 
-  Widget _formulario(ResponsiveUtil responsive) {
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 430),
+      constraints: BoxConstraints(
+        maxWidth: anchoFormulario,
+      ),
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(
-          horizontal: responsive.anchoP(4.5),
-          vertical: responsive.altoP(2.4),
+          horizontal: pantallaBaja
+              ? 14
+              : tablet
+              ? 30
+              : 18,
+          vertical: pantallaBaja
+              ? 12
+              : pantallaGrande
+              ? 24
+              : 18,
         ),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(.96),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.white.withOpacity(.80), width: 1),
+          borderRadius: BorderRadius.circular(
+            tablet ? 24 : 20,
+          ),
+          border: Border.all(
+            color: Colors.white.withOpacity(.80),
+            width: 1,
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(.18),
-              blurRadius: 28,
+              blurRadius: pantallaBaja ? 18 : 28,
               spreadRadius: 1,
-              offset: const Offset(0, 12),
+              offset: const Offset(0, 10),
             ),
           ],
         ),
@@ -233,13 +354,20 @@ class LoginPage extends GetView<LoginController> {
       ),
     );
   }
-
-  Widget _piePagina() {
+  Widget _piePagina({
+    required bool tablet,
+    required bool pantallaBaja,
+  }) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Image.asset(
           AppImages.imgloginPoliciaEcuador,
-          height: 40,
+          height: pantallaBaja
+              ? 30
+              : tablet
+              ? 42
+              : 38,
           fit: BoxFit.contain,
         ),
       ],

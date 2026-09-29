@@ -46,15 +46,14 @@ Al seleccionar la opción "ACEPTO", declaro que he leído, comprendido y acepto 
   String get _keyAcuerdo => '${_prefAcuerdo}_${user.idGenPersona}';
   String get _keyIdAcuerdo => '${_prefIdAcuerdo}_${user.idGenPersona}';
 
-  bool get puedeContinuar =>
-      puedeAceptar.value && acepta.value && !procesandoAceptacion.value;
+  bool get puedeContinuar =>puedeAceptar.value && acepta.value && !procesandoAceptacion.value;
 
   @override
   void onInit() {
     super.onInit();
 
     user = loginController.user.value;
-
+    scrollController.addListener(_validarLecturaAcuerdo);
     debugPrint('==========================================');
     debugPrint('ACUERDO APP - ON INIT');
     debugPrint('ID PERSONA ACTUAL: ${user.idGenPersona}');
@@ -67,7 +66,43 @@ Al seleccionar la opción "ACEPTO", declaro que he leído, comprendido y acepto 
 
     verificarAcuerdoAceptado();
   }
+  @override
+  void onReady() {
+    super.onReady();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _validarLecturaAcuerdo();
+    });
+  }
 
+  void _validarLecturaAcuerdo() {
+    if (!scrollController.hasClients) return;
+
+    final position = scrollController.position;
+    final double maxScroll = position.maxScrollExtent;
+
+    // Si no existe scroll, significa que TODO el acuerdo
+    // ya está visible en pantalla.
+    if (maxScroll <= 0) {
+      if (!puedeAceptar.value) puedeAceptar.value = true;
+      return;
+    }
+
+    // Si existe scroll, obliga a llegar prácticamente al final.
+    const double tolerancia = 10.0;
+    final bool llegoAlFinal =
+        position.pixels >= (maxScroll - tolerancia);
+
+    if (llegoAlFinal && !puedeAceptar.value) {
+      puedeAceptar.value = true;
+    }
+  }
+
+  @override
+  void onClose() {
+    scrollController.removeListener(_validarLecturaAcuerdo);
+    scrollController.dispose();
+    super.onClose();
+  }
   // ============================================================
   // VERIFICAR ACUERDO
   // ============================================================
@@ -461,7 +496,11 @@ Al seleccionar la opción "ACEPTO", declaro que he leído, comprendido y acepto 
       debugPrint('Error debug acuerdo local: $e');
     }
   }
-
+  void validarLecturaDespuesDeRenderizar() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!isClosed) _validarLecturaAcuerdo();
+    });
+  }
   // ============================================================
   // CERRAR SESIÓN
   // ============================================================
@@ -471,11 +510,5 @@ Al seleccionar la opción "ACEPTO", declaro que he leído, comprendido y acepto 
     if (redireccionando.value) return;
 
     Get.offAllNamed(AppRoutes.SPLASH_APP);
-  }
-
-  @override
-  void onClose() {
-    scrollController.dispose();
-    super.onClose();
   }
 }

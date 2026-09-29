@@ -310,9 +310,7 @@ class AcuerdoAppPage extends GetView<AcuerdoAppController> {
                   color: Color(0xFF0D4C9C),
                   size: 17,
                 ),
-
                 SizedBox(width: 7),
-
                 Expanded(
                   child: Text(
                     "CONDICIONES DE USO DEL APLICATIVO",
@@ -323,7 +321,6 @@ class AcuerdoAppPage extends GetView<AcuerdoAppController> {
                     ),
                   ),
                 ),
-
                 Icon(
                   Icons.swipe_up_alt_rounded,
                   color: Color(0xFF94A3B8),
@@ -332,7 +329,6 @@ class AcuerdoAppPage extends GetView<AcuerdoAppController> {
               ],
             ),
           ),
-
           Expanded(
             child: Scrollbar(
               controller: controller.scrollController,
@@ -342,9 +338,15 @@ class AcuerdoAppPage extends GetView<AcuerdoAppController> {
                 controller: controller.scrollController,
                 physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.fromLTRB(14, 12, 18, 15),
-                child: Obx(
-                  () => Text(
-                    controller.textoAcuerdo.value,
+                child: Obx(() {
+                  final texto = controller.textoAcuerdo.value;
+
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    controller.validarLecturaDespuesDeRenderizar();
+                  });
+
+                  return Text(
+                    texto,
                     textAlign: TextAlign.justify,
                     style: const TextStyle(
                       color: Color(0xFF374151),
@@ -352,8 +354,8 @@ class AcuerdoAppPage extends GetView<AcuerdoAppController> {
                       height: 1.5,
                       fontWeight: FontWeight.w400,
                     ),
-                  ),
-                ),
+                  );
+                }),
               ),
             ),
           ),
@@ -361,7 +363,6 @@ class AcuerdoAppPage extends GetView<AcuerdoAppController> {
       ),
     );
   }
-
   // ============================================================
   // ACEPTACIÓN
   // ============================================================

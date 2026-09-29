@@ -36,7 +36,11 @@ class LocalNotification {
   static Future<void> initializeLocalNotifications() async {
     const androidInit = AndroidInitializationSettings('ic_stat_operativo');
 
-    const iosInit = DarwinInitializationSettings();
+    const iosInit = DarwinInitializationSettings(
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
+    );
 
     const initSettings = InitializationSettings(
       android: androidInit,
@@ -47,9 +51,7 @@ class LocalNotification {
       settings: initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         try {
-          if (response.payload == null || response.payload!.isEmpty) {
-            return;
-          }
+          if (response.payload == null || response.payload!.isEmpty) return;
 
           final notification = notificationModelFromJson(response.payload!);
 
@@ -64,22 +66,9 @@ class LocalNotification {
           switch (notification.accion) {
             case "abrir_censo":
               print("Abrir pantalla de censo: ${notification.idAccion}");
-
-              // navigatorKey.currentState?.pushNamed(
-              //   '/detalleCenso',
-              //   arguments: notification.idAccion,
-              // );
-
               break;
-
             case "abrir_eleccion":
               print("Abrir pantalla de elecciones: ${notification.idAccion}");
-
-              // navigatorKey.currentState?.pushNamed(
-              //   '/detalleEleccion',
-              //   arguments: notification.idAccion,
-              // );
-
               break;
           }
         } catch (e) {
@@ -88,7 +77,6 @@ class LocalNotification {
       },
     );
   }
-
   /// Mostrar notificación
   static Future<void> showLocalNotification({
     required NotificationModel notification,
