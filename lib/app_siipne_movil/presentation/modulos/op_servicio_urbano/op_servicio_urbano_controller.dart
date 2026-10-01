@@ -108,15 +108,7 @@ class OpServicioUrbanoController extends GetxController {
   // ACTUALIZAR RESULTADO DESPUÉS DE CONSULTAR
   // ============================================================
   final RxBool actualizandoResultado = false.obs;
-  /*
-   * Variable con la que el registro fue insertado originalmente.
-   *
-   * La consulta sigue utilizando automáticamente la primera
-   * variable disponible. Esto mantiene intacto el flujo actual.
-   *
-   * Luego el usuario puede seleccionar otra variable y,
-   * al presionar NUEVA CONSULTA, se actualiza el registro.
-   */
+
   int idVariableInsertadaPersona = 0;
   int idVariableInsertadaVehiculo = 0;
   String mensajeErrorActualizaResultado = '';
@@ -207,6 +199,8 @@ class OpServicioUrbanoController extends GetxController {
   String mensajeErrorAntecedentesPersona = '';
   bool get tieneAntecedentesPersona =>
       datosAntecedentesPersona.value?.antecedentes.isNotEmpty ?? false;
+  final Set<String> _alertasPushMostradas = <String>{};
+  bool _dialogoPushProgramado = false;
   @override
   void onInit() {
     super.onInit();
@@ -220,32 +214,54 @@ class OpServicioUrbanoController extends GetxController {
     if (!isClosed) estadoNotificaciones.value = estado;
     if (kDebugMode) debugPrint('[PUSH] Estado: $estado');
   }
-
   Future<void> _activarNotificacionesOperativo() async {
     final int idEvento = idHdrEventoActual.value;
+
     if (idEvento <= 0) {
       debugPrint('[PUSH] No existe un ID de operativo válido');
       return;
     }
 
-    final push = OperativoPushService.instance;
+    final OperativoPushService push = OperativoPushService.instance;
+
     push.estado.removeListener(_estadoPushActualizado);
+    push.alertaCritica.removeListener(_alertaPushActualizada);
+    push.aperturaPendiente.removeListener(_alertaPushActualizada);
+
     push.estado.addListener(_estadoPushActualizado);
+    push.alertaCritica.addListener(_alertaPushActualizada);
+    push.aperturaPendiente.addListener(_alertaPushActualizada);
 
     try {
-      if (kDebugMode) debugPrint('[PUSH] Topic esperado: operativo_$idEvento');
+      debugPrint('==========================================');
+      debugPrint('[PUSH] ACTIVANDO NOTIFICACIONES');
+      debugPrint('[PUSH] Topic esperado: operativo_$idEvento');
+      debugPrint('==========================================');
+
       await push.activarOperativo(idEvento);
+
+      if (isClosed) return;
+
       _estadoPushActualizado();
+      _alertaPushActualizada();
 
       if (kDebugMode) {
         final String? token = await push.obtenerTokenDispositivo();
-        debugPrint('[PUSH] Token disponible: ${token != null && token.isNotEmpty}');
+
+        debugPrint('==========================================');
+        debugPrint('[PUSH] ESTADO: ${push.estado.value}');
+        debugPrint('[PUSH] FCM TOKEN: ${token != null && token.isNotEmpty ? 'SI' : 'NO'}');
+
+        if (defaultTargetPlatform == TargetPlatform.iOS) {
+          final String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+          debugPrint('[PUSH] APNs TOKEN: ${apnsToken != null && apnsToken.isNotEmpty ? 'SI' : 'NO'}');
+        }
+
+        debugPrint('==========================================');
       }
     } catch (e, stackTrace) {
-      if (kDebugMode) {
-        debugPrint('[PUSH] Error de activación: $e');
-        debugPrint('$stackTrace');
-      }
+      debugPrint('[PUSH] Error de activación: $e');
+      debugPrintStack(stackTrace: stackTrace);
     }
   }
   Future<void> _inicializarPantalla() async {
@@ -1176,6 +1192,16 @@ class OpServicioUrbanoController extends GetxController {
         } catch (e) {
           debugPrint('No fue posible reproducir audio: $e');
         }
+
+        debugPrint('==========================================');
+        debugPrint('ALERTA PERSONA RELACIONADA AL VEHÍCULO');
+        debugPrint('OPERATIVO: ${idHdrEventoActual.value}');
+        debugPrint('VEHÍCULO: ${dataVehiculo.first.datosVehiculo.data.placa}');
+        debugPrint('DOCUMENTO: $cedula');
+        debugPrint('TIPO: ${esConductor ? 'CONDUCTOR' : 'OCUPANTE'}');
+        debugPrint('ORDEN CAPTURA: SI');
+        debugPrint('PUSH: GENERADO POR SERVIDOR');
+        debugPrint('==========================================');
       }
       debugPrint('==========================================');
       debugPrint('PERSONA AGREGADA CORRECTAMENTE');
@@ -1763,8 +1789,12 @@ class OpServicioUrbanoController extends GetxController {
   // ============================================================
   @override
   void onClose() {
-    OperativoPushService.instance.estado.removeListener(_estadoPushActualizado);
-    // Conservar suscripción mientras siga anexado, incluso en segundo plano.
+    final OperativoPushService push = OperativoPushService.instance;
+
+    push.estado.removeListener(_estadoPushActualizado);
+    push.alertaCritica.removeListener(_alertaPushActualizada);
+    push.aperturaPendiente.removeListener(_alertaPushActualizada);
+
     scrollController.removeListener(_onScroll);
     scrollController.dispose();
     controllerCedula.dispose();
@@ -1773,6 +1803,7 @@ class OpServicioUrbanoController extends GetxController {
     controllerClaveFinalizar.dispose();
     focusCedula.dispose();
     focusPlaca.dispose();
+
     super.onClose();
   }
 // ============================================================
@@ -1892,5 +1923,564 @@ class OpServicioUrbanoController extends GetxController {
     } finally {
       autenticandoBiometria.value = false;
     }
+  }
+  void _alertaPushActualizada() {
+    if (isClosed) return;
+
+    final OperativoPushService push = OperativoPushService.instance;
+    final Map<String, dynamic>? data =
+        push.alertaCritica.value ?? push.aperturaPendiente.value;
+
+    if (data == null || data.isEmpty) return;
+
+    final int idEvento = int.tryParse(data['idHdrEvento']?.toString() ?? '') ?? 0;
+    if (idEvento <= 0 || idEvento != idHdrEventoActual.value) return;
+
+    final String tipo = data['tipo']?.toString().trim().toUpperCase() ?? '';
+    if (tipo != 'BOLETA' && tipo != 'VEHICULO_ROBADO') return;
+
+    final String alertaId = data['alertaId']?.toString().trim() ??
+        '${idEvento}_${data['idHdrEventoResum']}_${tipo}';
+
+    if (alertaId.isEmpty || _alertasPushMostradas.contains(alertaId) || _dialogoPushProgramado) {
+      return;
+    }
+
+    _alertasPushMostradas.add(alertaId);
+    _dialogoPushProgramado = true;
+
+    if (_alertasPushMostradas.length > 100) {
+      _alertasPushMostradas.remove(_alertasPushMostradas.first);
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _dialogoPushProgramado = false;
+
+      if (isClosed) return;
+
+      _mostrarDialogoAlertaPush(data);
+
+      if (identical(push.alertaCritica.value, data)) {
+        push.limpiarAlertaCritica();
+      }
+
+      if (identical(push.aperturaPendiente.value, data)) {
+        push.limpiarAperturaPendiente();
+      }
+    });
+  }
+
+  void _mostrarDialogoAlertaPush(Map<String, dynamic> data) {
+    final String tipo = data['tipo']?.toString().trim().toUpperCase() ?? '';
+    final bool esVehiculo = tipo == 'VEHICULO_ROBADO';
+    String valor(String key) => data[key]?.toString().trim() ?? '';
+
+    final String mensaje = valor('_mensaje').isNotEmpty
+        ? valor('_mensaje')
+        : esVehiculo
+        ? 'Se ha detectado un vehículo con alerta durante el operativo.'
+        : 'Se ha detectado una persona con alerta durante el operativo.';
+
+    final String placa = valor('placa').toUpperCase();
+    final String cedula = valor('cedula');
+    final String identificacion = esVehiculo ? placa : cedula;
+    final String consultadoPor = valor('consultadoPor').isNotEmpty
+        ? valor('consultadoPor')
+        : valor('usuario');
+    final String hora = valor('hora');
+
+    final String titulo = esVehiculo
+        ? 'VEHÍCULO ROBADO'
+        : 'ORDEN DE CAPTURA';
+
+    Get.dialog(
+      Dialog(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 26),
+        child: Container(
+          width: double.infinity,
+          constraints: const BoxConstraints(maxWidth: 440),
+          decoration: BoxDecoration(
+            color: const Color(0xFF07111F),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: const Color(0xFFD71920).withOpacity(.80),
+              width: 1.2,
+            ),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: const Color(0xFFD71920).withOpacity(.28),
+                blurRadius: 35,
+                spreadRadius: 2,
+                offset: const Offset(0, 12),
+              ),
+              BoxShadow(
+                color: Colors.black.withOpacity(.55),
+                blurRadius: 24,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Stack(
+            children: <Widget>[
+              Positioned(
+                top: -80,
+                right: -60,
+                child: Container(
+                  width: 190,
+                  height: 190,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: <Color>[
+                        const Color(0xFFD71920).withOpacity(.22),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: -100,
+                left: -80,
+                child: Container(
+                  width: 220,
+                  height: 220,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: <Color>[
+                        const Color(0xFF005CA9).withOpacity(.18),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                    height: 5,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: <Color>[
+                          Color(0xFF700000),
+                          Color(0xFFFF1E26),
+                          Color(0xFFFF5252),
+                          Color(0xFFFF1E26),
+                          Color(0xFF700000),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // ============================================================
+                  // CABECERA
+                  // ============================================================
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                          width: 64,
+                          height: 64,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: <Color>[
+                                Color(0xFFFF3038),
+                                Color(0xFFB00010),
+                              ],
+                            ),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(.18),
+                            ),
+                            boxShadow: <BoxShadow>[
+                              BoxShadow(
+                                color: const Color(0xFFFF1E26).withOpacity(.40),
+                                blurRadius: 20,
+                                spreadRadius: 1,
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            esVehiculo
+                                ? Icons.directions_car_filled_rounded
+                                : Icons.person_search_rounded,
+                            color: Colors.white,
+                            size: 32,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  _chipAlertaPush(
+                                    texto: 'ALERTA CRÍTICA',
+                                    icono: Icons.warning_amber_rounded,
+                                  ),
+                                  const SizedBox(width: 7),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF162439),
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(.08),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'SIIPNE MÓVIL 2',
+                                      style: TextStyle(
+                                        color: Color(0xFF95A8C0),
+                                        fontSize: 8.5,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: .7,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 9),
+                              Text(
+                                titulo,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  height: 1.05,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: .2,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                esVehiculo
+                                    ? 'ALERTA DETECTADA EN CONSULTA VEHICULAR'
+                                    : 'ALERTA DETECTADA EN CONSULTA DE PERSONA',
+                                style: const TextStyle(
+                                  color: Color(0xFF8CA0B8),
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: .8,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Línea tipo escáner
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 18),
+                    height: 1,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: <Color>[
+                          Colors.transparent,
+                          const Color(0xFFFF1E26).withOpacity(.9),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // ============================================================
+                  // MENSAJE PRINCIPAL
+                  // ============================================================
+                  Flexible(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(18, 15, 18, 8),
+                      child: Column(
+                        children: <Widget>[
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: <Color>[
+                                  const Color(0xFFD71920).withOpacity(.16),
+                                  const Color(0xFF101D2E),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(13),
+                              border: Border.all(
+                                color: const Color(0xFFD71920).withOpacity(.35),
+                              ),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Container(
+                                  width: 36,
+                                  height: 36,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFD71920).withOpacity(.18),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Icon(
+                                    Icons.notifications_active_rounded,
+                                    color: Color(0xFFFF5252),
+                                    size: 21,
+                                  ),
+                                ),
+                                const SizedBox(width: 11),
+                                Expanded(
+                                  child: Text(
+                                    mensaje,
+                                    style: const TextStyle(
+                                      color: Color(0xFFE9EEF5),
+                                      fontSize: 13,
+                                      height: 1.42,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          if (consultadoPor.isNotEmpty) ...<Widget>[
+                            const SizedBox(height: 9),
+                            _datoAlertaPush(
+                              icono: Icons.person_outline_rounded,
+                              titulo: 'CONSULTADO POR',
+                              valor: consultadoPor,
+                              anchoCompleto: true,
+                            ),
+                          ],
+
+                          if (hora.isNotEmpty) ...<Widget>[
+                            const SizedBox(height: 9),
+                            _datoAlertaPush(
+                              icono: Icons.access_time_rounded,
+                              titulo: 'HORA DE LA ALERTA',
+                              valor: hora,
+                              anchoCompleto: true,
+                            ),
+                          ],
+
+                          const SizedBox(height: 12),
+
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 9,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF0D1928),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: const Color(0xFF24364C),
+                              ),
+                            ),
+                            child: const Row(
+                              children: <Widget>[
+                                Icon(
+                                  Icons.info_outline_rounded,
+                                  color: Color(0xFF6EA7DA),
+                                  size: 17,
+                                ),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'Verifique la información y aplique el procedimiento institucional correspondiente.',
+                                    style: TextStyle(
+                                      color: Color(0xFFAFC0D2),
+                                      fontSize: 10.5,
+                                      height: 1.35,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // ============================================================
+                  // PIE / ACCIÓN
+                  // ============================================================
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF091421),
+                      border: Border(
+                        top: BorderSide(
+                          color: Colors.white.withOpacity(.06),
+                        ),
+                      ),
+                    ),
+                    child: SizedBox(
+                      height: 47,
+                      child: ElevatedButton(
+                        onPressed: () => Get.back(),
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          backgroundColor: const Color(0xFFD71920),
+                          foregroundColor: Colors.white,
+                          shadowColor: const Color(0xFFD71920),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(11),
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(
+                              Icons.verified_user_outlined,
+                              size: 20,
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              'CONFIRMAR ALERTA',
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: .7,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(.82),
+    );
+  }
+
+  Widget _chipAlertaPush({
+    required String texto,
+    required IconData icono,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        color: const Color(0xFFD71920).withOpacity(.17),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: const Color(0xFFFF3B43).withOpacity(.42),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Icon(icono, color: const Color(0xFFFF5258), size: 13),
+          const SizedBox(width: 5),
+          Text(
+            texto,
+            style: const TextStyle(
+              color: Color(0xFFFF7A7E),
+              fontSize: 8.5,
+              fontWeight: FontWeight.w800,
+              letterSpacing: .7,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _datoAlertaPush({
+    required IconData icono,
+    required String titulo,
+    required String valor,
+    bool destacado = false,
+    bool anchoCompleto = false,
+  }) {
+    return Container(
+      width: anchoCompleto ? double.infinity : null,
+      padding: const EdgeInsets.all(11),
+      decoration: BoxDecoration(
+        color: const Color(0xFF101C2B),
+        borderRadius: BorderRadius.circular(11),
+        border: Border.all(
+          color: destacado
+              ? const Color(0xFFD71920).withOpacity(.40)
+              : const Color(0xFF25374B),
+        ),
+      ),
+      child: Row(
+        children: <Widget>[
+          Container(
+            width: 35,
+            height: 35,
+            decoration: BoxDecoration(
+              color: destacado
+                  ? const Color(0xFFD71920).withOpacity(.15)
+                  : const Color(0xFF17283B),
+              borderRadius: BorderRadius.circular(9),
+            ),
+            child: Icon(
+              icono,
+              size: 18,
+              color: destacado
+                  ? const Color(0xFFFF4D55)
+                  : const Color(0xFF78A9D4),
+            ),
+          ),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  titulo,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFF778BA2),
+                    fontSize: 8.5,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: .8,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  valor,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: destacado
+                        ? const Color(0xFFFF6B70)
+                        : const Color(0xFFE6EDF5),
+                    fontSize: destacado ? 14 : 12.5,
+                    height: 1.15,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

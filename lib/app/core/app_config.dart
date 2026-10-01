@@ -32,11 +32,11 @@ class AppConfig {
       "ecuador.policianacional.dntic.siipnemovil";
 
   static String linkAppAndroid =
-      dotenv.env['LINK_APP_SIIPNE_ELECCIONES_ANDROID'] ??
-      "https://play.google.com/store/apps/details?id=ecuador.policianacional.dntic.siipnemovil2";
+      dotenv.env['LINK_APP_SIIPNE_MOVIL_ANDROID'] ??
+      "https://play.google.com/store/apps/details?id=ecuador.policianacional.dntic.siipnemovil_v2";
   static String linkAppIos =
-      dotenv.env['LINK_APP_SIIPNE_ELECCIONES_IOS'] ??
-      "https://apps.apple.com/ec/app/siipnemovil-2/id1552944115";
+      dotenv.env['LINK_APP_SIIPNE_MOVIL_IOS'] ??
+      "https://apps.apple.com/ec/app/";
 
   static bool isUserGoogleOrIos = false;
   static bool activarMocks = false;

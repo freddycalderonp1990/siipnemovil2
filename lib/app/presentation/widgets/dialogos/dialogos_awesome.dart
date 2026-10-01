@@ -717,7 +717,7 @@ class DialogosAwesome {
       btnOkOnPress: btnOkOnPress ?? () {},
       titleBtnSi: titleBtnOk,
       mostrarSegungoBtn: false,
-      codigoEstado: 'SIIPNE // ADVERTENCIA OPERATIVA',
+      codigoEstado: 'SIIPNE Móvil2// ADVERTENCIA OPERATIVA',
       etiquetaDetalle: 'INFORMACIÓN QUE REQUIERE ATENCIÓN',
       iconoEstado: Icons.warning_amber_rounded,
     );
