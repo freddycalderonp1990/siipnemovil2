@@ -295,9 +295,9 @@ mixin ResumenOperativoViewMixin on OpServicioUrbanoPageBase {
       buffer += "\n";
     }
 
-    buffer += "Atte.\n";
-    buffer += "${user.gradoSiglas.trim()} ${user.nombres.trim()}\n";
-    buffer += "Técnico ${user.funcion.trim()}";
+    buffer += "Atentamente.\n";
+    buffer += "${user.nombres.trim()}\n";
+    buffer += "${user.funcion.trim()}";
 
     await Share.share(buffer);
   }
