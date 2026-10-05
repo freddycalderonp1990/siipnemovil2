@@ -58,7 +58,7 @@ class DataConsultaPersona {
         datosAnt: DatosAnt.fromJson(json["datosAnt"] ?? {}),
         idGenPersona: ParseModel.parseToInt(json["idGenPersona"]),
         idHdrEventoResum: ParseModel.parseToInt(json["idHdrEventoResum"]),
-          consultaRepetida: ParseModel.parseToBool(json["consultaRepetida"])
+        consultaRepetida: ParseModel.parseToBool(json["consultaRepetida"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -343,46 +343,26 @@ class InfraccionesAnt {
 class OrdenCaptura {
   final bool success;
   final String message;
-  final List<DatosCaptura> ordenesCaptura;
+  final List<DatosCaptura> datosCaptura;
 
   OrdenCaptura({
     required this.success,
     required this.message,
-    required this.ordenesCaptura,
+    required this.datosCaptura,
   });
 
-  factory OrdenCaptura.fromJson(Map<String, dynamic> json) {
-    final dynamic data = json["data"];
-    final List<DatosCaptura> ordenes = data is List
-        ? data
-              .whereType<Map>()
-              .map(
-                (item) =>
-                    DatosCaptura.fromJson(Map<String, dynamic>.from(item)),
-              )
-              .where((item) => item.tieneDatos)
-              .toList()
-        : data is Map
-        ? <DatosCaptura>[
-            DatosCaptura.fromJson(Map<String, dynamic>.from(data)),
-          ].where((item) => item.tieneDatos).toList()
-        : <DatosCaptura>[];
-    return OrdenCaptura(
-      success: ParseModel.parseToBool(json["success"]),
-      message: ParseModel.parseToString(json["message"]),
-      ordenesCaptura: ordenes,
-    );
-  }
-
-  bool get tieneOrdenes => success && ordenesCaptura.isNotEmpty;
-  int get totalOrdenes => ordenesCaptura.length;
-  DatosCaptura get datosCaptura =>
-      ordenesCaptura.isNotEmpty ? ordenesCaptura.first : DatosCaptura.empty();
+  factory OrdenCaptura.fromJson(Map<String, dynamic> json) => OrdenCaptura(
+    success: json["success"],
+    message: json["message"],
+    datosCaptura: List<DatosCaptura>.from(
+      json["data"].map((x) => DatosCaptura.fromJson(x)),
+    ),
+  );
 
   Map<String, dynamic> toJson() => {
     "success": success,
     "message": message,
-    "data": ordenesCaptura.map((item) => item.toJson()).toList(),
+    "data": List<dynamic>.from(datosCaptura.map((x) => x.toJson())),
   };
 }
 
@@ -407,27 +387,6 @@ class DatosCaptura {
     required this.pais,
   });
 
-  factory DatosCaptura.empty() => DatosCaptura(
-    juzgado: "",
-    numoficio: "",
-    fechaBoleta: "",
-    causa: "",
-    delito: "",
-    tipoBoleta: "",
-    unidadRegistro: "",
-    pais: "",
-  );
-
-  bool get tieneDatos =>
-      juzgado.trim().isNotEmpty &&
-      numoficio.trim().isNotEmpty &&
-      fechaBoleta.trim().isNotEmpty &&
-      causa.trim().isNotEmpty &&
-      delito.trim().isNotEmpty &&
-      tipoBoleta.trim().isNotEmpty &&
-      unidadRegistro.trim().isNotEmpty &&
-      pais.trim().isNotEmpty;
-
   factory DatosCaptura.fromJson(Map<String, dynamic> json) => DatosCaptura(
     juzgado: ParseModel.parseToString(json["juzgado"]),
     numoficio: ParseModel.parseToString(json["numoficio"]),
@@ -437,6 +396,17 @@ class DatosCaptura {
     tipoBoleta: ParseModel.parseToString(json["tipoBoleta"]),
     unidadRegistro: ParseModel.parseToString(json["unidadRegistro"]),
     pais: ParseModel.parseToString(json["pais"]),
+  );
+
+  factory DatosCaptura.empty() => DatosCaptura(
+    juzgado: "",
+    numoficio: "",
+    fechaBoleta: "",
+    causa: "",
+    delito: "",
+    tipoBoleta: "",
+    unidadRegistro: "",
+    pais: "",
   );
 
   Map<String, dynamic> toJson() => {

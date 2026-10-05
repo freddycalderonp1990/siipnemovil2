@@ -21,8 +21,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "1.0.5"
-      resolved-ref: "1adff04b332bb599ab8faf41a2ba09fd1a86ab58"
+      ref: "1.0.6"
+      resolved-ref: f1682f32c499de9e68c736cf94b854995be61558
       url: "https://github.com/freddycalderonp1990/paquete_api_provider.git"
     source: git
     version: "0.0.1"

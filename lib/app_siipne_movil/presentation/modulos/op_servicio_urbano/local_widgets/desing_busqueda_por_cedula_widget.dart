@@ -6,6 +6,7 @@ import '../../../../data/models/models_siipne_movil.dart';
 import 'btnIconOperativoWidget.dart';
 import 'colors_local.dart';
 import 'operativo_polco_local_widgets.dart';
+
 import 'package:get/get.dart';
 
 class DesingBusquedaPorCedulaWidget extends StatelessWidget {
@@ -47,8 +48,6 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
       primary: false,
       physics: const NeverScrollableScrollPhysics(),
 
-
-
       itemCount: dataPersona.length,
 
       separatorBuilder: (_, __) => const SizedBox(height: 8),
@@ -69,7 +68,7 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
   // ============================================================
 
   Widget _cardResultado({required DataConsultaPersona data}) {
-    final bool tieneOrdenCaptura = data.ordenCaptura.tieneOrdenes;
+    final bool tieneOrdenCaptura = data.ordenCaptura.datosCaptura.length > 0;
 
     final Color colorTexto = tieneOrdenCaptura
         ? ColorsLocal.colorTextoOrdenCaptura
@@ -81,7 +80,9 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
 
     final LocalPersonSuModel persona = setDatosPersona(data);
 
-    final DatosCaptura orden = data.ordenCaptura.datosCaptura;
+    final DatosCaptura orden = data.ordenCaptura.datosCaptura.length > 0
+        ? data.ordenCaptura.datosCaptura.first
+        : DatosCaptura.empty();
 
     return Container(
       width: double.infinity,
@@ -171,9 +172,9 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
                   // ============================================
                   // FUENTES CONSULTADAS
                   // ============================================
-                   _estadoServicios(data),
+                  _estadoServicios(data),
 
-                   const SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
                   // ============================================
                   // NUEVA CONSULTA
@@ -481,9 +482,9 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
 
                         Text(
                           tieneOrdenCaptura
-                              ? data.ordenCaptura.totalOrdenes == 1
+                              ? data.ordenCaptura.datosCaptura.length == 1
                                     ? "SE ENCONTRÓ 1 ORDEN VIGENTE"
-                                    : "SE ENCONTRARON ${data.ordenCaptura.totalOrdenes} ÓRDENES VIGENTES"
+                                    : "SE ENCONTRARON ${data.ordenCaptura.datosCaptura.length} ÓRDENES VIGENTES"
                               : "NO SE REGISTRAN NOVEDADES",
                           style: TextStyle(
                             color: Colors.white.withOpacity(.80),
@@ -578,17 +579,17 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
                     const SizedBox(height: 8),
 
                     _detalleVisualOrden(orden),
-                    if (data.ordenCaptura.totalOrdenes > 1) ...[
+                    if ( data.ordenCaptura.datosCaptura.length > 1) ...[
                       const SizedBox(height: 9),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           onPressed: () => _mostrarTodasOrdenes(
-                            data.ordenCaptura.ordenesCaptura,
+                            data.ordenCaptura.datosCaptura,
                           ),
                           icon: const Icon(Icons.list_alt_rounded, size: 17),
                           label: Text(
-                            "VER TODAS (${data.ordenCaptura.totalOrdenes})",
+                            "VER TODAS (${ data.ordenCaptura.datosCaptura.length})",
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFFB42318),
@@ -996,12 +997,7 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
 
               const SizedBox(width: 5),
 
-              Expanded(
-                child: _badgeServicio(
-                  titulo: "DINARDAP",
-                  activo: true,
-                ),
-              ),
+              Expanded(child: _badgeServicio(titulo: "DINARDAP", activo: true)),
 
               const SizedBox(width: 5),
 
@@ -2385,7 +2381,9 @@ void _mostrarDialogoRestricciones(DataAnt ant) {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(13),
-                                border: Border.all(color: const Color(0xFFE6C0BD)),
+                                border: Border.all(
+                                  color: const Color(0xFFE6C0BD),
+                                ),
                               ),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -2418,7 +2416,8 @@ void _mostrarDialogoRestricciones(DataAnt ant) {
                               children: [
                                 Icon(
                                   Icons.check_circle_outline_rounded,
-                                  color: const Color(0xFF198754).withOpacity(.5),
+                                  color: const Color(0xFF198754)
+                                      .withOpacity(.5),
                                   size: 48,
                                 ),
                                 const SizedBox(height: 10),
