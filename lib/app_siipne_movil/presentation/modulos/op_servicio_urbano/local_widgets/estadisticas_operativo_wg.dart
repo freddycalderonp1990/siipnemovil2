@@ -240,45 +240,11 @@ mixin EstadisticasOperativoViewMixin on OpServicioUrbanoPageBase {
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Color(0xFF29445D),
-                        fontSize: 12,
+                        fontSize: 16,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-
-                    const SizedBox(height: 1),
-
-                    Text(
-                      resultado.descripcionOperativo.isEmpty
-                          ? "SIN DESCRIPCIÓN"
-                          : resultado.descripcionOperativo,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Color(0xFF718496),
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        height: 1.2,
-                      ),
-                    ),
                   ],
-                ),
-              ),
-
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEAF7F0),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Text(
-                  resultado.tipoOperativo.isEmpty
-                      ? "OPERATIVO"
-                      : resultado.tipoOperativo,
-                  style: const TextStyle(
-                    color: Color(0xFF198754),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w900,
-                  ),
                 ),
               ),
             ],
