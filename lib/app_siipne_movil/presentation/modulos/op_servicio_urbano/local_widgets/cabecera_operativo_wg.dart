@@ -4,13 +4,11 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
   Widget cabeceraOperativo() {
     return Obx(() {
       final int idOperativo = controller.idHdrEventoActual.value;
-
       final bool puedeFinalizar = controller.puedeFinalizarOperativo.value;
-      final String nombreOperativo = controller.nombreOperativoActual.value
-          .trim();
       final bool anexado = controller.esOperativoAnexado.value;
-
       final bool pendiente = controller.esOperativoPendiente.value;
+      final String nombreOperativo =
+      controller.nombreOperativoActual.value.trim();
 
       final String tipo = pendiente
           ? "OPERATIVO PENDIENTE"
@@ -35,6 +33,9 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
         ),
         child: Column(
           children: [
+            // ============================================================
+            // CABECERA PRINCIPAL
+            // ============================================================
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(11, 10, 11, 9),
@@ -42,7 +43,10 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Color(0xFF195BA6), Color(0xFF0A3D7E)],
+                  colors: [
+                    Color(0xFF195BA6),
+                    Color(0xFF0A3D7E),
+                  ],
                 ),
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(18),
@@ -69,9 +73,7 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
                           size: 24,
                         ),
                       ),
-
                       const SizedBox(width: 9),
-
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,9 +89,7 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
                                 letterSpacing: .35,
                               ),
                             ),
-
                             const SizedBox(height: 3),
-
                             Row(
                               children: [
                                 Container(
@@ -100,9 +100,7 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
                                     shape: BoxShape.circle,
                                   ),
                                 ),
-
                                 const SizedBox(width: 4),
-
                                 const Text(
                                   "ACTIVO",
                                   style: TextStyle(
@@ -111,17 +109,13 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
                                     fontWeight: FontWeight.w900,
                                   ),
                                 ),
-
                                 const SizedBox(width: 9),
-
                                 const Icon(
                                   Icons.security_rounded,
                                   color: Color(0xFFDCECFB),
                                   size: 12,
                                 ),
-
                                 const SizedBox(width: 3),
-
                                 const Flexible(
                                   child: Text(
                                     "CONSULTAS AUDITADAS",
@@ -139,7 +133,6 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
                           ],
                         ),
                       ),
-
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
@@ -164,9 +157,11 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 10),
 
+                  // ======================================================
+                  // IDENTIFICADOR DEL OPERATIVO
+                  // ======================================================
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(
@@ -176,7 +171,9 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(.13),
                       borderRadius: BorderRadius.circular(13),
-                      border: Border.all(color: Colors.white.withOpacity(.18)),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(.18),
+                      ),
                     ),
                     child: Row(
                       children: [
@@ -193,9 +190,7 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
                             size: 18,
                           ),
                         ),
-
                         const SizedBox(width: 8),
-
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,7 +204,6 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
                                   letterSpacing: .4,
                                 ),
                               ),
-
                               const SizedBox(height: 1),
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -224,10 +218,8 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
                                       letterSpacing: 1.2,
                                     ),
                                   ),
-
                                   if (nombreOperativo.isNotEmpty) ...[
                                     const SizedBox(width: 6),
-
                                     Text(
                                       "·",
                                       style: TextStyle(
@@ -236,16 +228,15 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
                                         fontWeight: FontWeight.w700,
                                       ),
                                     ),
-
                                     const SizedBox(width: 6),
-
                                     Expanded(
                                       child: Text(
                                         nombreOperativo.toUpperCase(),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                          color: Colors.white.withOpacity(.90),
+                                          color:
+                                          Colors.white.withOpacity(.90),
                                           fontSize: 13,
                                           fontWeight: FontWeight.w800,
                                           letterSpacing: .25,
@@ -258,7 +249,6 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
                             ],
                           ),
                         ),
-
                         const Icon(
                           Icons.verified_rounded,
                           color: Color(0xFF70E7A5),
@@ -271,10 +261,16 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
               ),
             ),
 
+            // ============================================================
+            // BOTONES
+            // ============================================================
             Padding(
               padding: const EdgeInsets.all(8),
               child: Row(
                 children: [
+                  // ======================================================
+                  // PERSONAL - SIEMPRE VISIBLE
+                  // ======================================================
                   Expanded(
                     child: botonCabeceraOperativo(
                       titulo: "PERSONAL",
@@ -288,9 +284,31 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
                     ),
                   ),
 
-                  if (puedeFinalizar) ...[
+                  // ======================================================
+                  // ANEXADO
+                  // MISMO RESUMEN DE FINALIZAR, SIN BOTÓN FINALIZAR
+                  // ======================================================
+                  if (anexado) ...[
                     const SizedBox(width: 6),
+                    Expanded(
+                      child: botonCabeceraOperativo(
+                        titulo: "CONSULTAS",
+                        icono: Icons.query_stats_rounded,
+                        color: const Color(0xFF195BA6),
+                        fondo: const Color(0xFFEAF3FC),
+                        borde: const Color(0xFFB6CFE5),
+                        onTap: controller.peticionServerState.value
+                            ? null
+                            : mostrarResumenAntesFinalizar,
+                      ),
+                    ),
+                  ],
 
+                  // ======================================================
+                  // RESPONSABLE DEL OPERATIVO
+                  // ======================================================
+                  if (!anexado && puedeFinalizar) ...[
+                    const SizedBox(width: 6),
                     Expanded(
                       child: botonCabeceraOperativo(
                         titulo: "QR",
@@ -303,9 +321,7 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
                             : mostrarQrOperativo,
                       ),
                     ),
-
                     const SizedBox(width: 6),
-
                     Expanded(
                       child: botonCabeceraOperativo(
                         titulo: "FINALIZAR",
@@ -322,6 +338,9 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
 
                   const SizedBox(width: 6),
 
+                  // ======================================================
+                  // SALIR - SIEMPRE VISIBLE
+                  // ======================================================
                   Expanded(
                     child: botonCabeceraOperativo(
                       titulo: "SALIR",
@@ -343,6 +362,9 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
     });
   }
 
+  // ============================================================
+  // BOTÓN CABECERA
+  // ============================================================
   Widget botonCabeceraOperativo({
     required String titulo,
     required IconData icono,
@@ -367,10 +389,12 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icono, color: color, size: 19),
-
+              Icon(
+                icono,
+                color: color,
+                size: 19,
+              ),
               const SizedBox(height: 2),
-
               FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
@@ -394,16 +418,13 @@ mixin CabeceraOperativoViewMixin on OpServicioUrbanoPageBase {
   // ============================================================
   // CERRAR SESIÓN
   // ============================================================
-
   void confirmarCerrarSesion() {
-    if (controller.peticionServerState.value) {
-      return;
-    }
+    if (controller.peticionServerState.value) return;
 
     DialogosAwesome.getWarningSiNo(
       title: "CERRAR SESIÓN",
       descripcion:
-          "¿Está seguro que desea cerrar la sesión actual?\n\n"
+      "¿Está seguro que desea cerrar la sesión actual?\n\n"
           "El operativo permanecerá activo y podrá retomarlo posteriormente si corresponde.",
       btnOkOnPress: () {
         controller.cerrarSesionOperativo();

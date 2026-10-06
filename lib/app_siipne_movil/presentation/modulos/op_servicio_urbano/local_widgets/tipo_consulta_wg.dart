@@ -56,20 +56,22 @@ mixin TipoConsultaViewMixin on OpServicioUrbanoPageBase {
                     subtitulo: "Documento de identidad",
                     detalle: "CONSULTA CIUDADANO",
                     icono: Icons.person_search_rounded,
-                    onTap: controller.seleccionarPersona,
+                    onTap: () {
+                      controller.seleccionarPersona();
+                    },
                   ),
                 ),
-
                 const SizedBox(width: 8),
-
                 Expanded(
                   child: botonConsulta(
                     seleccionado: controller.selectVehiculo.value,
-                    titulo: "VEHÍCULO / MOTOS",
+                    titulo: "VEHÍCULO/MOTO",
                     subtitulo: "Número de placa",
                     detalle: "CONSULTA DE VEHÍCULOS Y MOTOS",
                     icono: Icons.directions_car_filled_rounded,
-                    onTap: controller.seleccionarVehiculo,
+                    onTap: () {
+                      controller.seleccionarVehiculo();
+                    },
                   ),
                 ),
               ],

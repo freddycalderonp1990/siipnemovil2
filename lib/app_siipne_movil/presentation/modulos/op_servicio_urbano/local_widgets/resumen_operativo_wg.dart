@@ -1,64 +1,72 @@
 part of '../../pages.dart';
 
 mixin ResumenOperativoViewMixin on OpServicioUrbanoPageBase {
-  Future<void> mostrarResumenAntesFinalizar() async {
+  Future<void> mostrarResumenAntesFinalizar({
+    bool soloConsulta = false,
+  }) async {
     if (controller.peticionServerState.value ||
         controller.actualizandoResultado.value ||
         controller.cargandoResultadosOperativo.value) {
       return;
     }
+
     FocusManager.instance.primaryFocus?.unfocus();
-    final bool resultadoGuardado = await controller
-        .guardarResultadoPendienteAntesFinalizar();
 
-    if (!resultadoGuardado) {
+    // Solo cuando realmente se va a finalizar se guarda
+    // el resultado pendiente de la consulta actual.
+    if (!soloConsulta) {
+      final bool guardado =
+      await controller.guardarResultadoPendienteAntesFinalizar();
+
+      if (!guardado) {
+        DialogosAwesome.getError(
+          title: "NO FUE POSIBLE CONTINUAR",
+          descripcion:
+          controller.mensajeErrorActualizaResultado.isNotEmpty
+              ? controller.mensajeErrorActualizaResultado
+              : "No fue posible guardar el resultado pendiente.",
+        );
+        return;
+      }
+    }
+
+    final bool consultado =
+    await controller.consultarResultadosOperativo();
+
+    if (!consultado) {
       DialogosAwesome.getError(
-        title: "RESULTADO NO ACTUALIZADO",
-        descripcion: controller.mensajeErrorActualizaResultado.trim().isEmpty
-            ? "No fue posible guardar el resultado de la consulta actual."
-            : controller.mensajeErrorActualizaResultado,
+        title: "RESUMEN DEL OPERATIVO",
+        descripcion:
+        controller.mensajeErrorResultadosOperativo.isNotEmpty
+            ? controller.mensajeErrorResultadosOperativo
+            : "No fue posible obtener los resultados del operativo.",
       );
       return;
     }
 
-    /*
-   * ==========================================================
-   * 2. CONSULTAR RESUMEN DESDE BASE
-   * ==========================================================
-   */
-    final bool resumenConsultado = await controller
-        .consultarResultadosOperativo();
-
-    if (!resumenConsultado) {
-      DialogosAwesome.getError(
-        title: "RESUMEN NO DISPONIBLE",
-        descripcion: controller.mensajeErrorResultadosOperativo.trim().isEmpty
-            ? "No fue posible obtener el resumen del operativo."
-            : controller.mensajeErrorResultadosOperativo,
-      );
-      return;
-    }
-
-    final ResultadosOperativo? resultado = controller.resultadosOperativo.value;
+    final ResultadosOperativo? resultado =
+        controller.resultadosOperativo.value;
 
     if (resultado == null || !resultado.tieneDatos) {
-      DialogosAwesome.getError(
-        title: "RESUMEN NO DISPONIBLE",
+      DialogosAwesome.getInformation(
+        title: "RESUMEN DEL OPERATIVO",
         descripcion:
-            "El servidor no devolvió información válida del operativo.",
+        "No existen resultados registrados para este operativo.",
+        titleBtn: "ENTENDIDO",
       );
       return;
     }
 
-    /*
-   * ==========================================================
-   * 3. MOSTRAR DIÁLOGO
-   * ==========================================================
-   */
-    dialogoResumenOperativo(resultado);
+    // MISMO DIÁLOGO QUE YA UTILIZAS.
+    dialogoResumenOperativo(
+      resultado,
+      mostrarBotonFinalizar: !soloConsulta,
+    );
   }
-
-  void dialogoResumenOperativo(ResultadosOperativo resultado) {
+  void dialogoResumenOperativo(
+      ResultadosOperativo resultado, {
+        bool mostrarBotonFinalizar = true,
+      }) {
     final BuildContext? context = Get.context;
     if (context == null) return;
 
@@ -351,23 +359,36 @@ mixin ResumenOperativoViewMixin on OpServicioUrbanoPageBase {
           ),
         ),
         const SizedBox(width: 8),
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-              Future.delayed(const Duration(milliseconds: 150), validarAlertasAntesFinalizar);
-            },
-            icon: const Icon(Icons.edgesensor_low_sharp, size: 18),
-            label: const Text("FINALIZAR", style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900)),
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size(0, 47),
-              backgroundColor: const Color(0xFFB42318),
-              foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        if (!controller.esOperativoAnexado.value) ...[
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                Future.delayed(
+                  const Duration(milliseconds: 150),
+                  validarAlertasAntesFinalizar,
+                );
+              },
+              icon: const Icon(Icons.edgesensor_low_sharp, size: 18),
+              label: const Text(
+                "FINALIZAR",
+                style: TextStyle(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(0, 47),
+                backgroundColor: const Color(0xFFB42318),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
             ),
           ),
-        ),
+        ],
       ],
     );
   }

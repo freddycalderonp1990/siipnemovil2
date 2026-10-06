@@ -631,44 +631,6 @@ class OpServicioUrbanoController extends GetxController {
     return documentosPersonasVehiculoRegistradas.contains(valor);
   }
   // ============================================================
-  // SELECCIONAR PERSONA
-  // ============================================================
-  void seleccionarPersona() {
-    if (peticionServerState.value || actualizandoResultado.value) {
-      return;
-    }
-    if (dataPersona.isNotEmpty || dataVehiculo.isNotEmpty) {
-      return;
-    }
-    FocusManager.instance.primaryFocus?.unfocus();
-    selectPerson.value = true;
-    selectVehiculo.value = false;
-    final List<VariablesResultado> variables = variablesResultadoPersona;
-    variableResultadoSeleccionada.value = variables.isNotEmpty
-        ? variables.first
-        : null;
-    solicitarFocoPersona();
-  }
-  // ============================================================
-  // SELECCIONAR VEHÍCULO
-  // ============================================================
-  void seleccionarVehiculo() {
-    if (peticionServerState.value || actualizandoResultado.value) {
-      return;
-    }
-    if (dataPersona.isNotEmpty || dataVehiculo.isNotEmpty) {
-      return;
-    }
-    FocusManager.instance.primaryFocus?.unfocus();
-    selectPerson.value = false;
-    selectVehiculo.value = true;
-    final List<VariablesResultado> variables = variablesResultadoVehiculo;
-    variableResultadoSeleccionada.value = variables.isNotEmpty
-        ? variables.first
-        : null;
-    solicitarFocoVehiculo();
-  }
-  // ============================================================
   // SCROLL
   // ============================================================
   void _onScroll() {
@@ -983,59 +945,6 @@ class OpServicioUrbanoController extends GetxController {
         }
       }
     }
-  }
-  // ============================================================
-  // NUEVA CONSULTA VEHÍCULO
-  // ============================================================
-  Future<bool> nuevaConsultaVehiculo() async {
-    if (peticionServerState.value || actualizandoResultado.value) return false;
-
-    mensajeErrorConsulta = '';
-    mensajeErrorActualizaResultado = '';
-    FocusManager.instance.primaryFocus?.unfocus();
-
-    if (dataVehiculo.isEmpty) {
-      mensajeErrorConsulta = 'No existe un vehículo consultado.';
-      return false;
-    }
-
-    final bool tieneConductor = await consultarExistenciaConductor();
-
-    if (!tieneConductor) {
-      if (mensajeErrorConsulta.trim().isEmpty) {
-        final String placa = dataVehiculo.first.datosVehiculo.data.placa.trim().toUpperCase();
-        mensajeErrorConsulta = placa.isEmpty
-            ? 'Debe registrar un conductor antes de realizar una nueva consulta.'
-            : 'El vehículo $placa no tiene un conductor registrado. Debe registrar un conductor antes de realizar una nueva consulta.';
-      }
-      return false;
-    }
-
-    if (idHdrEventoResumVehiculo > 0) {
-      final bool actualizado = await actualizarResultadoRegistro(
-        idHdrEventoResum: idHdrEventoResumVehiculo,
-        idVariableOriginal: idVariableInsertadaVehiculo,
-      );
-      if (!actualizado) return false;
-    }
-
-    controllerPlaca.clear();
-    dataVehiculo.clear();
-    idVariableInsertadaVehiculo = 0;
-    vehiculoRobado.value = false;
-    ocultarBtnBuscarVehiculo.value = false;
-    placaConsultadaAnterior = placaConsultada;
-    placaConsultada = '';
-    _limpiarPersonasVehiculo();
-
-    conductorRegistradoEnBaseDeDatos.value = false;
-    conductorDesdeBase.value = null;
-
-    final List<VariablesResultado> variables = variablesResultadoVehiculo;
-    variableResultadoSeleccionada.value = variables.isNotEmpty ? variables.first : null;
-
-    solicitarFocoVehiculo();
-    return true;
   }
   // ============================================================
   // SELECCIÓN CONDUCTOR / OCUPANTE
@@ -2482,5 +2391,192 @@ class OpServicioUrbanoController extends GetxController {
         ],
       ),
     );
+  }
+// ============================================================
+// SELECCIONAR PERSONA
+// ============================================================
+  Future<void> seleccionarPersona() async {
+    if (peticionServerState.value || actualizandoResultado.value || isClosed) return;
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    // ==========================================================
+    // YA ESTAMOS EN PERSONA -> NUEVA CONSULTA PERSONA
+    // ==========================================================
+    if (selectPerson.value && dataPersona.isNotEmpty) {
+      final bool continuar = await nuevaConsultaPersona();
+      if (!continuar || isClosed) {
+        _mostrarErrorCambioConsulta();
+        return;
+      }
+    }
+
+    // ==========================================================
+    // VENIMOS DE VEHÍCULO -> VALIDAR VEHÍCULO ANTES DE CAMBIAR
+    // ==========================================================
+    if (selectVehiculo.value && dataVehiculo.isNotEmpty) {
+      final bool continuar = await nuevaConsultaVehiculo();
+
+      // nuevaConsultaVehiculo() valida conductor contra servidor.
+      // Si NO existe conductor, NO se permite cambiar a PERSONA.
+      if (!continuar || isClosed) {
+        _mostrarErrorCambioConsulta();
+        return;
+      }
+    }
+
+    if (isClosed) return;
+
+    selectPerson.value = true;
+    selectVehiculo.value = false;
+
+    final List<VariablesResultado> variables = variablesResultadoPersona;
+    variableResultadoSeleccionada.value =
+    variables.isNotEmpty ? variables.first : null;
+
+    solicitarFocoPersona();
+  }
+
+// ============================================================
+// SELECCIONAR VEHÍCULO
+// ============================================================
+  Future<void> seleccionarVehiculo() async {
+    if (peticionServerState.value || actualizandoResultado.value || isClosed) return;
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    // ==========================================================
+    // VENIMOS DE PERSONA -> GUARDAR RESULTADO ANTES DE CAMBIAR
+    // ==========================================================
+    if (selectPerson.value && dataPersona.isNotEmpty) {
+      final bool continuar = await nuevaConsultaPersona();
+      if (!continuar || isClosed) {
+        _mostrarErrorCambioConsulta();
+        return;
+      }
+    }
+
+    // ==========================================================
+    // YA ESTAMOS EN VEHÍCULO -> NUEVA CONSULTA VEHÍCULO
+    // ==========================================================
+    if (selectVehiculo.value && dataVehiculo.isNotEmpty) {
+      final bool continuar = await nuevaConsultaVehiculo();
+
+      // También valida conductor antes de permitir otro vehículo.
+      if (!continuar || isClosed) {
+        _mostrarErrorCambioConsulta();
+        return;
+      }
+    }
+
+    if (isClosed) return;
+
+    selectPerson.value = false;
+    selectVehiculo.value = true;
+
+    final List<VariablesResultado> variables = variablesResultadoVehiculo;
+    variableResultadoSeleccionada.value =
+    variables.isNotEmpty ? variables.first : null;
+
+    solicitarFocoVehiculo();
+  }
+
+// ============================================================
+// MOSTRAR ERROR AL CAMBIAR TIPO DE CONSULTA
+// ============================================================
+  void _mostrarErrorCambioConsulta() {
+    if (isClosed) return;
+
+    final String mensaje = mensajeErrorConsulta.trim().isNotEmpty
+        ? mensajeErrorConsulta.trim()
+        : mensajeErrorActualizaResultado.trim().isNotEmpty
+        ? mensajeErrorActualizaResultado.trim()
+        : 'No fue posible continuar con la nueva consulta. Verifique la información registrada.';
+
+    DialogosAwesome.getWarning(
+      title: "NO ES POSIBLE CONTINUAR",
+      descripcion: mensaje,
+    );
+  }
+  Future<bool> nuevaConsultaVehiculo() async {
+    if (peticionServerState.value || actualizandoResultado.value || isClosed) return false;
+
+    mensajeErrorConsulta = '';
+    mensajeErrorActualizaResultado = '';
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    if (dataVehiculo.isEmpty) {
+      mensajeErrorConsulta = 'No existe un vehículo consultado.';
+      return false;
+    }
+
+    final String placa =
+    dataVehiculo.first.datosVehiculo.data.placa.trim().toUpperCase();
+
+    debugPrint('==========================================');
+    debugPrint('VALIDANDO VEHÍCULO ANTES DE NUEVA CONSULTA');
+    debugPrint('PLACA: $placa');
+    debugPrint('DESTINO: NUEVA CONSULTA / CAMBIO DE TIPO');
+    debugPrint('==========================================');
+
+    // ==========================================================
+    // VALIDACIÓN PERSISTENTE DEL CONDUCTOR EN SERVIDOR
+    // ==========================================================
+    final bool tieneConductor = await consultarExistenciaConductor();
+
+    debugPrint('==========================================');
+    debugPrint('RESULTADO VALIDACIÓN CONDUCTOR');
+    debugPrint('PLACA: $placa');
+    debugPrint('TIENE CONDUCTOR: $tieneConductor');
+    debugPrint('==========================================');
+
+    if (!tieneConductor) {
+      if (mensajeErrorConsulta.trim().isEmpty) {
+        mensajeErrorConsulta = placa.isEmpty
+            ? 'Debe registrar un conductor antes de realizar una nueva consulta.'
+            : 'El vehículo $placa no tiene un conductor registrado. Debe registrar un conductor antes de realizar una nueva consulta.';
+      }
+
+      debugPrint('CAMBIO DE CONSULTA BLOQUEADO: VEHÍCULO SIN CONDUCTOR');
+      return false;
+    }
+
+    // ==========================================================
+    // GUARDAR RESULTADO PRELIMINAR DEL VEHÍCULO
+    // ==========================================================
+    if (idHdrEventoResumVehiculo > 0) {
+      final bool actualizado = await actualizarResultadoRegistro(
+        idHdrEventoResum: idHdrEventoResumVehiculo,
+        idVariableOriginal: idVariableInsertadaVehiculo,
+      );
+
+      if (!actualizado) {
+        if (mensajeErrorActualizaResultado.trim().isEmpty) {
+          mensajeErrorActualizaResultado =
+          'No fue posible guardar el resultado del vehículo consultado.';
+        }
+        return false;
+      }
+    }
+
+    // ==========================================================
+    // LIMPIAR VEHÍCULO ACTUAL
+    // ==========================================================
+    controllerPlaca.clear();
+    dataVehiculo.clear();
+    idVariableInsertadaVehiculo = 0;
+    vehiculoRobado.value = false;
+    ocultarBtnBuscarVehiculo.value = false;
+    placaConsultadaAnterior = placaConsultada;
+    placaConsultada = '';
+
+    _limpiarPersonasVehiculo();
+
+    conductorRegistradoEnBaseDeDatos.value = false;
+    conductorDesdeBase.value = null;
+
+    final List<VariablesResultado> variables = variablesResultadoVehiculo;
+    variableResultadoSeleccionada.value =
+    variables.isNotEmpty ? variables.first : null;
+
+    return true;
   }
 }
