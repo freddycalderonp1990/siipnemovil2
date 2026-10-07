@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 import 'package:api_provider/core/api_config.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -18,28 +17,6 @@ import 'package:permission_handler/permission_handler.dart';
 
 part 'notifications_event.dart';
 part 'notifications_state.dart';
-
-/// Handler para mensajes recibidos en segundo plano o cuando la app está cerrada
-Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  Random random = Random();
-  var id = random.nextInt(1000000);
-  var mensaje = message.data;
-
-  var body = mensaje['body'];
-  var title = mensaje['title'];
-
-  print("firebaseMessagingBackgroundHandler : $mensaje");
-  final notification = NotificationModel.fromJson(message.data);
-
-  print('accion: ${notification.accion}');
-  print('appName: ${notification.appName}');
-  print('idAccion: ${notification.idAccion}');
-  print('body: ${notification.body}');
-  print('title: ${notification.title}');
-  print('clickAction: ${notification.clickAction}');
-
-  LocalNotification.showLocalNotification(notification: notification);
-}
 
 class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   final FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -69,7 +46,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     });
     _inicializacion = _inicializarPermiso();
     _onForegroundMessage();
-    FirebaseMessaging.onMessageOpenedApp.listen(_onMessageOpenedApp);
+    _openedSubscription = FirebaseMessaging.onMessageOpenedApp.listen(_onMessageOpenedApp);
     _listenTokenRefresh();
   }
 
@@ -243,11 +220,10 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   }
 
   void _listenTokenRefresh() {
-    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-      print("🔄 TOKEN ACTUALIZADO: $newToken");
-
-      // Aquí debes enviarlo a tu backend
-      // insertToken(newToken);
+    _tokenSubscription = messaging.onTokenRefresh.listen((_) {
+      _registrarTokenPendiente();
+    }, onError: (Object error) {
+      print('[PUSH] Error actualizando token: $error');
     });
   }
 
@@ -392,7 +368,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
 
     if (token != null && token.isNotEmpty) {
       try {
-        insertToken(
+        await insertToken(
           tokenFcm: token,
           appName: appName.nameString,
           idGenUsuario: idGenUsuario,
@@ -423,7 +399,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   }
 
   /// Enviar token al backend
-  void insertToken({
+  Future<void> insertToken({
     required String tokenFcm,
     required String appName,
     required int idGenUsuario,
@@ -446,7 +422,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
 
       if (ApiConfig.token.length > 10) {
         print("tengo autorizacion para insertar token");
-        final result = await _insertTokenFcmUseCase.call(request: request);
+        await _insertTokenFcmUseCase.call(request: request);
       } else {
         print("Nooo tengo autorizacion para insertar token");
       }
@@ -455,6 +431,8 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     }
   }
   StreamSubscription<RemoteMessage>? _foregroundSubscription;
+  StreamSubscription<RemoteMessage>? _openedSubscription;
+  StreamSubscription<String>? _tokenSubscription;
   /// Mensajes recibidos en primer plano
   void _onForegroundMessage() {
     if (_foregroundSubscription != null) return;
@@ -464,6 +442,8 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   }
   // Mensajes recibidos en minimizado
   void _onMessageOpenedApp(RemoteMessage message) {
+    final tipo = message.data['tipo']?.toString().trim().toUpperCase();
+    if (tipo == 'BOLETA' || tipo == 'VEHICULO_ROBADO') return;
     print("========= onMessageOpenedApp =========");
 
     print(message.data);
@@ -479,7 +459,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
 
   /// Manejo de mensajes en cualquier estado
   void handleRemoteMessage(RemoteMessage message) async {
-    final tipo = message.data['tipo']?.toString();
+    final tipo = message.data['tipo']?.toString().trim().toUpperCase();
 
     // Estas alertas las muestra exclusivamente OperativoPushService.
     if (tipo == 'BOLETA' || tipo == 'VEHICULO_ROBADO') return;
@@ -500,6 +480,8 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   @override
   Future<void> close() async {
     await _foregroundSubscription?.cancel();
+    await _openedSubscription?.cancel();
+    await _tokenSubscription?.cancel();
     _foregroundSubscription = null;
     await super.close();
   }

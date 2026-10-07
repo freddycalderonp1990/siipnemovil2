@@ -35,9 +35,7 @@ mixin VehiculoResultadoViewMixin on OpServicioUrbanoPageBase {
   Future<void> nuevaConsultaPersona() async {
     final bool resultado = await controller.nuevaConsultaPersona();
 
-    if (resultado) {
-      return;
-    }
+    if (resultado) return;
 
     if (controller.mensajeErrorActualizaResultado.trim().isNotEmpty) {
       DialogosAwesome.getError(
@@ -420,56 +418,45 @@ mixin VehiculoResultadoViewMixin on OpServicioUrbanoPageBase {
   }
 
   Widget busquedaPersonaVehiculo() {
-    return BusquedaTipoOperativoWg(
-      key: const ValueKey("persona_relacionada_vehiculo"),
-      anchoPorcentaje: 100,
-      myKey: keyCedulaVehiculo,
-      controller: controller.controllerCedulaVehiculo,
-      maxLength: 10,
-      icono: const Icon(Icons.badge_outlined, color: AppColors.colorIcons),
-      keyboardType: TextInputType.number,
-      title: controller.tipoPersonaVehiculo.value == 'CONDUCTOR'
-          ? "Documento del conductor"
-          : "Documento del ocupante",
-      msjError: "Documento vacío",
-      onTap: confirmarPersonaVehiculo,
+    return FilledButton.icon(
+      onPressed: controller.consultandoPersonaVehiculo.value
+          ? null
+          : confirmarPersonaVehiculo,
+      icon: const Icon(Icons.person_search_rounded),
+      label: Text(controller.tipoPersonaVehiculo.value == 'CONDUCTOR'
+          ? 'CONSULTAR CONDUCTOR'
+          : 'CONSULTAR OCUPANTE'),
     );
   }
 
   Future<void> confirmarPersonaVehiculo() async {
-    final bool valido = keyCedulaVehiculo.currentState?.validate() ?? false;
-
-    if (!valido) return;
-
-    final String documento = controller.controllerCedulaVehiculo.text.trim();
-
-    if (documento.isEmpty) return;
-
-    await cerrarTeclado();
-
-    final String rol = controller.tipoPersonaVehiculo.value;
-
-    dialogoConfirmarBusqueda(
-      tipo: rol,
-      etiqueta: "NÚMERO DE DOCUMENTO",
-      dato: documento,
-      icono: rol == 'CONDUCTOR'
-          ? Icons.person_pin_rounded
-          : Icons.person_add_alt_1_rounded,
-      onConfirmar: () async {
-        final bool resultado = await controller
-            .consultarPersonaRelacionadaVehiculo(key: keyCedulaVehiculo);
-
-        if (!resultado) {
-          DialogosAwesome.getError(
-            title: "CONSULTA NO REALIZADA",
-            descripcion: controller.mensajeErrorConsulta.isEmpty
-                ? "No fue posible registrar la persona en el vehículo."
-                : controller.mensajeErrorConsulta,
-          );
-        }
-      },
-    );
+    final context = Get.context;
+    if (controller.dialogoConsultaAbierto.value ||
+        controller.consultandoPersonaVehiculo.value ||
+        context == null || !context.mounted) return;
+    controller.dialogoConsultaAbierto.value = true;
+    controller.controllerCedulaVehiculo.clear();
+    try {
+      await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => DialogoConsultaOperativa(
+          titulo: controller.tipoPersonaVehiculo.value == 'CONDUCTOR'
+              ? 'Consultar conductor'
+              : 'Consultar ocupante',
+          esPersona: true,
+          formKey: keyCedulaVehiculo,
+          documentoController: controller.controllerCedulaVehiculo,
+          onConsultar: (nacionalidad) => controller.consultarPersonaRelacionadaVehiculo(
+            key: keyCedulaVehiculo,
+            nacionalidad: nacionalidad,
+          ),
+          obtenerError: () => controller.mensajeErrorConsulta,
+        ),
+      );
+    } finally {
+      controller.dialogoConsultaAbierto.value = false;
+    }
   }
 
   Widget personasRegistradasVehiculo() {

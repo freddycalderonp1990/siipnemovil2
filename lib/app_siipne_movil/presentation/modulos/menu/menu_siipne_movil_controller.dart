@@ -521,7 +521,7 @@ class MenuSiipneMovilController extends GetxController {
   // CERRAR SESIÓN
   // ============================================================
 
-  void cerrarSesion() {
+  Future<void> cerrarSesion() async {
     if (peticionServerState.value ||
         consultandoOperativos.value ||
         descargandoPdf.value) {
@@ -535,7 +535,8 @@ class MenuSiipneMovilController extends GetxController {
     debugPrint('ID USUARIO: ${user.idGenUsuario}');
     debugPrint('==========================================');
 
-    Get.offAllNamed(AppRoutes.SPLASH_APP);
+    await OperativoPushService.instance.salirOperativo();
+    if (!isClosed) Get.offAllNamed(AppRoutes.SPLASH_APP);
   }
 
   // ============================================================

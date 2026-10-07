@@ -26,9 +26,11 @@ mixin PersonaResultadoViewMixin on OpServicioUrbanoPageBase {
             dataPersona: controller.dataPersona,
           ),
         ),
+
       ],
     );
   }
+
   // ============================================================
   // ANTECEDENTES PERSONA
   // ============================================================
@@ -101,8 +103,7 @@ mixin PersonaResultadoViewMixin on OpServicioUrbanoPageBase {
 
     final String fechaNormalizada = fechaDefuncion.toUpperCase();
 
-    final bool personaFallecida =
-        fechaDefuncion.isNotEmpty &&
+    final bool personaFallecida = fechaDefuncion.isNotEmpty &&
         fechaNormalizada != 'N/D' &&
         fechaNormalizada != 'NULL' &&
         fechaDefuncion != '0000-00-00';
@@ -173,9 +174,7 @@ mixin PersonaResultadoViewMixin on OpServicioUrbanoPageBase {
                             size: 23,
                           ),
                         ),
-
                         const SizedBox(width: 9),
-
                         const Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,7 +202,6 @@ mixin PersonaResultadoViewMixin on OpServicioUrbanoPageBase {
                             ],
                           ),
                         ),
-
                         IconButton(
                           constraints: const BoxConstraints(
                             minWidth: 34,
@@ -257,9 +255,7 @@ mixin PersonaResultadoViewMixin on OpServicioUrbanoPageBase {
                                     size: 22,
                                   ),
                                 ),
-
                                 const SizedBox(width: 9),
-
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
@@ -278,9 +274,7 @@ mixin PersonaResultadoViewMixin on OpServicioUrbanoPageBase {
                                           height: 1.2,
                                         ),
                                       ),
-
                                       const SizedBox(height: 3),
-
                                       Row(
                                         children: [
                                           const Icon(
@@ -349,9 +343,7 @@ mixin PersonaResultadoViewMixin on OpServicioUrbanoPageBase {
                                     size: 21,
                                   ),
                                 ),
-
                                 const SizedBox(width: 8),
-
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
@@ -369,9 +361,7 @@ mixin PersonaResultadoViewMixin on OpServicioUrbanoPageBase {
                                           fontWeight: FontWeight.w900,
                                         ),
                                       ),
-
                                       const SizedBox(height: 2),
-
                                       Text(
                                         tieneAntecedentes
                                             ? "${antecedentes.antecedentes.length} registro${antecedentes.antecedentes.length == 1 ? '' : 's'} encontrado${antecedentes.antecedentes.length == 1 ? '' : 's'}"
@@ -385,7 +375,6 @@ mixin PersonaResultadoViewMixin on OpServicioUrbanoPageBase {
                                     ],
                                   ),
                                 ),
-
                                 Text(
                                   "${antecedentes.antecedentes.length}",
                                   style: TextStyle(
@@ -402,7 +391,6 @@ mixin PersonaResultadoViewMixin on OpServicioUrbanoPageBase {
 
                           if (tieneAntecedentes) ...[
                             const SizedBox(height: 8),
-
                             ...List.generate(antecedentes.antecedentes.length, (
                               int index,
                             ) {
@@ -440,9 +428,7 @@ mixin PersonaResultadoViewMixin on OpServicioUrbanoPageBase {
                                         ),
                                       ),
                                     ),
-
                                     const SizedBox(width: 8),
-
                                     Expanded(
                                       child: Text(
                                         antecedente,
@@ -477,9 +463,7 @@ mixin PersonaResultadoViewMixin on OpServicioUrbanoPageBase {
                                   color: Color(0xFF607589),
                                   size: 18,
                                 ),
-
                                 SizedBox(width: 7),
-
                                 Expanded(
                                   child: Text(
                                     "Información obtenida mediante los servicios institucionales habilitados para la consulta operativa.",

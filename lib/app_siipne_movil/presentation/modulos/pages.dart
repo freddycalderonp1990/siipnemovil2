@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'op_servicio_urbano/local_widgets/dialogo_consulta_operativa.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -25,6 +27,7 @@ import '../../core/utils/operativo_qr_util.dart';
 import '../../core/values/app_siipne_movil_images.dart';
 import '../../data/models/models_siipne_movil.dart';
 import '../widgets/custom_siipne_movil_widgets.dart';
+import '../widgets/selector_nacionalidad_widget.dart';
 import 'controllers.dart';
 import 'menu/widgets/indicador_scroll.dart';
 import 'op_servicio_urbano/local_widgets/desing_busqueda_por_cedula_widget.dart';

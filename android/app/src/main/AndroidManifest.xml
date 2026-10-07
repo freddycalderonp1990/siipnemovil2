@@ -2,6 +2,8 @@
     <!-- Acesso Biometrico -->
     <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
     <!-- Internet -->
     <uses-permission android:name="android.permission.INTERNET"/>
 
@@ -15,6 +17,12 @@
         android:icon="@mipmap/launcher_icon"
         android:allowBackup="false"
         android:fullBackupContent="false">
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="alertas_operativo_v2" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_operativo" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

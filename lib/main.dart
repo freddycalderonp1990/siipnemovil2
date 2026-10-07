@@ -47,9 +47,17 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // Los mensajes con notification ya los muestra el sistema en background.
   if (message.notification != null) return;
 
-  // OperativoPushService usa mensajes notification + data.
-  final tipo = message.data['tipo']?.toString();
-  if (tipo == 'BOLETA' || tipo == 'VEHICULO_ROBADO') return;
+  // Procesar también las alertas operativas que contienen únicamente data.
+  final tipo = message.data['tipo']?.toString().trim().toUpperCase();
+  if (tipo == 'BOLETA' || tipo == 'VEHICULO_ROBADO') {
+    try {
+      await OperativoPushService.instance.mostrarEnSegundoPlano(message);
+    } catch (e, stackTrace) {
+      debugPrint('[PUSH BACKGROUND] Error mostrando alerta operativa: $e');
+      debugPrintStack(stackTrace: stackTrace);
+    }
+    return;
+  }
 
   // Compatibilidad con mensajes antiguos que solo contienen data.
   try {
@@ -94,8 +102,8 @@ void main() async {
     }
 
     try {
-      await LocalNotification.initializeLocalNotifications();
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+      await LocalNotification.initializeLocalNotifications();
       debugPrint('[PUSH MAIN] LocalNotification inicializado');
     } catch (e, stackTrace) {
       debugPrint('[PUSH MAIN] Error en LocalNotification: $e');

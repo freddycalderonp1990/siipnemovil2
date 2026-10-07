@@ -1,16 +1,20 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import 'operativo_push_identity.dart';
+import 'consulta_persona_push_guard.dart';
 
 class OperativoPushService {
   OperativoPushService._();
   static final OperativoPushService instance = OperativoPushService._();
 
+  static const String _keyOperativo = 'siipne_push_operativo_activo';
   static const String _key = 'siipne_push_topics_pendientes';
   static const String _channelId = 'alertas_operativo_v2';
   static const String _channelName = 'Alertas críticas del operativo';
@@ -37,10 +41,14 @@ class OperativoPushService {
   final ValueNotifier<Map<String, dynamic>?> alertaCritica = ValueNotifier<Map<String, dynamic>?>(null);
 
   final Set<String> _vistos = <String>{};
+  final ConsultaPersonaPushGuard consultasPersona = ConsultaPersonaPushGuard();
   final Set<String> _topics = <String>{};
 
   Future<void>? _init;
   Future<void> _cola = Future<void>.value();
+  StreamSubscription<RemoteMessage>? _mensajes;
+  StreamSubscription<RemoteMessage>? _aperturas;
+  StreamSubscription<String>? _tokens;
   Timer? _retry;
   Timer? _timerAlertaCritica;
 
@@ -59,10 +67,14 @@ class OperativoPushService {
     throw e;
   });
 
-  Future<void> _inicializar() async {
+  Future<void> _inicializar({bool segundoPlano = false}) async {
     if (!compatible) return;
 
     await _cargarTopics();
+    if (segundoPlano) {
+      _deseado = int.tryParse(await _storage.read(key: _keyOperativo) ?? '') ?? 0;
+      _sesionResuelta = true;
+    }
 
     await _local.initialize(
       settings: const InitializationSettings(
@@ -82,6 +94,8 @@ class OperativoPushService {
           ?.createNotificationChannel(_channel);
     }
 
+    if (segundoPlano) return;
+
     /*
      * Evitamos que Firebase muestre automáticamente una segunda notificación
      * cuando la aplicación está en primer plano.
@@ -95,7 +109,7 @@ class OperativoPushService {
 
     await _procesarAperturaInicial();
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    _mensajes ??= FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       if (kDebugMode) {
         debugPrint('[PUSH] MENSAJE RECIBIDO');
         debugPrint('[PUSH] messageId: ${message.messageId}');
@@ -113,11 +127,14 @@ class OperativoPushService {
       }
     });
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      aperturaPendiente.value = Map<String, dynamic>.from(message.data);
+    _aperturas ??= FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      aperturaPendiente.value = <String, dynamic>{
+        ...message.data,
+        '_pushId': operativoPushIdentity(message),
+      };
     });
 
-    FirebaseMessaging.instance.onTokenRefresh.listen(
+    _tokens ??= FirebaseMessaging.instance.onTokenRefresh.listen(
           (_) {
         _confirmado = '';
         unawaited(_programar());
@@ -152,7 +169,10 @@ class OperativoPushService {
     final RemoteMessage? initial = await FirebaseMessaging.instance.getInitialMessage();
 
     if (initial != null) {
-      aperturaPendiente.value = Map<String, dynamic>.from(initial.data);
+      aperturaPendiente.value = <String, dynamic>{
+        ...initial.data,
+        '_pushId': operativoPushIdentity(initial),
+      };
     }
 
     final NotificationAppLaunchDetails? launch = await _local.getNotificationAppLaunchDetails();
@@ -211,6 +231,9 @@ class OperativoPushService {
 
     try {
       debugPrint('[PUSH] Iniciando operativo_$idHdrEvento');
+      if (compatible) {
+        await _storage.write(key: _keyOperativo, value: '$idHdrEvento');
+      }
       await inicializar();
 
       if (!compatible) {
@@ -284,12 +307,15 @@ class OperativoPushService {
   Future<void> salirOperativo() async {
     _deseado = 0;
     _sesionResuelta = true;
+    consultasPersona.limpiar();
 
     aperturaPendiente.value = null;
     limpiarAlertaCritica();
 
     try {
+      if (compatible) await _storage.delete(key: _keyOperativo);
       await inicializar();
+      _vistos.clear();
       await _local.cancelAll();
       await _programar();
     } catch (e) {
@@ -357,7 +383,14 @@ class OperativoPushService {
     }
   }
 
-  Future<void> _mostrar(RemoteMessage message) async {
+  /// Se ejecuta en el isolate de Firebase para mensajes operativos solo data.
+  Future<void> mostrarEnSegundoPlano(RemoteMessage message) async {
+    if (!compatible || message.notification != null) return;
+    await _inicializar(segundoPlano: true);
+    await _mostrar(message, segundoPlano: true);
+  }
+
+  Future<void> _mostrar(RemoteMessage message, {bool segundoPlano = false}) async {
     final Map<String, dynamic> data =
     Map<String, dynamic>.from(message.data);
 
@@ -373,11 +406,14 @@ class OperativoPushService {
       return;
     }
 
-    final String alertaId = data['alertaId']?.toString().trim() ?? '';
-    final String? key =
-    alertaId.isNotEmpty ? alertaId : message.messageId;
+    if (!await consultasPersona.permitirAlerta(data)) return;
+    // La sesión puede cambiar mientras esperamos la respuesta HTTP.
+    if (_deseado <= 0 || data['idHdrEvento']?.toString() != '$_deseado') return;
 
-    if (key == null || key.isEmpty || !_vistos.add(key)) {
+    final String key = operativoPushIdentity(message);
+    data['_pushId'] = key;
+
+    if (!_vistos.add(key)) {
       return;
     }
 
@@ -385,10 +421,10 @@ class OperativoPushService {
       final int id = _generarIdNotificacion(key);
 
       final String tituloRecibido =
-          message.notification?.title?.trim() ?? '';
+          message.notification?.title?.trim() ?? data['title']?.toString().trim() ?? '';
 
       final String mensajeRecibido =
-          message.notification?.body?.trim() ?? '';
+          message.notification?.body?.trim() ?? data['body']?.toString().trim() ?? '';
 
       final String titulo = tituloRecibido.isNotEmpty
           ? tituloRecibido
@@ -402,11 +438,9 @@ class OperativoPushService {
        * Activa el overlay rojo de la aplicación.
        * Solo se visualizará si la UI está actualmente disponible.
        */
-      _activarAlertaCritica(
-        data: data,
-        titulo: titulo,
-        mensaje: mensaje,
-      );
+      if (!segundoPlano) {
+        _activarAlertaCritica(data: data, titulo: titulo, mensaje: mensaje);
+      }
 
       await _local.show(
         id: id,
@@ -683,6 +717,10 @@ class OperativoPushService {
   }
 
   void dispose() {
+    consultasPersona.limpiar();
+    unawaited(_mensajes?.cancel());
+    unawaited(_aperturas?.cancel());
+    unawaited(_tokens?.cancel());
     _retry?.cancel();
     _timerAlertaCritica?.cancel();
 

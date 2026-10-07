@@ -669,6 +669,8 @@ class OpMigracionController extends GetxController {
           ip: _ipConsulta,
           idGenUsuario: user.idGenUsuario,
           idVariableResultado: idVariableResultado,
+            siglasNacionalidad:'',
+            idGenPersona:user.idGenPersona
         ),
       );
       dataPersonaComplementaria.assignAll(<DataConsultaPersona>[resultado]);

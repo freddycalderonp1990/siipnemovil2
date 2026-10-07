@@ -59,8 +59,6 @@ class OpServicioUrbanoPage extends OpServicioUrbanoPageBase
           const SizedBox(height: 1),
           tipoDeConsulta(),
           const SizedBox(height: 5),
-          busquedaTipoOperativo(),
-          const SizedBox(height: 6),
           resultado,
           const SizedBox(height: 15),
         ],

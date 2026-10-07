@@ -78,17 +78,9 @@ abstract class OpServicioUrbanoPageBase
     required IconData icono,
     required VoidCallback onTap,
   });
-  Widget busquedaTipoOperativo();
-  Widget cardBusqueda({
-    required String titulo,
-    required String descripcion,
-    required IconData icono,
-    required Widget child,
-  });
   Future<void> confirmarBusquedaPersona();
   Future<void> confirmarBusquedaVehiculo();
   Future<void> cerrarTeclado();
-  Future<void> mostrarPreparandoConsulta({required String tipo});
   void dialogoConfirmarBusqueda({
     required String tipo,
     required String etiqueta,

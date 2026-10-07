@@ -67,7 +67,7 @@ class DialogosAwesome {
     required String titulo,
     required IconData icono,
     required Color color,
-    required VoidCallback onPressed,
+    required VoidCallback? onPressed,
     String? subtitulo,
     bool secundario = false,
   }) {
@@ -81,6 +81,7 @@ class DialogosAwesome {
 
     return Semantics(
       button: true,
+      enabled: onPressed != null,
       label: titulo,
       child: Container(
         height: subtitulo == null ? 54 : 60,
@@ -248,6 +249,7 @@ class DialogosAwesome {
     String codigo = 'SIIPNE // CONTROL OPERATIVO',
     String imgString = AppImages.escudopolicia,
     IconData? iconoEstado,
+    Widget? trailing,
   }) {
     final bool esTemaRojo = color == colorError;
 
@@ -379,6 +381,7 @@ class DialogosAwesome {
                   ],
                 ),
               ),
+              if (trailing != null) trailing,
             ],
           ),
         ],
@@ -1885,6 +1888,118 @@ class DialogosAwesome {
 
     abrirDialogo();
   }
+}
+
+/// Estructura compartida con las alertas institucionales del aplicativo.
+class DialogoInstitucional extends StatelessWidget {
+  const DialogoInstitucional({
+    super.key,
+    required this.titulo,
+    required this.codigo,
+    required this.icono,
+    required this.child,
+    this.onCerrar,
+    this.mostrarCerrar = false,
+  });
+
+  final String titulo;
+  final String codigo;
+  final IconData icono;
+  final Widget child;
+  final VoidCallback? onCerrar;
+  final bool mostrarCerrar;
+
+  static const Color barrera = Color(0xD1061C35);
+
+  @override
+  Widget build(BuildContext context) => Dialog(
+    backgroundColor: Colors.transparent,
+    elevation: 0,
+    insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 480),
+      child: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        child: DialogosAwesome._fondoDialogo(
+          color: DialogosAwesome._azulInstitucional,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              DialogosAwesome._encabezadoDialogo(
+                title: titulo,
+                codigo: codigo,
+                color: DialogosAwesome._azulInstitucional,
+                iconoEstado: icono,
+                trailing: mostrarCerrar
+                    ? IconButton(
+                        tooltip: 'Cerrar',
+                        onPressed: onCerrar,
+                        icon: const Icon(Icons.close_rounded),
+                        color: Colors.white,
+                        disabledColor: Colors.white38,
+                        visualDensity: VisualDensity.compact,
+                      )
+                    : null,
+              ),
+              const SizedBox(height: 12),
+              child,
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+class TarjetaDialogoInstitucional extends StatelessWidget {
+  const TarjetaDialogoInstitucional({
+    super.key,
+    required this.etiqueta,
+    required this.icono,
+    required this.child,
+  });
+
+  final String etiqueta;
+  final IconData icono;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => DialogosAwesome._cardInformativa(
+    color: DialogosAwesome._azulInstitucional,
+    etiqueta: etiqueta,
+    icono: icono,
+    child: child,
+  );
+}
+
+class BotonDialogoInstitucional extends StatelessWidget {
+  const BotonDialogoInstitucional({
+    super.key,
+    required this.titulo,
+    required this.icono,
+    this.onPressed,
+    this.secundario = false,
+  });
+
+  final String titulo;
+  final IconData icono;
+  final VoidCallback? onPressed;
+  final bool secundario;
+
+  @override
+  Widget build(BuildContext context) => Opacity(
+    opacity: onPressed == null ? .45 : 1,
+    child: DialogosAwesome._botonAccionTecnico(
+      titulo: titulo,
+      icono: icono,
+      color: secundario
+          ? DialogosAwesome._grisInstitucional
+          : DialogosAwesome._azulInstitucional,
+      secundario: secundario,
+      onPressed: onPressed,
+    ),
+  );
 }
 
 /// Contenedor modal sin los 40 dp laterales que impone [Dialog].

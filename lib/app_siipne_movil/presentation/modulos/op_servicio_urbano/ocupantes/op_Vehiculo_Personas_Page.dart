@@ -11,15 +11,12 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
   late final OpServicioUrbanoController controller;
 
   final GlobalKey<FormState> _keyPersonaVehiculo = GlobalKey<FormState>();
-  final GlobalKey _keyCampoDocumento = GlobalKey();
   final ScrollController _scrollController = ScrollController();
-  final FocusNode _focusDocumento = FocusNode();
 
   @override
   void initState() {
     super.initState();
     controller = Get.find<OpServicioUrbanoController>();
-    _focusDocumento.addListener(_onFocusDocumento);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (controller.conductorRegistradoEnBaseDeDatos.value) {
@@ -40,34 +37,8 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
 
   @override
   void dispose() {
-    _focusDocumento.removeListener(_onFocusDocumento);
-    _focusDocumento.dispose();
     _scrollController.dispose();
     super.dispose();
-  }
-
-  void _onFocusDocumento() {
-    if (!_focusDocumento.hasFocus) return;
-
-    Future.delayed(
-      const Duration(milliseconds: 280),
-      _mostrarCampoSobreTeclado,
-    );
-  }
-
-  Future<void> _mostrarCampoSobreTeclado() async {
-    if (!mounted) return;
-
-    final BuildContext? context = _keyCampoDocumento.currentContext;
-
-    if (context == null) return;
-
-    await Scrollable.ensureVisible(
-      context,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-      alignment: .28,
-    );
   }
 
   // ============================================================
@@ -108,24 +79,18 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
           padding: const EdgeInsets.fromLTRB(7, 7, 7, 20),
           children: [
             _cabeceraVehiculo(vehiculo),
-
             const SizedBox(height: 7),
-
             _resumenPersonas(
               conductorRegistrado: conductorRegistrado,
               cantidadOcupantes: cantidadOcupantes,
             ),
-
             const SizedBox(height: 7),
-
             _accionesRegistro(
               conductorRegistrado: conductorRegistrado,
               tipoSeleccionado: tipoSeleccionado,
               cargando: cargando,
             ),
-
             const SizedBox(height: 8),
-
             _personasRegistradas(
               conductorRegistrado: conductorRegistrado,
               cantidadOcupantes: cantidadOcupantes,
@@ -174,9 +139,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
               size: 27,
             ),
           ),
-
           const SizedBox(width: 9),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,9 +153,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                     letterSpacing: .25,
                   ),
                 ),
-
                 const SizedBox(height: 1),
-
                 Text(
                   vehiculo.placa.trim().isEmpty ? "SIN PLACA" : vehiculo.placa,
                   maxLines: 1,
@@ -204,9 +165,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                     letterSpacing: .7,
                   ),
                 ),
-
                 const SizedBox(height: 1),
-
                 Text(
                   "${vehiculo.marca} · ${vehiculo.modelo}",
                   maxLines: 1,
@@ -220,9 +179,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
               ],
             ),
           ),
-
           const SizedBox(width: 8),
-
           Material(
             color: Colors.transparent,
             child: InkWell(
@@ -286,9 +243,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
               ),
             ],
           ),
-
           const SizedBox(height: 8),
-
           Row(
             children: [
               Expanded(
@@ -306,9 +261,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                   );
                 }),
               ),
-
               const SizedBox(width: 6),
-
               Expanded(
                 child: _estadoPersona(
                   icon: Icons.groups_2_rounded,
@@ -356,9 +309,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
               size: 16,
             ),
           ),
-
           const SizedBox(width: 6),
-
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -376,7 +327,6 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                     fontWeight: FontWeight.w900,
                   ),
                 ),
-
                 Text(
                   detalle,
                   maxLines: 1,
@@ -407,7 +357,6 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
     final bool esConductor = tipoSeleccionado == "CONDUCTOR";
 
     return Container(
-      key: _keyCampoDocumento,
       width: double.infinity,
       padding: const EdgeInsets.all(9),
       decoration: BoxDecoration(
@@ -436,9 +385,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
               ),
             ],
           ),
-
           const SizedBox(height: 7),
-
           Obx(() {
             final bool yaExisteEnBase =
                 controller.conductorRegistradoEnBaseDeDatos.value;
@@ -447,7 +394,8 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
               return Container(
                 width: double.infinity,
                 margin: const EdgeInsets.only(bottom: 10),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 decoration: BoxDecoration(
                   color: const Color(0xFFEAF7F0),
                   borderRadius: BorderRadius.circular(10),
@@ -508,97 +456,22 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
               ],
             );
           }),
-
           _variableResultadoPersona(),
-
           const SizedBox(height: 8),
-
-          Form(
-            key: _keyPersonaVehiculo,
-            child: TextFormField(
-              focusNode: _focusDocumento,
-              controller: controller.controllerCedulaVehiculo,
-              enabled: !cargando,
-              keyboardType: TextInputType.number,
-              maxLength: 10,
-              textInputAction: TextInputAction.search,
-              scrollPadding: const EdgeInsets.only(bottom: 140),
-              onTap: () {
-                Future.delayed(
-                  const Duration(milliseconds: 280),
-                  _mostrarCampoSobreTeclado,
-                );
-              },
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return "Ingrese un documento";
-                }
-
-                return null;
-              },
-              onFieldSubmitted: (_) {
-                if (!cargando) {
-                  _consultarPersona();
-                }
-              },
-              decoration: InputDecoration(
-                counterText: "",
-                hintText: esConductor
-                    ? "Documento del conductor"
-                    : "Documento del ocupante",
-                hintStyle: const TextStyle(
-                  fontSize: 15,
-                  color: Color(0xFF8996A3),
-                ),
-                prefixIcon: Icon(
-                  esConductor
-                      ? Icons.person_pin_rounded
-                      : Icons.airline_seat_recline_normal_rounded,
-                  color: const Color(0xFF195BA6),
-                  size: 18,
-                ),
-                suffixIcon: cargando
-                    ? const Padding(
-                        padding: EdgeInsets.all(13),
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Color(0xFF195BA6),
-                        ),
-                      )
-                    : IconButton(
-                        onPressed: _consultarPersona,
-                        icon: const Icon(
-                          Icons.search_rounded,
-                          color: Color(0xFF195BA6),
-                        ),
-                      ),
-                filled: true,
-                fillColor: const Color(0xFFF7F9FC),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 10,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(11),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(11),
-                  borderSide: const BorderSide(color: Color(0xFFD5E0E9)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(11),
-                  borderSide: const BorderSide(
-                    color: Color(0xFF195BA6),
-                    width: 1.4,
-                  ),
-                ),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: cargando ? null : _consultarPersona,
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFF195BA6),
+                minimumSize: const Size(0, 48),
               ),
+              icon: const Icon(Icons.person_search_rounded),
+              label: Text(esConductor ? 'CONSULTAR CONDUCTOR' : 'CONSULTAR OCUPANTE'),
             ),
           ),
-
           if (cargando) ...[
             const SizedBox(height: 6),
-
             const Row(
               children: [
                 SizedBox(
@@ -666,12 +539,10 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                 color: seleccionado
                     ? Colors.white
                     : habilitado
-                    ? const Color(0xFF195BA6)
-                    : const Color(0xFFAAB4BE),
+                        ? const Color(0xFF195BA6)
+                        : const Color(0xFFAAB4BE),
               ),
-
               const SizedBox(width: 5),
-
               Flexible(
                 child: Text(
                   titulo,
@@ -681,8 +552,8 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                     color: seleccionado
                         ? Colors.white
                         : habilitado
-                        ? const Color(0xFF52687C)
-                        : const Color(0xFFAAB4BE),
+                            ? const Color(0xFF52687C)
+                            : const Color(0xFFAAB4BE),
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
                   ),
@@ -961,9 +832,8 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
 
       if (nombres == "PERSONA CONSULTADA") {
         try {
-          final String nombreDinardap = (dinardap.nombre ?? "")
-              .toString()
-              .trim();
+          final String nombreDinardap =
+              (dinardap.nombre ?? "").toString().trim();
 
           if (nombreDinardap.isNotEmpty) nombres = nombreDinardap;
         } catch (_) {}
@@ -1270,69 +1140,41 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
   // CONSULTAR PERSONA
   // ============================================================
 
+  bool _dialogoConsultaAbierto = false;
+
   Future<void> _consultarPersona() async {
-    if (controller.consultandoPersonaVehiculo.value) {
-      return;
-    }
-    final String documento = controller.controllerCedulaVehiculo.text.trim();
-
-    if (controller.documentoPersonaVehiculoRegistrado(documento)) {
-      FocusManager.instance.primaryFocus?.unfocus();
-
-      DialogosAwesome.getWarning(
-        title: "PERSONA YA REGISTRADA",
-        descripcion:
-            "La persona con documento $documento ya se encuentra relacionada con este vehículo.",
+    if (_dialogoConsultaAbierto || controller.consultandoPersonaVehiculo.value) return;
+    final bool eraConductor = controller.tipoPersonaVehiculo.value == 'CONDUCTOR';
+    _dialogoConsultaAbierto = true;
+    controller.controllerCedulaVehiculo.clear();
+    bool? resultado;
+    try {
+      resultado = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        barrierColor: DialogoInstitucional.barrera,
+        builder: (_) => DialogoConsultaOperativa(
+          titulo: eraConductor ? 'Consultar conductor' : 'Consultar ocupante',
+          esPersona: true,
+          formKey: _keyPersonaVehiculo,
+          documentoController: controller.controllerCedulaVehiculo,
+          onConsultar: (nacionalidad) => controller.consultarPersonaRelacionadaVehiculo(
+            key: _keyPersonaVehiculo,
+            nacionalidad: nacionalidad,
+          ),
+          obtenerError: () => controller.mensajeErrorConsulta,
+        ),
       );
-
-      return;
+    } finally {
+      _dialogoConsultaAbierto = false;
     }
-    final bool valido = _keyPersonaVehiculo.currentState?.validate() ?? false;
+    if (!mounted || resultado != true) return;
 
-    if (!valido) {
-      _focusDocumento.requestFocus();
-
-      await _mostrarCampoSobreTeclado();
-
-      return;
-    }
-
-    final bool eraConductor =
-        controller.tipoPersonaVehiculo.value == "CONDUCTOR";
-
-    FocusManager.instance.primaryFocus?.unfocus();
-
-    final bool resultado = await controller.consultarPersonaRelacionadaVehiculo(
-      key: _keyPersonaVehiculo,
-    );
-
-    if (!resultado) {
-      DialogosAwesome.getError(
-        title: "CONSULTA NO REALIZADA",
-        descripcion: controller.mensajeErrorConsulta.isEmpty
-            ? "No fue posible consultar la persona."
-            : controller.mensajeErrorConsulta,
-      );
-
-      return;
-    }
-
-    DataConsultaPersona? persona;
-
-    if (eraConductor && controller.dataPersona_conductor.isNotEmpty) {
-      persona = controller.dataPersona_conductor.first;
-    } else if (!eraConductor && controller.dataPersona_ocupantes.isNotEmpty) {
-      persona = controller.dataPersona_ocupantes.last;
-    }
-
-    if (persona != null && mounted) {
-      _mostrarDialogoDetallePersona(persona, eraConductor ? "CONDUCTOR" : "OCUPANTE");
-
-      controller.controllerCedulaVehiculo.clear();
-
-      if (eraConductor) {
-        controller.tipoPersonaVehiculo.value = "OCUPANTE";
-      }
+    final DataConsultaPersona? persona = eraConductor
+        ? (controller.dataPersona_conductor.isEmpty ? null : controller.dataPersona_conductor.first)
+        : (controller.dataPersona_ocupantes.isEmpty ? null : controller.dataPersona_ocupantes.last);
+    if (persona != null) {
+      _mostrarDialogoDetallePersona(persona, eraConductor ? 'CONDUCTOR' : 'OCUPANTE');
     }
   }
 
@@ -1347,7 +1189,8 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
 
         return Dialog(
           backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 18),
+          insetPadding:
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 18),
           child: Container(
             width: double.infinity,
             constraints: BoxConstraints(maxHeight: alto * .88),
@@ -1450,7 +1293,6 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
     );
   }
 
-
   // ============================================================
   // PERSONAS REGISTRADAS
   // CUADRÍCULA TIPO VEHÍCULO
@@ -1509,9 +1351,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
               color: Color(0xFF195BA6),
               size: 16,
             ),
-
             const SizedBox(width: 5),
-
             const Expanded(
               child: Text(
                 "DISTRIBUCIÓN DE PERSONAS",
@@ -1522,7 +1362,6 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                 ),
               ),
             ),
-
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
@@ -1537,9 +1376,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                     color: Color(0xFF195BA6),
                     size: 11,
                   ),
-
                   const SizedBox(width: 3),
-
                   Text(
                     "${gridItems.length}",
                     style: const TextStyle(
@@ -1645,9 +1482,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                               color: Colors.white,
                               size: 13,
                             ),
-
                             SizedBox(width: 4),
-
                             Text(
                               "FRENTE DEL VEHÍCULO",
                               style: TextStyle(
@@ -1672,11 +1507,11 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                         itemCount: gridItems.length,
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 7,
-                              mainAxisSpacing: 7,
-                              childAspectRatio: .90,
-                            ),
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 7,
+                          mainAxisSpacing: 7,
+                          childAspectRatio: .90,
+                        ),
                         itemBuilder: (BuildContext context, int index) {
                           final Map<String, dynamic> item = gridItems[index];
 
@@ -1727,9 +1562,8 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
 
     final bool alerta = data.ordenCaptura.success;
 
-    final Color colorRol = conductor
-        ? const Color(0xFF195BA6)
-        : const Color(0xFF198754);
+    final Color colorRol =
+        conductor ? const Color(0xFF195BA6) : const Color(0xFF198754);
 
     return Material(
       color: Colors.transparent,
@@ -1743,15 +1577,15 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
             color: alerta
                 ? const Color(0xFFFFF2F1)
                 : seleccionado
-                ? const Color(0xFFEAF3FC)
-                : Colors.white,
+                    ? const Color(0xFFEAF3FC)
+                    : Colors.white,
             borderRadius: BorderRadius.circular(15),
             border: Border.all(
               color: alerta
                   ? const Color(0xFFE2A19D)
                   : seleccionado
-                  ? const Color(0xFF79A9D3)
-                  : const Color(0xFFD5E1EB),
+                      ? const Color(0xFF79A9D3)
+                      : const Color(0xFFD5E1EB),
               width: seleccionado ? 1.5 : 1,
             ),
             boxShadow: [
@@ -1785,9 +1619,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                       color: colorRol,
                       size: 11,
                     ),
-
                     const SizedBox(width: 3),
-
                     Flexible(
                       child: Text(
                         titulo,
@@ -1864,9 +1696,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                           : const Color(0xFF198754),
                       size: 11,
                     ),
-
                     const SizedBox(width: 3),
-
                     Text(
                       alerta ? "ALERTA" : "REGISTRADO",
                       style: TextStyle(
@@ -1895,10 +1725,12 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
     String nombre = "SIN DATOS";
 
     String fotoSiipne = "";
+    String documento = "";
     dynamic fotoDinardap;
 
     if (data.dataSiipne.success) {
       final String nombreSiipne = data.dataSiipne.datosSiipne.apenom.trim();
+      documento = data.dataSiipne.datosSiipne.documento.trim();
 
       if (nombreSiipne.isNotEmpty) {
         nombre = nombreSiipne;
@@ -1910,6 +1742,11 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
     final dynamic dinardap = data.dataDinardap.datosDinardap;
 
     if (dinardap != null) {
+      if (documento.isEmpty) {
+        try {
+          documento = (dinardap.cedula ?? '').toString().trim();
+        } catch (_) {}
+      }
       try {
         final String nombreDinardap = (dinardap.nombre ?? '').toString().trim();
 
@@ -1983,8 +1820,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
 
       final bool jpg = bytes[0] == 0xFF && bytes[1] == 0xD8;
 
-      final bool png =
-          bytes.length >= 8 &&
+      final bool png = bytes.length >= 8 &&
           bytes[0] == 0x89 &&
           bytes[1] == 0x50 &&
           bytes[2] == 0x4E &&
@@ -2034,10 +1870,8 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
         limpio = limpio.split(',').last;
       }
 
-      limpio = limpio
-          .replaceAll('\n', '')
-          .replaceAll('\r', '')
-          .replaceAll(' ', '');
+      limpio =
+          limpio.replaceAll('\n', '').replaceAll('\r', '').replaceAll(' ', '');
 
       final int resto = limpio.length % 4;
 
@@ -2082,9 +1916,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
             color: Color(0xFF9AA8B5),
             size: 28,
           ),
-
           SizedBox(height: 5),
-
           Text(
             "SIN PERSONAS REGISTRADAS",
             textAlign: TextAlign.center,
@@ -2094,9 +1926,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
               fontWeight: FontWeight.w900,
             ),
           ),
-
           SizedBox(height: 2),
-
           Text(
             "Registre primero el conductor y luego los ocupantes del vehículo.",
             textAlign: TextAlign.center,
@@ -2135,9 +1965,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                 size: 29,
               ),
             ),
-
             const SizedBox(height: 9),
-
             const Text(
               "VEHÍCULO NO DISPONIBLE",
               textAlign: TextAlign.center,
@@ -2147,9 +1975,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                 fontWeight: FontWeight.w900,
               ),
             ),
-
             const SizedBox(height: 4),
-
             const Text(
               "No existe información de un vehículo consultado para relacionar personas.",
               textAlign: TextAlign.center,
@@ -2159,9 +1985,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                 height: 1.3,
               ),
             ),
-
             const SizedBox(height: 12),
-
             OutlinedButton.icon(
               onPressed: Get.back,
               icon: const Icon(Icons.arrow_back_rounded, size: 16),
@@ -2175,6 +1999,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
       ),
     );
   }
+
   Widget _asientoConductorDesdeBase({
     required String titulo,
     required ConductorVehiculo data,

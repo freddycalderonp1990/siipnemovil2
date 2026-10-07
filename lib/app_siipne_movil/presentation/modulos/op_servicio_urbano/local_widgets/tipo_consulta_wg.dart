@@ -56,8 +56,15 @@ mixin TipoConsultaViewMixin on OpServicioUrbanoPageBase {
                     subtitulo: "Documento de identidad",
                     detalle: "CONSULTA CIUDADANO",
                     icono: Icons.person_search_rounded,
-                    onTap: () {
-                      controller.seleccionarPersona();
+                    onTap: () async {
+                      if (controller.dialogoConsultaAbierto.value) return;
+                      await controller.seleccionarPersona();
+                      if (!controller.isClosed &&
+                          controller.selectPerson.value &&
+                          controller.dataPersona.isEmpty &&
+                          !controller.ocultarBtnBuscarPersona.value) {
+                        await confirmarBusquedaPersona();
+                      }
                     },
                   ),
                 ),
@@ -69,8 +76,15 @@ mixin TipoConsultaViewMixin on OpServicioUrbanoPageBase {
                     subtitulo: "Número de placa",
                     detalle: "CONSULTA DE VEHÍCULOS Y MOTOS",
                     icono: Icons.directions_car_filled_rounded,
-                    onTap: () {
-                      controller.seleccionarVehiculo();
+                    onTap: () async {
+                      if (controller.dialogoConsultaAbierto.value) return;
+                      await controller.seleccionarVehiculo();
+                      if (!controller.isClosed &&
+                          controller.selectVehiculo.value &&
+                          controller.dataVehiculo.isEmpty &&
+                          !controller.ocultarBtnBuscarVehiculo.value) {
+                        await confirmarBusquedaVehiculo();
+                      }
                     },
                   ),
                 ),
@@ -90,168 +104,171 @@ mixin TipoConsultaViewMixin on OpServicioUrbanoPageBase {
     required IconData icono,
     required VoidCallback onTap,
   }) {
+    final bool bloqueado =
+        controller.cargandoVariablesResultado.value ||
+        controller.peticionServerState.value ||
+        controller.actualizandoResultado.value ||
+        controller.dialogoConsultaAbierto.value;
     final Color colorPrincipal = seleccionado
         ? Colors.white
         : const Color(0xFF1764B2);
 
-    return ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: 108),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 220),
-            curve: Curves.easeOut,
-
-            // No agregar height ni constraints aquí.
-            padding: const EdgeInsets.all(9),
-
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: seleccionado
-                    ? const [
-                  Color(0xFF1764B2),
-                  Color(0xFF073B78),
-                ]
-                    : const [
-                  Color(0xFFFAFCFE),
-                  Color(0xFFF1F5F9),
-                ],
-              ),
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 180),
+      opacity: bloqueado ? .45 : 1,
+      child: Semantics(
+        button: true,
+        enabled: !bloqueado,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 108),
+          child: Material(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
+            child: InkWell(
+              onTap: bloqueado ? null : onTap,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: seleccionado
-                    ? const Color(0xFF1764B2)
-                    : const Color(0xFFD8E3ED),
-                width: seleccionado ? 2 : 1,
-              ),
-              boxShadow: seleccionado
-                  ? [
-                BoxShadow(
-                  color: const Color(0xFF195BA6).withOpacity(.20),
-                  blurRadius: 11,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-                  : null,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: seleccionado
-                            ? Colors.white.withOpacity(.16)
-                            : const Color(0xFFE4EEF8),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        icono,
-                        size: 24,
-                        color: colorPrincipal,
-                      ),
-                    ),
-                    const SizedBox(width: 7),
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            titulo,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: seleccionado
-                                  ? Colors.white
-                                  : const Color(0xFF253E55),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w900,
-                              height: 1.15,
-                            ),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOut,
+
+                // No agregar height ni constraints aquí.
+                padding: const EdgeInsets.all(9),
+
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: seleccionado
+                        ? const [Color(0xFF1764B2), Color(0xFF073B78)]
+                        : const [Color(0xFFFAFCFE), Color(0xFFF1F5F9)],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: seleccionado
+                        ? const Color(0xFF1764B2)
+                        : const Color(0xFFD8E3ED),
+                    width: seleccionado ? 2 : 1,
+                  ),
+                  boxShadow: seleccionado
+                      ? [
+                          BoxShadow(
+                            color: const Color(0xFF195BA6).withOpacity(.20),
+                            blurRadius: 11,
+                            offset: const Offset(0, 4),
                           ),
-                          if (subtitulo.trim().isNotEmpty) ...[
-                            const SizedBox(height: 3),
-                            Text(
-                              subtitulo,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: seleccionado
-                                    ? Colors.white.withOpacity(.78)
-                                    : const Color(0xFF7C8998),
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                height: 1.2,
+                        ]
+                      : null,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: seleccionado
+                                ? Colors.white.withOpacity(.16)
+                                : const Color(0xFFE4EEF8),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(icono, size: 24, color: colorPrincipal),
+                        ),
+                        const SizedBox(width: 7),
+                        Expanded(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                titulo,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: seleccionado
+                                      ? Colors.white
+                                      : const Color(0xFF253E55),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w900,
+                                  height: 1.15,
+                                ),
                               ),
-                            ),
-                          ],
-                        ],
-                      ),
+                              if (subtitulo.trim().isNotEmpty) ...[
+                                const SizedBox(height: 3),
+                                Text(
+                                  subtitulo,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: seleccionado
+                                        ? Colors.white.withOpacity(.78)
+                                        : const Color(0xFF7C8998),
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.2,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Container(
+                          width: 22,
+                          height: 22,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: seleccionado
+                                ? Colors.white
+                                : const Color(0xFFE7EDF3),
+                          ),
+                          child: Icon(
+                            seleccionado
+                                ? Icons.check_rounded
+                                : Icons.circle_outlined,
+                            size: 19,
+                            color: seleccionado
+                                ? const Color(0xFF1764B2)
+                                : const Color(0xFFA1ACB7),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 5),
+                    const SizedBox(height: 8),
                     Container(
-                      width: 22,
-                      height: 22,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: seleccionado
-                            ? Colors.white
-                            : const Color(0xFFE7EDF3),
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 7,
+                        vertical: 5,
                       ),
-                      child: Icon(
-                        seleccionado
-                            ? Icons.check_rounded
-                            : Icons.circle_outlined,
-                        size: 19,
+                      decoration: BoxDecoration(
                         color: seleccionado
-                            ? const Color(0xFF1764B2)
-                            : const Color(0xFFA1ACB7),
+                            ? Colors.white.withOpacity(.12)
+                            : const Color(0xFFEAF0F5),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        seleccionado ? "$detalle · SELECCIONADO" : detalle,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: seleccionado
+                              ? Colors.white
+                              : const Color(0xFF607589),
+                          fontSize: 9,
+                          fontWeight: FontWeight.w900,
+                          height: 1.2,
+                          letterSpacing: .25,
+                        ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 7,
-                    vertical: 5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: seleccionado
-                        ? Colors.white.withOpacity(.12)
-                        : const Color(0xFFEAF0F5),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    seleccionado ? "$detalle · SELECCIONADO" : detalle,
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: seleccionado
-                          ? Colors.white
-                          : const Color(0xFF607589),
-                      fontSize: 9,
-                      fontWeight: FontWeight.w900,
-                      height: 1.2,
-                      letterSpacing: .25,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),

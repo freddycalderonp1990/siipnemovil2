@@ -11,6 +11,9 @@ class ConsultarPersonaRequest {
   final int hdrIdHdrResum;
   final String tipoRelacion;
   final String consultadoPor;
+  final String siglasNacionalidad;
+  final int idGenPersona;
+
 
   ConsultarPersonaRequest({
     required this.idOperativo,
@@ -22,7 +25,9 @@ class ConsultarPersonaRequest {
     required this.idVariableResultado,
     this.hdrIdHdrResum = 0,
     this.tipoRelacion = '',
-    required this.consultadoPor
+    required this.siglasNacionalidad,
+    required this.consultadoPor,
+    required this.idGenPersona,
   });
 
   Map<String, dynamic> toJson() {
@@ -34,8 +39,11 @@ class ConsultarPersonaRequest {
       "ip": ip,
       "idGenUsuario": idGenUsuario,
       "idVariableResultado": idVariableResultado,
+      "siglasNacionalidad":siglasNacionalidad,
       "consultadoPor": consultadoPor,
+      "personaAuditar":idGenPersona
     };
+      data["nacionalidad"] = siglasNacionalidad!.trim().toUpperCase();
 
     if (hdrIdHdrResum > 0) {
       data["hdr_idHdrEventoResum"] = hdrIdHdrResum;
