@@ -16,6 +16,10 @@ mixin PersonaResultadoViewMixin on OpServicioUrbanoPageBase {
         Padding(
           padding: const EdgeInsets.fromLTRB(5, 2, 5, 8),
           child: DesingBusquedaPorCedulaWidget(
+            onReconsultarAnt: (data) async {
+              await controller.consultarLicencia(data);
+            },
+            cargandoAnt: controller.peticionServerState.value,
             widgetAntesNuevaConsulta: resultadoConsultaVariable(),
             onPressedAceptar: () {
               nuevaConsultaPersona();
@@ -24,6 +28,7 @@ mixin PersonaResultadoViewMixin on OpServicioUrbanoPageBase {
               mostrarAntecedentesPersona();
             },
             dataPersona: controller.dataPersona,
+
           ),
         ),
 

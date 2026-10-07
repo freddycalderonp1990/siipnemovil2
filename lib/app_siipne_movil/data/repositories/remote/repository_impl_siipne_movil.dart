@@ -151,4 +151,9 @@ class SiipneMovilRepositoryImpl extends SiipneMovilRepository {
       request: request,
     );
   }
+
+  @override
+  Future<DatosAnt> getLicencia({required GetLicenciaRequest request}) async {
+    return await siipneMovilRemoteDataSource.getLicencia(request: request);
+  }
 }

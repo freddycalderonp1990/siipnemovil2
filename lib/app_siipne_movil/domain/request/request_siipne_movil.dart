@@ -13,6 +13,7 @@ part 'get_datos_operativo_usuario.dart';
 part 'actualizar_resultado_request.dart';
 part 'resultados_operativo_request.dart';
 part 'antecedentes_request.dart';
+part 'get_licencia_request.dart';
 
 part 'get_datos_extranjero_documento_request.dart';
 part 'get_movimientos_migratorios_request.dart';

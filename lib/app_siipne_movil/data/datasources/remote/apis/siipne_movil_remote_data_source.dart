@@ -63,6 +63,10 @@ abstract class SiipneMovilRemoteDataSource {
   Future<ConductorVehiculo?> getDatosConductorVehiculo({
     required ConductorVehiculoRequest request,
   });
+
+  Future<DatosAnt> getLicencia({
+    required GetLicenciaRequest request,
+  });
 }
 
 class SiipneMovilRemoteDataSourceImpl implements SiipneMovilRemoteDataSource {
@@ -331,6 +335,20 @@ class SiipneMovilRemoteDataSourceImpl implements SiipneMovilRemoteDataSource {
 
     return await ExceptionHelper.manejarErroresParseJsonException(() async {
       return conductorVehiculoModelFromJson(json).conductorVehiculo;
+    });
+  }
+
+  @override
+  Future<DatosAnt> getLicencia({required GetLicenciaRequest request}) async {
+    Map<String, dynamic> body = HeadAppSiipneMovilRequest(
+      uri: SiipneMovilApiConstantes.SIIPNE_MOVIL_GET_LICENCIA_ANT,
+      bodyRequest: request.toJson(),
+    ).toJson();
+
+    String json = await UrlApiProviderAppCenso.post(body: body);
+
+    return await ExceptionHelper.manejarErroresParseJsonException(() async {
+      return datosAntModelFromJson(json);
     });
   }
 

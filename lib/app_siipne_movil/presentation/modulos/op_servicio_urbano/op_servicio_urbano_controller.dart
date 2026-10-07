@@ -61,8 +61,9 @@ class OpServicioUrbanoController extends GetxController {
   String get descripcionVariableResultadoSeleccionada =>
       variableResultadoSeleccionada.value?.desHdrTipoResum.trim() ?? '';
   List<VariablesResultado> get variablesResultadoPersona {
-    final List<VariablesResultado> lista =
-        variablesResultado.where((VariablesResultado item) {
+    final List<VariablesResultado> lista = variablesResultado.where((
+      VariablesResultado item,
+    ) {
       final String tipo = item.tipoConsulta.trim().toUpperCase();
       return tipo == 'T' || tipo == 'P';
     }).toList();
@@ -79,8 +80,9 @@ class OpServicioUrbanoController extends GetxController {
   }
 
   List<VariablesResultado> get variablesResultadoVehiculo {
-    final List<VariablesResultado> lista =
-        variablesResultado.where((VariablesResultado item) {
+    final List<VariablesResultado> lista = variablesResultado.where((
+      VariablesResultado item,
+    ) {
       final String tipo = item.tipoConsulta.trim().toUpperCase();
       return tipo == 'T' || tipo == 'V';
     }).toList();
@@ -259,13 +261,15 @@ class OpServicioUrbanoController extends GetxController {
         debugPrint('==========================================');
         debugPrint('[PUSH] ESTADO: ${push.estado.value}');
         debugPrint(
-            '[PUSH] FCM TOKEN: ${token != null && token.isNotEmpty ? 'SI' : 'NO'}');
+          '[PUSH] FCM TOKEN: ${token != null && token.isNotEmpty ? 'SI' : 'NO'}',
+        );
 
         if (defaultTargetPlatform == TargetPlatform.iOS) {
-          final String? apnsToken =
-              await FirebaseMessaging.instance.getAPNSToken();
+          final String? apnsToken = await FirebaseMessaging.instance
+              .getAPNSToken();
           debugPrint(
-              '[PUSH] APNs TOKEN: ${apnsToken != null && apnsToken.isNotEmpty ? 'SI' : 'NO'}');
+            '[PUSH] APNs TOKEN: ${apnsToken != null && apnsToken.isNotEmpty ? 'SI' : 'NO'}',
+          );
         }
 
         debugPrint('==========================================');
@@ -310,9 +314,9 @@ class OpServicioUrbanoController extends GetxController {
     if (nombreOperativoArgumento.isNotEmpty) {
       nombreOperativoActual.value = nombreOperativoArgumento;
     }
-    final String tipoAcceso = ParseModel.parseToString(
-      arguments['tipoAcceso'],
-    ).trim().toUpperCase();
+    final String tipoAcceso = ParseModel.parseToString(arguments['tipoAcceso'])
+        .trim()
+        .toUpperCase();
     int idEvento = ParseModel.parseToInt(arguments['idHdrEvento']);
     if (idEvento <= 0) {
       idEvento = ParseModel.parseToInt(arguments['numeroOperativo']);
@@ -472,10 +476,10 @@ class OpServicioUrbanoController extends GetxController {
     }
     cargandoVariablesResultado.value = true;
     try {
-      final List<VariablesResultado> resultado =
-          await siipneMovilUseCase.consultarVariblesResultado(
-        request: GetVariablesResultadosRequest(idOperativo: idOperativo),
-      );
+      final List<VariablesResultado> resultado = await siipneMovilUseCase
+          .consultarVariblesResultado(
+            request: GetVariablesResultadosRequest(idOperativo: idOperativo),
+          );
       variablesResultado.assignAll(resultado);
       final List<VariablesResultado> variablesDisponibles =
           variablesResultadoConsultaActual;
@@ -485,8 +489,9 @@ class OpServicioUrbanoController extends GetxController {
        *
        * YA NO se muestra en pantalla antes de consultar.
        */
-      variableResultadoSeleccionada.value =
-          variablesDisponibles.isNotEmpty ? variablesDisponibles.first : null;
+      variableResultadoSeleccionada.value = variablesDisponibles.isNotEmpty
+          ? variablesDisponibles.first
+          : null;
       variablesResultadoCargadas.value = true;
       errorCargaVariables.value = false;
       debugPrint('==========================================');
@@ -506,8 +511,7 @@ class OpServicioUrbanoController extends GetxController {
       variableResultadoSeleccionada.value = null;
       variablesResultadoCargadas.value = false;
       errorCargaVariables.value = true;
-      mensajeErrorVariables =
-          'No fue posible obtener las variables configuradas para el operativo.';
+      mensajeErrorVariables = 'No fue posible obtener las variables configuradas para el operativo.';
       debugPrint('ERROR VARIABLES RESULTADO: $e');
       debugPrint('$stackTrace');
       return false;
@@ -577,21 +581,20 @@ class OpServicioUrbanoController extends GetxController {
       debugPrint('VARIABLE ORIGINAL: $idVariableOriginal');
       debugPrint('VARIABLE NUEVA: $idVariableNueva');
       debugPrint('==========================================');
-      final ActualizaResultado resultado =
-          await siipneMovilUseCase.actualizaResultado(
-        request: ActualizarResultadoRequest(
-          idHdrEventoResum: idHdrEventoResum,
-          idHdrTipoResum: idVariableNueva,
-        ),
-      );
+      final ActualizaResultado resultado = await siipneMovilUseCase
+          .actualizaResultado(
+            request: ActualizarResultadoRequest(
+              idHdrEventoResum: idHdrEventoResum,
+              idHdrTipoResum: idVariableNueva,
+            ),
+          );
       if (resultado.idHdrEventoResum <= 0) {
         mensajeErrorActualizaResultado =
             'El servidor no confirmó la actualización del resultado.';
         return false;
       }
       if (resultado.idHdrEventoResum != idHdrEventoResum) {
-        mensajeErrorActualizaResultado =
-            'El registro confirmado por el servidor no corresponde a la consulta actual.';
+        mensajeErrorActualizaResultado = 'El registro confirmado por el servidor no corresponde a la consulta actual.';
         return false;
       }
       debugPrint('==========================================');
@@ -727,7 +730,7 @@ class OpServicioUrbanoController extends GetxController {
         ip: ip,
         idGenUsuario: user.idGenUsuario,
         idVariableResultado: idVariable,
-          idGenPersona:user.idGenPersona,
+        idGenPersona: user.idGenPersona,
       );
 
       dataPersona.clear();
@@ -736,8 +739,8 @@ class OpServicioUrbanoController extends GetxController {
       idVariableInsertadaPersona = 0;
       await _activarNotificacionesOperativo();
       if (isClosed) return false;
-      final DataConsultaPersona data =
-          await siipneMovilUseCase.consultarPersona(request: request);
+      final DataConsultaPersona data = await siipneMovilUseCase
+          .consultarPersona(request: request);
       push.consultasPersona.finalizar(
         consultaPush,
         consultaRepetida: data.consultaRepetida,
@@ -845,8 +848,9 @@ class OpServicioUrbanoController extends GetxController {
   // ============================================================
   // CONSULTAR VEHÍCULO
   // ============================================================
-  Future<bool> consultarVehiculoPorPlaca(
-      {required GlobalKey<FormState> key}) async {
+  Future<bool> consultarVehiculoPorPlaca({
+    required GlobalKey<FormState> key,
+  }) async {
     if (peticionServerState.value || isClosed) return false;
     mensajeErrorConsulta = '';
     mensajeErrorActualizaResultado = '';
@@ -915,8 +919,9 @@ class OpServicioUrbanoController extends GetxController {
       _limpiarPersonasVehiculo();
       await _activarNotificacionesOperativo();
       if (isClosed) return false;
-      final DataVehiculo data =
-          await siipneMovilUseCase.consultarVehiculo(request: request);
+      final DataVehiculo data = await siipneMovilUseCase.consultarVehiculo(
+        request: request,
+      );
 
       if (isClosed) return false;
       if (!data.datosVehiculo.success) {
@@ -936,7 +941,8 @@ class OpServicioUrbanoController extends GetxController {
       if (vehiculoRobado.value) {
         try {
           await UtilidadesUtil.playAudio(
-              nameAudio: AppSiipneMovilImages.audio_Alerta);
+            nameAudio: AppSiipneMovilImages.audio_Alerta,
+          );
         } catch (e) {
           debugPrint('No fue posible reproducir el audio de alerta: $e');
         }
@@ -1026,8 +1032,7 @@ class OpServicioUrbanoController extends GetxController {
     }
     final int idPadre = idHdrEventoResumVehiculo;
     if (idPadre <= 0) {
-      mensajeErrorConsulta =
-          'El vehículo no posee un identificador válido para relacionar personas.';
+      mensajeErrorConsulta = 'El vehículo no posee un identificador válido para relacionar personas.';
       return false;
     }
     final String cedula = controllerCedulaVehiculo.text.trim();
@@ -1068,7 +1073,8 @@ class OpServicioUrbanoController extends GetxController {
         variablesResultadoPersona;
     final VariablesResultado? seleccionada =
         variableResultadoSeleccionada.value;
-    final bool seleccionCompatible = seleccionada != null &&
+    final bool seleccionCompatible =
+        seleccionada != null &&
         variablesDisponibles.any(
           (VariablesResultado item) =>
               item.idVariable == seleccionada.idVariable,
@@ -1076,8 +1082,8 @@ class OpServicioUrbanoController extends GetxController {
     final int idVariable = seleccionCompatible
         ? seleccionada.idVariable
         : variablesDisponibles.isNotEmpty
-            ? variablesDisponibles.first.idVariable
-            : 0;
+        ? variablesDisponibles.first.idVariable
+        : 0;
     consultandoPersonaVehiculo.value = true;
     paginaPersonasVehiculoLoading.value = true;
     final push = OperativoPushService.instance;
@@ -1116,12 +1122,13 @@ class OpServicioUrbanoController extends GetxController {
         idGenUsuario: user.idGenUsuario,
         idVariableResultado: idVariable,
         hdrIdHdrResum: idPadre,
-        tipoRelacion: esConductor ? 'CONDUCTOR' : 'OCUPANTE', idGenPersona:user.idGenPersona
+        tipoRelacion: esConductor ? 'CONDUCTOR' : 'OCUPANTE',
+        idGenPersona: user.idGenPersona,
       );
       await _activarNotificacionesOperativo();
       if (isClosed) return false;
-      final DataConsultaPersona persona =
-          await siipneMovilUseCase.consultarPersona(request: request);
+      final DataConsultaPersona persona = await siipneMovilUseCase
+          .consultarPersona(request: request);
       push.consultasPersona.finalizar(
         consultaPush,
         consultaRepetida: persona.consultaRepetida,
@@ -1255,8 +1262,7 @@ class OpServicioUrbanoController extends GetxController {
       return;
     }
     if (idHdrEventoResumVehiculo <= 0) {
-      mensajeErrorConsulta =
-          'El vehículo no posee un idHdrEventoResum válido para relacionar personas.';
+      mensajeErrorConsulta = 'El vehículo no posee un idHdrEventoResum válido para relacionar personas.';
       return;
     }
     await consultarExistenciaConductor();
@@ -1270,8 +1276,9 @@ class OpServicioUrbanoController extends GetxController {
       return false;
     }
 
-    final String placa =
-        dataVehiculo.first.datosVehiculo.data.placa.trim().toUpperCase();
+    final String placa = dataVehiculo.first.datosVehiculo.data.placa
+        .trim()
+        .toUpperCase();
     if (placa.isEmpty) {
       mensajeErrorConsulta = 'No fue posible determinar la placa del vehículo.';
       return false;
@@ -1285,13 +1292,13 @@ class OpServicioUrbanoController extends GetxController {
       conductorRegistradoEnBaseDeDatos.value = false;
       conductorDesdeBase.value = null;
 
-      final ConductorVehiculo? resultado =
-          await siipneMovilUseCase.getDatosConductorVehiculo(
-        request: ConductorVehiculoRequest(
-          idHdrEvento: idHdrEventoActual.value,
-          placa: placa,
-        ),
-      );
+      final ConductorVehiculo? resultado = await siipneMovilUseCase
+          .getDatosConductorVehiculo(
+            request: ConductorVehiculoRequest(
+              idHdrEvento: idHdrEventoActual.value,
+              placa: placa,
+            ),
+          );
 
       if (resultado == null ||
           resultado.cedula.trim().isEmpty ||
@@ -1306,14 +1313,14 @@ class OpServicioUrbanoController extends GetxController {
       tipoPersonaVehiculo.value = 'OCUPANTE';
 
       debugPrint(
-          'CONDUCTOR SERVIDOR [$placa]: ${resultado.cedula} - ${resultado.conductor}');
+        'CONDUCTOR SERVIDOR [$placa]: ${resultado.cedula} - ${resultado.conductor}',
+      );
       return true;
     } catch (e, stackTrace) {
       conductorRegistradoEnBaseDeDatos.value = false;
       conductorDesdeBase.value = null;
       tipoPersonaVehiculo.value = 'CONDUCTOR';
-      mensajeErrorConsulta =
-          'No fue posible verificar el conductor del vehículo. Intente nuevamente.';
+      mensajeErrorConsulta = 'No fue posible verificar el conductor del vehículo. Intente nuevamente.';
       debugPrint('ERROR CONSULTANDO CONDUCTOR [$placa]: $e');
       debugPrint('$stackTrace');
       return false;
@@ -1381,8 +1388,7 @@ class OpServicioUrbanoController extends GetxController {
         return false;
       }
       if (resultado.idHdrEvento != idEvento) {
-        mensajeErrorFinalizar =
-            'El operativo confirmado por el servidor no corresponde al operativo actual.';
+        mensajeErrorFinalizar = 'El operativo confirmado por el servidor no corresponde al operativo actual.';
         return false;
       }
       // No convertir un fallo push en fallo de finalización ya confirmada.
@@ -1417,8 +1423,9 @@ class OpServicioUrbanoController extends GetxController {
     controllerCedulaVehiculo.clear();
     paginaPersonasVehiculoLoading.value = false;
 
-    tipoPersonaVehiculo.value =
-        conductorRegistradoEnBaseDeDatos.value ? 'OCUPANTE' : 'CONDUCTOR';
+    tipoPersonaVehiculo.value = conductorRegistradoEnBaseDeDatos.value
+        ? 'OCUPANTE'
+        : 'CONDUCTOR';
   }
 
   // ============================================================
@@ -1459,10 +1466,10 @@ class OpServicioUrbanoController extends GetxController {
       debugPrint('CONSULTANDO PERSONAL DEL OPERATIVO');
       debugPrint('ID HDR EVENTO: $idEvento');
       debugPrint('==========================================');
-      final List<Integrante> resultado =
-          await siipneMovilUseCase.consultarPersonalOperativo(
-        request: GetDatosPoliciasOperativoRequest(idHdrEvento: idEvento),
-      );
+      final List<Integrante> resultado = await siipneMovilUseCase
+          .consultarPersonalOperativo(
+            request: GetDatosPoliciasOperativoRequest(idHdrEvento: idEvento),
+          );
       personalOperativo.assignAll(resultado);
       debugPrint('PERSONAL RECIBIDO: ${personalOperativo.length}');
       if (personalOperativo.isEmpty) {
@@ -1589,10 +1596,10 @@ class OpServicioUrbanoController extends GetxController {
       debugPrint('CONSULTANDO RESUMEN DEL OPERATIVO');
       debugPrint('ID HDR EVENTO: $idEvento');
       debugPrint('==========================================');
-      final ResultadosOperativo resultado =
-          await siipneMovilUseCase.getDatosResultadosOperativo(
-        request: ResultadosOperativoRequest(idHdrEvento: idEvento),
-      );
+      final ResultadosOperativo resultado = await siipneMovilUseCase
+          .getDatosResultadosOperativo(
+            request: ResultadosOperativoRequest(idHdrEvento: idEvento),
+          );
       if (resultado.idHdrEvento <= 0) {
         mensajeErrorResultadosOperativo =
             'El servidor no devolvió información válida del operativo.';
@@ -1702,10 +1709,10 @@ class OpServicioUrbanoController extends GetxController {
         'ORIGEN: ${personaConsulta != null ? 'PERSONA VEHÍCULO' : 'CONSULTA PRINCIPAL'}',
       );
       debugPrint('==========================================');
-      final DataAntecedentes resultado =
-          await siipneMovilUseCase.getDatosAntecedentes(
-        request: AntecedentesRequest(documento: documento),
-      );
+      final DataAntecedentes resultado = await siipneMovilUseCase
+          .getDatosAntecedentes(
+            request: AntecedentesRequest(documento: documento),
+          );
       datosAntecedentesPersona.value = resultado;
       debugPrint('==========================================');
       debugPrint('ANTECEDENTES CONSULTADOS');
@@ -1751,17 +1758,15 @@ class OpServicioUrbanoController extends GetxController {
 
     super.onClose();
   }
-// ============================================================
-// BIOMETRÍA
-// ============================================================
+  // ============================================================
+  // BIOMETRÍA
+  // ============================================================
 
   Future<bool> biometriaConfiguradaEnApp() async {
     try {
       return await loginController.biometriaConfiguradaEnApp();
     } catch (e) {
-      debugPrint(
-        '[CIERRE BIOMETRIA] Error verificando configuración: $e',
-      );
+      debugPrint('[CIERRE BIOMETRIA] Error verificando configuración: $e');
       return false;
     }
   }
@@ -1788,9 +1793,7 @@ class OpServicioUrbanoController extends GetxController {
       final bool soportado = await auth.isDeviceSupported();
 
       if (!soportado) {
-        debugPrint(
-          '[CIERRE BIOMETRIA] Dispositivo sin soporte biométrico',
-        );
+        debugPrint('[CIERRE BIOMETRIA] Dispositivo sin soporte biométrico');
         return false;
       }
 
@@ -1798,20 +1801,16 @@ class OpServicioUrbanoController extends GetxController {
       final bool disponible = await auth.canCheckBiometrics;
 
       if (!disponible) {
-        debugPrint(
-          '[CIERRE BIOMETRIA] Biometría no disponible',
-        );
+        debugPrint('[CIERRE BIOMETRIA] Biometría no disponible');
         return false;
       }
 
       // 4. Verificar que exista biometría registrada.
-      final List<BiometricType> biometricos =
-          await auth.getAvailableBiometrics();
+      final List<BiometricType> biometricos = await auth
+          .getAvailableBiometrics();
 
       if (biometricos.isEmpty) {
-        debugPrint(
-          '[CIERRE BIOMETRIA] No existen biométricos registrados',
-        );
+        debugPrint('[CIERRE BIOMETRIA] No existen biométricos registrados');
         return false;
       }
 
@@ -1824,30 +1823,25 @@ class OpServicioUrbanoController extends GetxController {
       debugPrint('==========================================');
 
       final bool autenticado = await auth.authenticate(
-        localizedReason: 'Confirme su identidad para finalizar el operativo '
+        localizedReason:
+            'Confirme su identidad para finalizar el operativo '
             '${idHdrEventoActual.value}',
         biometricOnly: true,
         persistAcrossBackgrounding: true,
       );
 
       if (!autenticado) {
-        debugPrint(
-          '[CIERRE BIOMETRIA] Autenticación no completada',
-        );
+        debugPrint('[CIERRE BIOMETRIA] Autenticación no completada');
         return false;
       }
 
-      debugPrint(
-        '[CIERRE BIOMETRIA] Identidad confirmada correctamente',
-      );
+      debugPrint('[CIERRE BIOMETRIA] Identidad confirmada correctamente');
 
       return true;
     } on LocalAuthException catch (e) {
       // Cancelar el diálogo biométrico NO es un error del sistema.
       if (e.code == LocalAuthExceptionCode.userCanceled) {
-        debugPrint(
-          '[CIERRE BIOMETRIA] Autenticación cancelada por el usuario',
-        );
+        debugPrint('[CIERRE BIOMETRIA] Autenticación cancelada por el usuario');
         return false;
       }
 
@@ -1858,9 +1852,7 @@ class OpServicioUrbanoController extends GetxController {
 
       return false;
     } catch (e, stackTrace) {
-      debugPrint(
-        '[CIERRE BIOMETRIA] Error inesperado: $e',
-      );
+      debugPrint('[CIERRE BIOMETRIA] Error inesperado: $e');
       debugPrint('$stackTrace');
 
       return false;
@@ -1885,12 +1877,12 @@ class OpServicioUrbanoController extends GetxController {
     final String tipo = data['tipo']?.toString().trim().toUpperCase() ?? '';
     if (tipo != 'BOLETA' && tipo != 'VEHICULO_ROBADO') return;
 
-    final String alertaId = data['_pushId']?.toString().trim() ??
+    final String alertaId =
+        data['_pushId']?.toString().trim() ??
         data['alertaId']?.toString().trim() ??
         '${idEvento}_${data['idHdrEventoResum']}_${tipo}';
 
-    if (alertaId.isEmpty ||
-        _alertasPushMostradas.contains(alertaId)) {
+    if (alertaId.isEmpty || _alertasPushMostradas.contains(alertaId)) {
       return;
     }
 
@@ -1901,18 +1893,19 @@ class OpServicioUrbanoController extends GetxController {
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-
       if (isClosed) return;
 
-      _colaDialogosPush = _colaDialogosPush.then((_) async {
-        if (!await push.consultasPersona.permitirAlerta(data)) return;
-        if (isClosed) return;
-        await _mostrarDialogoAlertaPush(data);
-      }).catchError((Object error, StackTrace stackTrace) {
-        _alertasPushMostradas.remove(alertaId);
-        debugPrint('[PUSH] Error mostrando diálogo: $error');
-        debugPrintStack(stackTrace: stackTrace);
-      });
+      _colaDialogosPush = _colaDialogosPush
+          .then((_) async {
+            if (!await push.consultasPersona.permitirAlerta(data)) return;
+            if (isClosed) return;
+            await _mostrarDialogoAlertaPush(data);
+          })
+          .catchError((Object error, StackTrace stackTrace) {
+            _alertasPushMostradas.remove(alertaId);
+            debugPrint('[PUSH] Error mostrando diálogo: $error');
+            debugPrintStack(stackTrace: stackTrace);
+          });
 
       if (identical(push.alertaCritica.value, data)) {
         push.limpiarAlertaCritica();
@@ -1933,8 +1926,8 @@ class OpServicioUrbanoController extends GetxController {
     final String mensaje = valor('_mensaje').isNotEmpty
         ? valor('_mensaje')
         : esVehiculo
-            ? 'Se ha detectado un vehículo con alerta durante el operativo.'
-            : 'Se ha detectado una persona con alerta durante el operativo.';
+        ? 'Se ha detectado un vehículo con alerta durante el operativo.'
+        : 'Se ha detectado una persona con alerta durante el operativo.';
 
     final String placa = valor('placa').toUpperCase();
     final String cedula = valor('cedula');
@@ -2277,9 +2270,7 @@ class OpServicioUrbanoController extends GetxController {
                     decoration: BoxDecoration(
                       color: const Color(0xFF091421),
                       border: Border(
-                        top: BorderSide(
-                          color: Colors.white.withOpacity(.06),
-                        ),
+                        top: BorderSide(color: Colors.white.withOpacity(.06)),
                       ),
                     ),
                     child: SizedBox(
@@ -2298,10 +2289,7 @@ class OpServicioUrbanoController extends GetxController {
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Icon(
-                              Icons.verified_user_outlined,
-                              size: 20,
-                            ),
+                            Icon(Icons.verified_user_outlined, size: 20),
                             SizedBox(width: 8),
                             Text(
                               'CONFIRMAR ALERTA',
@@ -2327,18 +2315,13 @@ class OpServicioUrbanoController extends GetxController {
     );
   }
 
-  Widget _chipAlertaPush({
-    required String texto,
-    required IconData icono,
-  }) {
+  Widget _chipAlertaPush({required String texto, required IconData icono}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       decoration: BoxDecoration(
         color: const Color(0xFFD71920).withOpacity(.17),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: const Color(0xFFFF3B43).withOpacity(.42),
-        ),
+        border: Border.all(color: const Color(0xFFFF3B43).withOpacity(.42)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -2392,8 +2375,9 @@ class OpServicioUrbanoController extends GetxController {
             child: Icon(
               icono,
               size: 18,
-              color:
-                  destacado ? const Color(0xFFFF4D55) : const Color(0xFF78A9D4),
+              color: destacado
+                  ? const Color(0xFFFF4D55)
+                  : const Color(0xFF78A9D4),
             ),
           ),
           const SizedBox(width: 9),
@@ -2442,9 +2426,9 @@ class OpServicioUrbanoController extends GetxController {
     consultaRepetida = false;
   }
 
-// ============================================================
-// SELECCIONAR PERSONA
-// ============================================================
+  // ============================================================
+  // SELECCIONAR PERSONA
+  // ============================================================
   Future<void> seleccionarPersona() async {
     if (cargandoVariablesResultado.value ||
         peticionServerState.value ||
@@ -2484,13 +2468,14 @@ class OpServicioUrbanoController extends GetxController {
     selectVehiculo.value = false;
 
     final List<VariablesResultado> variables = variablesResultadoPersona;
-    variableResultadoSeleccionada.value =
-        variables.isNotEmpty ? variables.first : null;
+    variableResultadoSeleccionada.value = variables.isNotEmpty
+        ? variables.first
+        : null;
   }
 
-// ============================================================
-// SELECCIONAR VEHÍCULO
-// ============================================================
+  // ============================================================
+  // SELECCIONAR VEHÍCULO
+  // ============================================================
   Future<void> seleccionarVehiculo() async {
     if (cargandoVariablesResultado.value ||
         peticionServerState.value ||
@@ -2529,21 +2514,22 @@ class OpServicioUrbanoController extends GetxController {
     selectVehiculo.value = true;
 
     final List<VariablesResultado> variables = variablesResultadoVehiculo;
-    variableResultadoSeleccionada.value =
-        variables.isNotEmpty ? variables.first : null;
+    variableResultadoSeleccionada.value = variables.isNotEmpty
+        ? variables.first
+        : null;
   }
 
-// ============================================================
-// MOSTRAR ERROR AL CAMBIAR TIPO DE CONSULTA
-// ============================================================
+  // ============================================================
+  // MOSTRAR ERROR AL CAMBIAR TIPO DE CONSULTA
+  // ============================================================
   void _mostrarErrorCambioConsulta() {
     if (isClosed) return;
 
     final String mensaje = mensajeErrorConsulta.trim().isNotEmpty
         ? mensajeErrorConsulta.trim()
         : mensajeErrorActualizaResultado.trim().isNotEmpty
-            ? mensajeErrorActualizaResultado.trim()
-            : 'No fue posible continuar con la nueva consulta. Verifique la información registrada.';
+        ? mensajeErrorActualizaResultado.trim()
+        : 'No fue posible continuar con la nueva consulta. Verifique la información registrada.';
 
     DialogosAwesome.getWarning(
       title: "NO ES POSIBLE CONTINUAR",
@@ -2564,8 +2550,9 @@ class OpServicioUrbanoController extends GetxController {
       return false;
     }
 
-    final String placa =
-        dataVehiculo.first.datosVehiculo.data.placa.trim().toUpperCase();
+    final String placa = dataVehiculo.first.datosVehiculo.data.placa
+        .trim()
+        .toUpperCase();
 
     debugPrint('==========================================');
     debugPrint('VALIDANDO VEHÍCULO ANTES DE NUEVA CONSULTA');
@@ -2632,5 +2619,30 @@ class OpServicioUrbanoController extends GetxController {
     limpiarSeleccionConsulta();
 
     return true;
+  }
+
+  Future<void> consultarLicencia(DataConsultaPersona data) async {
+    peticionServerState(true);
+
+    try {
+      await ExceptionDialogos.manejarErroresShowDialogo(
+        showMsjNodata: false,
+            () async {
+          final GetLicenciaRequest request = GetLicenciaRequest(
+            documento: data.dataSiipne.datosSiipne.documento,
+          );
+
+
+          final DatosAnt respuesta =
+          await siipneMovilUseCase.getLicencia(
+            request: request,
+          );
+
+          data.datosAnt = respuesta;
+        },
+      );
+    } finally {
+      peticionServerState(false);
+    }
   }
 }

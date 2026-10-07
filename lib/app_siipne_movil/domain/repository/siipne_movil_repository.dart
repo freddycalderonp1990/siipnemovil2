@@ -63,4 +63,11 @@ abstract class SiipneMovilRepository {
   Future<ConductorVehiculo?> getDatosConductorVehiculo({
     required ConductorVehiculoRequest request,
   });
+
+  Future<DatosAnt> getLicencia({
+    required GetLicenciaRequest request,
+  });
+
+
+
 }

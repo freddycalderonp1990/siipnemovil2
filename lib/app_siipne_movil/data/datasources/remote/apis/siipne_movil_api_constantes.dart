@@ -19,6 +19,7 @@ class SiipneMovilApiConstantes {
   static const SIIPNE_MOVIL_PUT_RESULTADO = "v1-put-variable-resultado";
   static const SIIPNE_MOVIL_GET_RESULTADO_OPERATIVO = "v1-get-resultados-operativo";
   static const SIIPNE_MOVIL_GET_ANTECEDENTES_PERSONA ="v1-get-antecedentes-persona";
+  static const SIIPNE_MOVIL_GET_LICENCIA_ANT = "v1-get-licencia-ant";
 
 
   ///////////////// OPERATIVOS MIGRACIÓN

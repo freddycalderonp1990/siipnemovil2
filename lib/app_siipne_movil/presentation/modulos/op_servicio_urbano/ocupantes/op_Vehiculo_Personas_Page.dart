@@ -1271,14 +1271,20 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                       padding: const EdgeInsets.all(12),
                       child: Column(
                         children: [
-                          DesingBusquedaPorCedulaWidget(
-                            dataPersona: [persona],
-                            onPressedAceptar: () {
-                              Navigator.of(dialogContext).pop();
-                            },
-                            onPressedAntecedentes: () {
-                              _mostrarAntecedentesPersonaVehiculo(persona, rol);
-                            },
+                          Obx(
+                                () => DesingBusquedaPorCedulaWidget(
+                              onReconsultarAnt: (data) async {
+                                await controller.consultarLicencia(data);
+                              },
+                              cargandoAnt: controller.peticionServerState.value,
+                              dataPersona: [persona],
+                              onPressedAceptar: () {
+                                Navigator.of(dialogContext).pop();
+                              },
+                              onPressedAntecedentes: () {
+                                _mostrarAntecedentesPersonaVehiculo(persona, rol);
+                              },
+                            ),
                           ),
                         ],
                       ),

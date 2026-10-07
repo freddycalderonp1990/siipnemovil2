@@ -548,7 +548,14 @@ mixin VehiculoResultadoViewMixin on OpServicioUrbanoPageBase {
             ),
           ),
 
+
           DesingBusquedaPorCedulaWidget(
+            onReconsultarAnt: (data) async {
+              print("vehiculo resultado");
+              await controller.consultarLicencia(data);
+            },
+            cargandoAnt: controller.peticionServerState.value,
+
             onPressedAceptar: onEliminar,
             dataPersona: <DataConsultaPersona>[data],
           ),

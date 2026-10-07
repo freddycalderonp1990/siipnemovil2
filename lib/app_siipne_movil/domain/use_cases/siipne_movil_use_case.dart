@@ -7,6 +7,10 @@ class SiipneMovilUseCase {
 
   SiipneMovilUseCase({required this.repository});
 
+  Future<DatosAnt> getLicencia({required GetLicenciaRequest request}) {
+    return repository.getLicencia(request: request);
+  }
+
   Future<List<DataModulo>> getModulos({
     required GetPermisosModulosRequest request,
   }) {

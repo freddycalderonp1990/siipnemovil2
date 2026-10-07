@@ -35,7 +35,7 @@ class DataConsultaPersona {
   final DataSiipne dataSiipne;
   final DataDinardap dataDinardap;
   final OrdenCaptura ordenCaptura;
-  final DatosAnt datosAnt;
+   DatosAnt datosAnt;
   final int idGenPersona;
   final int idHdrEventoResum;
   final bool consultaRepetida;
@@ -194,6 +194,11 @@ class Edad {
 
   Map<String, dynamic> toJson() => {"anos": anos, "meses": meses, "dias": dias};
 }
+
+
+DatosAnt datosAntModelFromJson(String str) => DatosAnt.fromJson(json.decode(str));
+
+String datosAntModelToJson(DatosAnt data) => json.encode(data.toJson());
 
 class DatosAnt {
   final bool success;

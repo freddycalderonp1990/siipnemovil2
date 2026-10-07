@@ -11,6 +11,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
 
 
 
+
   const DesingDatosVehiculoWg({
     Key? key,
     required this.data,
@@ -32,7 +33,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
         const SizedBox(height: 7),
         _datosVehiculo(),
         const SizedBox(height: 7),
-        _datosPropietario(),
+       _datosPropietario(),
         const SizedBox(height: 7),
         DesingRestriccionVehiculoWg(
           data: data.restriccionPj,
@@ -189,10 +190,11 @@ class DesingDatosVehiculoWg extends StatelessWidget {
   Widget _datosVehiculo() {
     final DatosVehiculoSiipneData v = data.datosVehiculo.data;
 
+
     return _cardSeccion(
       icono: Icons.directions_car_outlined,
-      titulo: "INFORMACIÓN VEHICULAR",
-      subtitulo: "Datos obtenidos de ${v.fuente}",
+      titulo: "INFORMACIÓN VEHICULAR ",
+      subtitulo: "Datos obtenidos de ${v.fuente} - ${data.datosVehiculo.data.msjSwAnt}",
       child: Column(
         children: [
           _fila2(
@@ -201,6 +203,23 @@ class DesingDatosVehiculoWg extends StatelessWidget {
               titulo: "PLACA",
               valor: v.placa,
             ),
+
+            _miniDatoCompacto(
+              icono: Icons.fact_check_outlined,
+              titulo: "PLACA ANTERIOR",
+              valor: v.placaAnterior,
+            ),
+          ),
+
+          const SizedBox(height: 4),
+
+          _fila2(
+            _miniDatoCompacto(
+              icono: Icons.pin_outlined,
+              titulo: "CLASE",
+              valor: v.clase,
+            ),
+
             _miniDatoCompacto(
               icono: Icons.fact_check_outlined,
               titulo: "MODELO",
@@ -242,8 +261,8 @@ class DesingDatosVehiculoWg extends StatelessWidget {
             ),
             _miniDatoCompacto(
               icono: Icons.palette_outlined,
-              titulo: "COLOR",
-              valor: v.color,
+              titulo: "COLOR1 - COLOR2",
+              valor: "${v.color} - ${v.color2}",
             ),
           ),
         ],
@@ -280,7 +299,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Row(
+           Row(
             children: [
               Icon(
                 Icons.person_pin_circle_outlined,
@@ -301,7 +320,7 @@ class DesingDatosVehiculoWg extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "Identificación y datos del propietario del vehículo",
+                      "Identificación y datos del propietario del vehículo - ${data.datospropietario.message}",
                       style: TextStyle(
                         color: Color(0xFF8493A1),
                         fontSize: 8,
@@ -650,12 +669,16 @@ class DesingDatosVehiculoWg extends StatelessWidget {
 
     Widget placeholder() {
       return Container(
-        color: const Color(0xFFEAF2FA),
-        child: const Center(
-          child: Icon(Icons.person_rounded, color: Color(0xFF7796B3), size: 40),
+        color:  Color(0xFFEAF2FA),
+        child:  Center(
+          child:  Image.asset(
+            AppSiipneMovilImages.icon_ANT,
+            fit: BoxFit.contain,
+          ),
         ),
       );
     }
+
 
     Widget contenedor(Widget child) {
       return Container(

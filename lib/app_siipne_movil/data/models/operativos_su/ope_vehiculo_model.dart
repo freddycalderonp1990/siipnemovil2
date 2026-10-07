@@ -187,6 +187,7 @@ class DatosVehiculoSiipneData {
   String fuente;
   String msjSwAnt;
   double tiempoRespuesta;
+  bool existeRespuestaSwAnt;
 
   DatosVehiculoSiipneData({
     required this.idGenVehiculo,
@@ -214,6 +215,7 @@ class DatosVehiculoSiipneData {
     required this.fuente,
     required this.msjSwAnt,
     required this.tiempoRespuesta,
+    required this.existeRespuestaSwAnt
   });
 
   factory DatosVehiculoSiipneData.fromJson(Map<String, dynamic> json) =>
@@ -243,6 +245,7 @@ class DatosVehiculoSiipneData {
         fuente: ParseModel.parseToString(json['fuente']),
         msjSwAnt: ParseModel.parseToString(json['msjSwAnt']),
         tiempoRespuesta: ParseModel.parseToDouble(json['tiempoRespuesta']),
+        existeRespuestaSwAnt: ParseModel.parseToBool(json['existeRespuestaSwAnt']),
       );
 
   factory DatosVehiculoSiipneData.empty() => DatosVehiculoSiipneData(
@@ -271,6 +274,7 @@ class DatosVehiculoSiipneData {
     fuente: '',
     msjSwAnt: '',
     tiempoRespuesta: 0.0,
+    existeRespuestaSwAnt: false
   );
 
   bool get tieneIdentificacion =>

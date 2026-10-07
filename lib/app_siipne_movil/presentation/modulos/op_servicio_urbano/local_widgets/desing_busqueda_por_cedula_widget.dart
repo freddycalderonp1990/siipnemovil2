@@ -14,6 +14,8 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
   final VoidCallback? onPressedAceptar;
   final VoidCallback? onPressedAntecedentes;
   final Widget? widgetAntesNuevaConsulta;
+  final Future<void> Function(DataConsultaPersona data)? onReconsultarAnt;
+  final bool cargandoAnt;
 
   const DesingBusquedaPorCedulaWidget({
     super.key,
@@ -21,6 +23,8 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
     this.onPressedAceptar,
     this.onPressedAntecedentes,
     this.widgetAntesNuevaConsulta,
+    this.onReconsultarAnt,
+    this.cargandoAnt = false,
   });
 
   @override
@@ -37,8 +41,6 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
   // ============================================================
 
   Widget _contenido() {
-    final ResponsiveUtil responsive = ResponsiveUtil();
-
     return ListView.separated(
       /*
        * IMPORTANTE:
@@ -155,7 +157,13 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
 
                   const SizedBox(height: 8),
 
-                  _cardDatosAnt(data),
+                  _cardDatosAnt(
+                    data,
+                    onReconsultarAnt: onReconsultarAnt == null
+                        ? null
+                        : () => onReconsultarAnt!(data),
+                    cargandoAnt: cargandoAnt,
+                  ),
                   const SizedBox(height: 8),
 
                   // ============================================
@@ -579,7 +587,7 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
                     const SizedBox(height: 8),
 
                     _detalleVisualOrden(orden),
-                    if ( data.ordenCaptura.datosCaptura.length > 1) ...[
+                    if (data.ordenCaptura.datosCaptura.length > 1) ...[
                       const SizedBox(height: 9),
                       SizedBox(
                         width: double.infinity,
@@ -589,7 +597,7 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
                           ),
                           icon: const Icon(Icons.list_alt_rounded, size: 17),
                           label: Text(
-                            "VER TODAS (${ data.ordenCaptura.datosCaptura.length})",
+                            "VER TODAS (${data.ordenCaptura.datosCaptura.length})",
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFFB42318),
@@ -1289,7 +1297,11 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
   // CARD ANT
   // ============================================================
 
-  Widget _cardDatosAnt(DataConsultaPersona data) {
+  Widget _cardDatosAnt(
+    DataConsultaPersona data, {
+    VoidCallback? onReconsultarAnt,
+    bool cargandoAnt = false,
+  }) {
     final bool existe = data.datosAnt.success;
 
     if (!existe) {
@@ -1343,6 +1355,82 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+
+                  const SizedBox(height: 7),
+
+                  if (onReconsultarAnt != null)
+                    if (onReconsultarAnt != null)
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: cargandoAnt ? null : onReconsultarAnt,
+                          borderRadius: BorderRadius.circular(20),
+                          child: Container(
+                            height: 32,
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            decoration: BoxDecoration(
+                              color: cargandoAnt
+                                  ? const Color(0xFFF1F3F5)
+                                  : const Color(0xFFEAF3FC),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: cargandoAnt
+                                    ? const Color(0xFFD8DEE4)
+                                    : const Color(0xFFB7D0E7),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (cargandoAnt)
+                                  const SizedBox(
+                                    width: 13,
+                                    height: 13,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 1.8,
+                                    ),
+                                  )
+                                else
+                                  const Icon(
+                                    Icons.refresh_rounded,
+                                    color: Color(0xFF195BA6),
+                                    size: 14,
+                                  ),
+
+                                const SizedBox(width: 5),
+
+                                Text(
+                                  cargandoAnt
+                                      ? "CONSULTANDO..."
+                                      : "VOLVER A CONSULTAR",
+                                  style: TextStyle(
+                                    color: cargandoAnt
+                                        ? const Color(0xFF8796A5)
+                                        : const Color(0xFF195BA6),
+                                    fontSize: 8,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: .1,
+                                  ),
+                                ),
+
+                                if (!cargandoAnt) ...[
+                                  const SizedBox(width: 3),
+
+                                  const Icon(
+                                    Icons.chevron_right_rounded,
+                                    color: Color(0xFF5E87AD),
+                                    size: 15,
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+
+
+
                 ],
               ),
             ),
@@ -1434,9 +1522,7 @@ class DesingBusquedaPorCedulaWidget extends StatelessWidget {
 
           if (ant.licencias.isNotEmpty) ...[
             const SizedBox(height: 9),
-
             const Divider(height: 1, color: Color(0xFFD6E3ED)),
-
             const SizedBox(height: 8),
 
             const Row(
