@@ -38,8 +38,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "6.0.0"
-      resolved-ref: "54c42c51906a134659b30758f822abe1590f0e5e"
+      ref: "6.0.1"
+      resolved-ref: a83894ce2ced37a04a732c51d22bb39858a8cf9c
       url: "https://github.com/freddycalderonp1990/app_mi_upc.git"
     source: git
     version: "0.0.1"

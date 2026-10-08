@@ -98,7 +98,7 @@ dependencies:
   app_mi_upc:
     git:
       url: https://github.com/freddycalderonp1990/app_mi_upc.git
-      ref: 6.0.0
+      ref: 6.0.1
 
 
 dev_dependencies:
