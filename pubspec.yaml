@@ -81,12 +81,14 @@ dependencies:
   #QLCipher permite cifrar la base de datos SQLite, protegiendo la información almacenada mediante una clave
   # de seguridad y evitando que pueda ser consultada directamente sin autorización.
   sqflite_sqlcipher: ^3.4.1 # base de datos
-  flutter_secure_storage: ^11.2.0 #reemplaza SharedPreferences
+  flutter_secure_storage: ^10.3.1 #reemplaza SharedPreferences
 
 
   country_utils: ^0.5.3
   mobile_scanner: ^7.4.0
   cryptography: ^2.9.0
+
+
 
   api_provider:
     git:
@@ -96,7 +98,8 @@ dependencies:
   app_mi_upc:
     git:
       url: https://github.com/freddycalderonp1990/app_mi_upc.git
-      ref: v5.0.1
+      ref: 6.0.0
+
 
 dev_dependencies:
   flutter_test:
