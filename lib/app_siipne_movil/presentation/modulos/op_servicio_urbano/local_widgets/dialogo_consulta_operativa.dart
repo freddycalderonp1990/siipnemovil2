@@ -66,11 +66,11 @@ class _DialogoConsultaOperativaState extends State<DialogoConsultaOperativa> {
     if (documento.isEmpty) {
       return widget.esPersona
           ? 'Ingrese un documento.'
-          : 'Ingrese una placa válida.';
+          : 'Ingrese una placa/chasis/motor válido.';
     }
     if (!widget.esPersona &&
-        !RegExp(r'^[A-Za-z0-9]{6,7}$').hasMatch(documento)) {
-      return 'La placa debe tener mínimo 6 caracteres.';
+        !RegExp(r'^[A-Za-z0-9]{6,100}$').hasMatch(documento)) {
+      return 'Debe tener mínimo 6 caracteres.';
     }
     if (widget.esPersona &&
         !_extranjero &&
@@ -448,7 +448,7 @@ class _DialogoConsultaOperativaState extends State<DialogoConsultaOperativa> {
                       autofocus: true,
                       maxLength: widget.esPersona
                           ? (_extranjero ? null : 10)
-                          : 7,
+                          : 100,
                       keyboardType: widget.esPersona && !_extranjero
                           ? TextInputType.number
                           : TextInputType.text,
@@ -475,7 +475,7 @@ class _DialogoConsultaOperativaState extends State<DialogoConsultaOperativa> {
                             ? (_extranjero
                                   ? 'Documento extranjero'
                                   : 'Número de cédula')
-                            : 'Placa',
+                            : 'Placa/Chasis/Motor',
                         hintText: widget.esPersona
                             ? (_extranjero
                                   ? 'Pasaporte o identificación'
