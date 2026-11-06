@@ -38,15 +38,16 @@ class _DialogoConsultaOperativaState extends State<DialogoConsultaOperativa> {
   Country? _pais;
   String _error = '';
   bool _consultaRepetida = false;
+  String _documentoConsultado = ''; // Variable segura para congelar el documento de la alerta
 
   bool get _ocupado => _confirmando || _consultando;
   String get _nacionalidad =>
       _extranjero ? _pais?.isoCodeAlpha3.toUpperCase() ?? '' : 'ECU';
   bool get _puedeConsultar =>
       !_ocupado &&
-      !_consultaRepetida &&
-      _validarDocumento(widget.documentoController.text) == null &&
-      (!widget.esPersona || !_extranjero || _pais != null);
+          !_consultaRepetida &&
+          _validarDocumento(widget.documentoController.text) == null &&
+          (!widget.esPersona || !_extranjero || _pais != null);
 
   @override
   void initState() {
@@ -97,7 +98,6 @@ class _DialogoConsultaOperativaState extends State<DialogoConsultaOperativa> {
     if (route.isCurrent) {
       navigator.pop<bool>(resultado);
     } else {
-      // Una alerta puede abrirse encima mientras termina la consulta.
       navigator.removeRoute<bool>(route, resultado);
     }
   }
@@ -107,15 +107,19 @@ class _DialogoConsultaOperativaState extends State<DialogoConsultaOperativa> {
         !(widget.formKey.currentState?.validate() ?? false)) {
       return;
     }
+
+    // Capturamos el documento antes de realizar llamadas asíncronas
+    final documentoActual = widget.documentoController.text.trim().toUpperCase();
+
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() {
       _confirmando = true;
       _error = '';
       _consultaRepetida = false;
+      _documentoConsultado = documentoActual;
     });
 
     try {
-      final documento = widget.documentoController.text.trim().toUpperCase();
       final confirmado = await showDialog<bool>(
         context: context,
         barrierDismissible: false,
@@ -143,7 +147,7 @@ class _DialogoConsultaOperativaState extends State<DialogoConsultaOperativa> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      documento,
+                      documentoActual,
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
@@ -218,11 +222,12 @@ class _DialogoConsultaOperativaState extends State<DialogoConsultaOperativa> {
     } catch (error, stackTrace) {
       debugPrint('Error en consulta operativa: $error');
       debugPrintStack(stackTrace: stackTrace);
-      if (mounted)
+      if (mounted) {
         setState(
-          () => _error =
-              'No fue posible realizar la consulta. Intente nuevamente.',
+              () => _error =
+          'No fue posible realizar la consulta. Intente nuevamente.',
         );
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -237,46 +242,78 @@ class _DialogoConsultaOperativaState extends State<DialogoConsultaOperativa> {
     return Semantics(
       liveRegion: true,
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFFE8F1FA),
-          borderRadius: BorderRadius.circular(13),
-          border: Border.all(color: const Color(0xFFAAC8E5)),
+          color: const Color(0xFFE2EDF8),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: const Color(0xFF90B5DC),
+            width: 1.2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               children: [
-                Icon(Icons.fact_check_outlined, color: AppColors.colorAzul),
-                SizedBox(width: 9),
-                Expanded(
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: AppColors.colorAzul.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.fact_check_rounded,
+                    color: AppColors.colorAzul,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                const Expanded(
                   child: Text(
                     'PERSONA YA CONSULTADA',
                     style: TextStyle(
                       color: AppColors.colorAzul,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 13.5,
+                      letterSpacing: -0.2,
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-            Text(
-              widget.documentoController.text.trim().toUpperCase(),
-              style: const TextStyle(
-                color: Color(0xFF203E5B),
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.7),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFCBDCEB)),
+              ),
+              child: Text(
+                _documentoConsultado, // Muestra el documento congelado sin importar si el controller cambió
+                style: const TextStyle(
+                  color: Color(0xFF0F172A),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.5,
+                ),
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             const Text(
               'Esta persona ya tiene una consulta registrada en este operativo. '
-              'Ingrese otro documento o pulse SALIR para elegir un tipo de consulta.',
+                  'Ingrese otro documento o pulse SALIR para elegir un tipo de consulta.',
               style: TextStyle(
-                color: Color(0xFF52687D),
+                color: Color(0xFF475569),
                 fontSize: 12,
                 height: 1.4,
               ),
@@ -294,6 +331,7 @@ class _DialogoConsultaOperativaState extends State<DialogoConsultaOperativa> {
     required IconData icono,
   }) {
     final seleccionado = _extranjero == extranjero;
+
     return Expanded(
       child: Semantics(
         button: true,
@@ -301,77 +339,100 @@ class _DialogoConsultaOperativaState extends State<DialogoConsultaOperativa> {
         enabled: !_ocupado,
         child: Material(
           color: Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
           child: InkWell(
-            onTap: _ocupado
-                ? null
-                : () {
-                    if (seleccionado) return;
-                    setState(() {
-                      _extranjero = extranjero;
-                      _pais = null;
-                      widget.documentoController.clear();
-                      _error = '';
-                    });
-                    widget.formKey.currentState?.reset();
-                  },
-            borderRadius: BorderRadius.circular(13),
+            onTap: _ocupado ? null : () {
+              if (seleccionado) return;
+              setState(() {
+                _extranjero = extranjero;
+                _pais = null;
+                widget.documentoController.clear();
+                _error = '';
+              });
+              widget.formKey.currentState?.reset();
+            },
+            borderRadius: BorderRadius.circular(12),
             child: Ink(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                   colors: seleccionado
                       ? const [AppColors.colorAzul, AppColors.colorAzulSecond]
                       : const [Color(0xFFFAFCFE), Color(0xFFF1F5F9)],
                 ),
-                borderRadius: BorderRadius.circular(13),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: seleccionado
-                      ? AppColors.colorAzul
-                      : const Color(0xFFC6D7E6),
+                  color: seleccionado ? AppColors.colorAzul : const Color(0xFFD1DDE6),
+                  width: seleccionado ? 1.5 : 1,
                 ),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Icon(
-                        icono,
-                        color: seleccionado
-                            ? Colors.white
-                            : AppColors.colorAzul,
-                        size: 23,
-                      ),
-                      Icon(
-                        seleccionado
-                            ? Icons.check_circle_rounded
-                            : Icons.radio_button_unchecked_rounded,
-                        color: seleccionado
-                            ? Colors.white
-                            : const Color(0xFF64788B),
-                        size: 17,
-                      ),
-                    ],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: seleccionado ? 0.08 : 0.03),
+                    blurRadius: seleccionado ? 6 : 4,
+                    offset: const Offset(0, 2),
                   ),
-                  const SizedBox(height: 7),
-                  Text(
-                    titulo,
-                    style: TextStyle(
-                      color: seleccionado ? Colors.white : AppColors.colorAzul,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
+                ],
+              ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Icon(
+                      seleccionado ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+                      color: seleccionado ? Colors.white : const Color(0xFF94A3B8),
+                      size: 16,
                     ),
                   ),
-                  const SizedBox(height: 3),
-                  Text(
-                    detalle,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: seleccionado
-                          ? Colors.white70
-                          : const Color(0xFF52687D),
-                      fontSize: 10,
+                  Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 32,
+                          height: 32,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: seleccionado
+                                ? Colors.white.withValues(alpha: 0.18)
+                                : AppColors.colorAzul.withValues(alpha: 0.08),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            icono,
+                            color: seleccionado ? Colors.white : AppColors.colorAzul,
+                            size: 18,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          titulo,
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: seleccionado ? Colors.white : AppColors.colorAzul,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          detalle,
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: seleccionado ? Colors.white70 : const Color(0xFF64748B),
+                            fontSize: 9.5,
+                            height: 1.2,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -413,7 +474,7 @@ class _DialogoConsultaOperativaState extends State<DialogoConsultaOperativa> {
                   children: [
                     if (widget.esPersona) ...[
                       const Text(
-                        'TIPO DE DOCUMENTO',
+                        'TIPO DE CONSULTA',
                         style: TextStyle(
                           color: AppColors.colorAzul,
                           fontSize: 10,
@@ -457,30 +518,30 @@ class _DialogoConsultaOperativaState extends State<DialogoConsultaOperativa> {
                       inputFormatters: widget.esPersona && !_extranjero
                           ? [FilteringTextInputFormatter.digitsOnly]
                           : [
-                              if (!widget.esPersona)
-                                FilteringTextInputFormatter.allow(
-                                  RegExp(r'[a-zA-Z0-9]'),
-                                ),
-                              TextInputFormatter.withFunction(
-                                (oldValue, newValue) => newValue.copyWith(
-                                  text: newValue.text.toUpperCase(),
-                                ),
-                              ),
-                            ],
+                        if (!widget.esPersona)
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'[a-zA-Z0-9]'),
+                          ),
+                        TextInputFormatter.withFunction(
+                              (oldValue, newValue) => newValue.copyWith(
+                            text: newValue.text.toUpperCase(),
+                          ),
+                        ),
+                      ],
                       onFieldSubmitted: (_) => _consultar(),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: _validarDocumento,
                       decoration: InputDecoration(
                         labelText: widget.esPersona
                             ? (_extranjero
-                                  ? 'Documento extranjero'
-                                  : 'Número de cédula')
+                            ? 'Documento extranjero'
+                            : 'Número de cédula')
                             : 'Placa/Chasis/Motor',
                         hintText: widget.esPersona
                             ? (_extranjero
-                                  ? 'Pasaporte o identificación'
-                                  : 'Ingrese los 10 dígitos')
-                            : 'Ej. ABC1234',
+                            ? 'Pasaporte o identificación'
+                            : 'Ingrese los 10 dígitos')
+                            : 'Placa/Motor/Chasis',
                         prefixIcon: Icon(
                           widget.esPersona
                               ? Icons.badge_outlined
@@ -490,7 +551,7 @@ class _DialogoConsultaOperativaState extends State<DialogoConsultaOperativa> {
                         fillColor: Colors.white,
                         labelStyle: const TextStyle(
                           color: AppColors.colorAzul,
-                          fontSize: 13,
+                          fontSize: 18,
                         ),
                         hintStyle: const TextStyle(
                           color: Color(0xFF64788B),

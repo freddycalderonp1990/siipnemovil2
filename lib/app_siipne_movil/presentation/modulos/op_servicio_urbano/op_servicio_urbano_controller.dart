@@ -19,6 +19,10 @@ class OpServicioUrbanoController extends GetxController {
   final RxList<DataConsultaPersona> dataPersona = <DataConsultaPersona>[].obs;
   final RxList<DataVehiculo> dataVehiculo = <DataVehiculo>[].obs;
   final RxBool paginaPersonasVehiculoLoading = false.obs;
+  final RxBool internetPublicoDisponible = false.obs;
+  final Set<String> _documentosConOrdenCapturaConfirmada = <String>{};
+  bool _verificandoInternetPublico = false;
+  bool _pushOperativoActivado = false;
   // ============================================================
   // OPERATIVO
   // ============================================================
@@ -36,7 +40,7 @@ class OpServicioUrbanoController extends GetxController {
   // RESUMEN DEL OPERATIVO
   // ============================================================
   final Rxn<ResultadosOperativo> resultadosOperativo =
-      Rxn<ResultadosOperativo>();
+  Rxn<ResultadosOperativo>();
   final RxBool cargandoResultadosOperativo = false.obs;
   String mensajeErrorResultadosOperativo = '';
   // ============================================================
@@ -44,8 +48,19 @@ class OpServicioUrbanoController extends GetxController {
   // ============================================================
   final RxList<VariablesResultado> variablesResultado =
       <VariablesResultado>[].obs;
+  // Variable activa utilizada por las vistas principales existentes.
+  // Se conserva para compatibilidad con los mixins actuales.
   final Rxn<VariablesResultado> variableResultadoSeleccionada =
-      Rxn<VariablesResultado>();
+  Rxn<VariablesResultado>();
+  // Selecciones independientes por tipo de registro. Evitan que una variable
+  // seleccionada para persona/conductor/ocupante modifique el resultado del
+  // vehículo, o viceversa.
+  final Rxn<VariablesResultado> variableResultadoPersonaSeleccionada =
+  Rxn<VariablesResultado>();
+  final Rxn<VariablesResultado> variableResultadoVehiculoSeleccionada =
+  Rxn<VariablesResultado>();
+  final Rxn<VariablesResultado> variableResultadoPersonaVehiculoSeleccionada =
+  Rxn<VariablesResultado>();
   final RxBool cargandoVariablesResultado = false.obs;
   final RxBool variablesResultadoCargadas = false.obs;
   final RxBool errorCargaVariables = false.obs;
@@ -62,8 +77,8 @@ class OpServicioUrbanoController extends GetxController {
       variableResultadoSeleccionada.value?.desHdrTipoResum.trim() ?? '';
   List<VariablesResultado> get variablesResultadoPersona {
     final List<VariablesResultado> lista = variablesResultado.where((
-      VariablesResultado item,
-    ) {
+        VariablesResultado item,
+        ) {
       final String tipo = item.tipoConsulta.trim().toUpperCase();
       return tipo == 'T' || tipo == 'P';
     }).toList();
@@ -81,8 +96,8 @@ class OpServicioUrbanoController extends GetxController {
 
   List<VariablesResultado> get variablesResultadoVehiculo {
     final List<VariablesResultado> lista = variablesResultado.where((
-      VariablesResultado item,
-    ) {
+        VariablesResultado item,
+        ) {
       final String tipo = item.tipoConsulta.trim().toUpperCase();
       return tipo == 'T' || tipo == 'V';
     }).toList();
@@ -102,6 +117,36 @@ class OpServicioUrbanoController extends GetxController {
     return lista;
   }
 
+  VariablesResultado? get variableDefaultPersona {
+    final List<VariablesResultado> lista = variablesResultadoPersona;
+    if (lista.isEmpty) return null;
+    for (final VariablesResultado item in lista) {
+      final String descripcion = _normalizarTextoOperativo(
+        item.desHdrTipoResum,
+      );
+      if (descripcion == 'PERSONAS REGISTRADAS' ||
+          descripcion == 'PERSONA REGISTRADA') {
+        return item;
+      }
+    }
+    return lista.first;
+  }
+
+  VariablesResultado? get variableDefaultVehiculo {
+    final List<VariablesResultado> lista = variablesResultadoVehiculo;
+    if (lista.isEmpty) return null;
+    for (final VariablesResultado item in lista) {
+      final String descripcion = _normalizarTextoOperativo(
+        item.desHdrTipoResum,
+      );
+      if (descripcion == 'VEHICULOS REVISADOS' ||
+          descripcion == 'VEHICULO REVISADO') {
+        return item;
+      }
+    }
+    return lista.first;
+  }
+
   List<VariablesResultado> get variablesResultadoConsultaActual {
     if (selectPerson.value) {
       return variablesResultadoPersona;
@@ -116,7 +161,6 @@ class OpServicioUrbanoController extends GetxController {
   // ACTUALIZAR RESULTADO DESPUÉS DE CONSULTAR
   // ============================================================
   final RxBool actualizandoResultado = false.obs;
-
   int idVariableInsertadaPersona = 0;
   int idVariableInsertadaVehiculo = 0;
   String mensajeErrorActualizaResultado = '';
@@ -138,11 +182,11 @@ class OpServicioUrbanoController extends GetxController {
   // CONDUCTOR / OCUPANTES
   // ============================================================
   final Set<String> documentosPersonasVehiculoRegistradas = <String>{};
+  final Set<String> _documentosConsultadosOperativo = <String>{};
   String documentoConductorVehiculo = '';
   final List<String> documentosOcupantesVehiculo = <String>[];
   final TextEditingController controllerCedulaVehiculo =
-      TextEditingController();
-
+  TextEditingController();
   final RxList<DataConsultaPersona> dataPersona_conductor =
       <DataConsultaPersona>[].obs;
   final RxList<DataConsultaPersona> dataPersona_ocupantes =
@@ -166,6 +210,7 @@ class OpServicioUrbanoController extends GetxController {
   String placaConsultada = '';
   int idHdrEventoResumPersona = 0;
   bool consultaRepetida = false;
+  bool _ultimaConsultaPersonaRecuperadaPorTimeout = false;
   int get idHdrEventoResumVehiculo {
     if (dataVehiculo.isEmpty) return 0;
     return dataVehiculo.first.idHdrEventoResum;
@@ -177,7 +222,7 @@ class OpServicioUrbanoController extends GetxController {
   // FINALIZAR
   // ============================================================
   final TextEditingController controllerClaveFinalizar =
-      TextEditingController();
+  TextEditingController();
   final RxBool ocultarClaveFinalizar = true.obs;
   final RxBool autenticandoBiometria = false.obs;
   final RxBool finalizandoOperativo = false.obs;
@@ -196,11 +241,161 @@ class OpServicioUrbanoController extends GetxController {
   // INIT
   // ============================================================
   final RxString nombreOperativoActual = ''.obs;
+  final RxString nombreModuloActual = ''.obs;
+  final RxBool requiereConductorDesdeConfiguracion = false.obs;
+  String _normalizarTextoOperativo(String value) {
+    return value
+        .trim()
+        .toUpperCase()
+        .replaceAll('Á', 'A')
+        .replaceAll('É', 'E')
+        .replaceAll('Í', 'I')
+        .replaceAll('Ó', 'O')
+        .replaceAll('Ú', 'U')
+        .replaceAll('Ü', 'U')
+        .replaceAll(RegExp(r'\s+'), ' ');
+  }
+
+  bool get esModuloOperativosPreventivos {
+    final String modulo = _normalizarTextoOperativo(nombreModuloActual.value);
+    return modulo.contains('OPERATIVO') && modulo.contains('PREVENTIV');
+  }
+
+  bool get requiereConductorObligatorio =>
+      requiereConductorDesdeConfiguracion.value ||
+          esModuloOperativosPreventivos;
+  bool _nombreModuloGenerico(String value) {
+    final String modulo = _normalizarTextoOperativo(value);
+    return modulo.isEmpty ||
+        modulo == 'SERVICIO URBANO' ||
+        modulo == 'MOVIL SERVICIO URBANO' ||
+        modulo == 'MOVILES SERVICIO URBANO';
+  }
+
+  Future<void> _resolverModuloOperativoActual() async {
+    final int idTipoOperativo = idOperativoVariablesActual.value;
+    if (idTipoOperativo <= 0 || isClosed) return;
+    if (esModuloOperativosPreventivos) {
+      requiereConductorDesdeConfiguracion.value = true;
+      return;
+    }
+    if (!esOperativoPendiente.value &&
+        !_nombreModuloGenerico(nombreModuloActual.value))
+      return;
+    try {
+      final List<DataModulo> modulos = await siipneMovilUseCase.getModulos(
+        request: GetPermisosModulosRequest(
+          idGenUsuario: user.idGenUsuario,
+          idGenPersona: user.idGenPersona,
+        ),
+      );
+      for (final DataModulo modulo in modulos) {
+        if (isClosed) return;
+        try {
+          final List<DataTipoOperativo> tipos = await siipneMovilUseCase
+              .getTipoOperativos(
+            request: GetTipoOperativosRequest(
+              idGenModulo: modulo.idGenModulo,
+            ),
+          );
+          final bool pertenece = tipos.any(
+                (DataTipoOperativo item) => item.idOperativo == idTipoOperativo,
+          );
+          if (!pertenece) continue;
+          final String nombreReal = modulo.descripcion.trim();
+          if (nombreReal.isNotEmpty) nombreModuloActual.value = nombreReal;
+          final String moduloNormalizado = _normalizarTextoOperativo(
+            nombreReal,
+          );
+          requiereConductorDesdeConfiguracion.value =
+              moduloNormalizado.contains('OPERATIVO') &&
+                  moduloNormalizado.contains('PREVENTIV');
+          debugPrint('==========================================');
+          debugPrint('MÓDULO OPERATIVO RESUELTO');
+          debugPrint('ID TIPO OPERATIVO: $idTipoOperativo');
+          debugPrint('MÓDULO REAL: ${nombreModuloActual.value}');
+          debugPrint(
+            'CONDUCTOR OBLIGATORIO: ${requiereConductorObligatorio ? 'SI' : 'NO'}',
+          );
+          debugPrint('==========================================');
+          return;
+        } catch (e) {
+          debugPrint(
+            'No fue posible validar el módulo ${modulo.descripcion}: $e',
+          );
+        }
+      }
+      debugPrint(
+        'No fue posible asociar el tipo operativo $idTipoOperativo a un módulo permitido.',
+      );
+    } catch (e, stackTrace) {
+      debugPrint('ERROR RESOLVIENDO MÓDULO DEL OPERATIVO: $e');
+      debugPrint('$stackTrace');
+    }
+  }
+
+  String _leerNombreModuloDesdeObjeto(dynamic objeto) {
+    if (objeto == null) return '';
+    dynamic valor;
+    try {
+      valor = objeto.nombreModulo;
+    } catch (_) {}
+    if (ParseModel.parseToString(valor).trim().isEmpty) {
+      try {
+        valor = objeto.descripcionModulo;
+      } catch (_) {}
+    }
+    if (ParseModel.parseToString(valor).trim().isEmpty) {
+      try {
+        valor = objeto.modulo;
+      } catch (_) {}
+    }
+    if (ParseModel.parseToString(valor).trim().isEmpty) {
+      try {
+        final dynamic jsonDinamico = objeto.toJson();
+        if (jsonDinamico is Map) {
+          final Map<String, dynamic> json = Map<String, dynamic>.from(
+            jsonDinamico,
+          );
+          valor =
+              json['nombreModulo'] ??
+                  json['descripcionModulo'] ??
+                  json['desModulo'] ??
+                  json['modulo'];
+        }
+      } catch (_) {}
+    }
+    return ParseModel.parseToString(valor).trim();
+  }
+
+  void _cargarNombreModulo(Map<dynamic, dynamic> arguments) {
+    nombreModuloActual.value = '';
+    final List<String> claves = <String>[
+      'nombreModulo',
+      'descripcionModulo',
+      'desModulo',
+    ];
+    for (final String clave in claves) {
+      final String valor = ParseModel.parseToString(arguments[clave]).trim();
+      if (valor.isNotEmpty) {
+        nombreModuloActual.value = valor;
+        break;
+      }
+    }
+    if (nombreModuloActual.value.isEmpty) {
+      final dynamic modulo = arguments['modulo'];
+      final String desdeModulo = _leerNombreModuloDesdeObjeto(modulo);
+      if (desdeModulo.isNotEmpty) {
+        nombreModuloActual.value = desdeModulo;
+      }
+    }
+  }
+
   // ============================================================
   // ANTECEDENTES PERSONA
   // ============================================================
   final Rxn<DataAntecedentes> datosAntecedentesPersona =
-      Rxn<DataAntecedentes>();
+  Rxn<DataAntecedentes>();
   final RxBool consultandoAntecedentesPersona = false.obs;
   String mensajeErrorAntecedentesPersona = '';
   bool get tieneAntecedentesPersona =>
@@ -223,69 +418,135 @@ class OpServicioUrbanoController extends GetxController {
   }
 
   Future<void> _activarNotificacionesOperativo() async {
+    if (isClosed) {
+      return;
+    }
     final int idEvento = idHdrEventoActual.value;
-
-    if (isClosed) return;
-
     if (idEvento <= 0) {
       debugPrint('[PUSH] No existe un ID de operativo válido');
       return;
     }
-
+    /*
+   * Si ya fue activado correctamente no volver
+   * a tocar Firebase.
+   */
+    if (_pushOperativoActivado) {
+      debugPrint('[PUSH] Notificaciones ya activadas para el operativo.');
+      return;
+    }
+    /*
+   * ============================================================
+   * VALIDAR INTERNET PÚBLICO ANTES DE FIREBASE
+   * ============================================================
+   *
+   * MUY IMPORTANTE:
+   *
+   * Esto ocurre ANTES de acceder a:
+   *
+   * OperativoPushService.instance
+   * FirebaseMessaging.instance
+   * getToken()
+   * subscribeToTopic()
+   * getAPNSToken()
+   */
+    final bool tieneInternet = await _hayInternetPublico();
+    if (!tieneInternet) {
+      if (!isClosed) {
+        estadoNotificaciones.value =
+        'Notificaciones omitidas - sin Internet público';
+      }
+      debugPrint('==========================================');
+      debugPrint('[PUSH] OMITIDO');
+      debugPrint('[PUSH] No existe acceso a Internet público.');
+      debugPrint('[PUSH] Las consultas SIIPNE continuarán normalmente.');
+      debugPrint('[PUSH] NO se accederá a Firebase.');
+      debugPrint('==========================================');
+      return;
+    }
+    if (isClosed) {
+      return;
+    }
+    /*
+   * Recién aquí obtenemos el servicio PUSH.
+   */
     final OperativoPushService push = OperativoPushService.instance;
-
     push.estado.removeListener(_estadoPushActualizado);
     push.alertaCritica.removeListener(_alertaPushActualizada);
     push.aperturaPendiente.removeListener(_alertaPushActualizada);
-
     push.estado.addListener(_estadoPushActualizado);
     push.alertaCritica.addListener(_alertaPushActualizada);
     push.aperturaPendiente.addListener(_alertaPushActualizada);
-
     try {
       debugPrint('==========================================');
+      debugPrint('[PUSH] INTERNET PÚBLICO DISPONIBLE');
       debugPrint('[PUSH] ACTIVANDO NOTIFICACIONES');
       debugPrint('[PUSH] Topic esperado: operativo_$idEvento');
       debugPrint('==========================================');
-
-      await push.activarOperativo(idEvento);
-
-      if (isClosed) return;
-
+      /*
+     * FIREBASE SOLO SE EJECUTA AQUÍ.
+     */
+      await push.activarOperativo(idEvento).timeout(const Duration(seconds: 8));
+      if (isClosed) {
+        return;
+      }
+      _pushOperativoActivado = true;
       _estadoPushActualizado();
       _alertaPushActualizada();
-
+      /*
+     * Información únicamente para DEBUG.
+     */
       if (kDebugMode) {
-        final String? token = await push.obtenerTokenDispositivo();
-
-        debugPrint('==========================================');
-        debugPrint('[PUSH] ESTADO: ${push.estado.value}');
-        debugPrint(
-          '[PUSH] FCM TOKEN: ${token != null && token.isNotEmpty ? 'SI' : 'NO'}',
-        );
-
-        if (defaultTargetPlatform == TargetPlatform.iOS) {
-          final String? apnsToken = await FirebaseMessaging.instance
-              .getAPNSToken();
-          debugPrint(
-            '[PUSH] APNs TOKEN: ${apnsToken != null && apnsToken.isNotEmpty ? 'SI' : 'NO'}',
+        try {
+          final String? token = await push.obtenerTokenDispositivo().timeout(
+            const Duration(seconds: 5),
           );
+          debugPrint('==========================================');
+          debugPrint('[PUSH] ESTADO: ${push.estado.value}');
+          debugPrint(
+            '[PUSH] FCM TOKEN: '
+                '${token != null && token.isNotEmpty ? 'SI' : 'NO'}',
+          );
+          if (defaultTargetPlatform == TargetPlatform.iOS) {
+            try {
+              final String? apnsToken = await FirebaseMessaging.instance
+                  .getAPNSToken()
+                  .timeout(const Duration(seconds: 5));
+              debugPrint(
+                '[PUSH] APNs TOKEN: '
+                    '${apnsToken != null && apnsToken.isNotEmpty ? 'SI' : 'NO'}',
+              );
+            } catch (e) {
+              debugPrint('[PUSH] No fue posible consultar APNs: $e');
+            }
+          }
+          debugPrint('==========================================');
+        } catch (e) {
+          debugPrint('[PUSH] No fue posible obtener token: $e');
         }
-
-        debugPrint('==========================================');
       }
     } catch (e, stackTrace) {
-      debugPrint('[PUSH] Error de activación: $e');
+      /*
+     * Un problema con Firebase JAMÁS debe
+     * convertirse en un problema de consulta SIIPNE.
+     */
+      _pushOperativoActivado = false;
+      if (!isClosed) {
+        estadoNotificaciones.value = 'Notificaciones no disponibles';
+      }
+      debugPrint('==========================================');
+      debugPrint('[PUSH] FIREBASE NO DISPONIBLE');
+      debugPrint('[PUSH] $e');
+      debugPrint('[PUSH] El operativo continúa sin notificaciones.');
       debugPrintStack(stackTrace: stackTrace);
+      debugPrint('==========================================');
     }
   }
 
   Future<void> _inicializarPantalla() async {
     _cargarDatosOperativo();
-    if (!datosOperativoValidos.value) {
-      return;
-    }
-    // La suscripción no bloquea las consultas ni modifica sus resultados.
+    if (!datosOperativoValidos.value) return;
+    await _resolverModuloOperativoActual();
+    if (isClosed) return;
     _activarNotificacionesOperativo();
     await cargarVariablesResultado();
   }
@@ -295,6 +556,7 @@ class OpServicioUrbanoController extends GetxController {
   // ============================================================
   void _cargarDatosOperativo() {
     nombreOperativoActual.value = '';
+    nombreModuloActual.value = '';
     datosOperativoValidos.value = true;
     mensajeDatosOperativo = '';
     puedeFinalizarOperativo.value = false;
@@ -308,6 +570,20 @@ class OpServicioUrbanoController extends GetxController {
       _marcarDatosInvalidos('No se recibieron datos válidos del operativo.');
       return;
     }
+    _cargarNombreModulo(arguments);
+    final dynamic requiereConductorArgumento =
+    arguments['requiereConductorObligatorio'];
+    if (requiereConductorArgumento is bool) {
+      requiereConductorDesdeConfiguracion.value = requiereConductorArgumento;
+    } else {
+      final String valor = ParseModel.parseToString(requiereConductorArgumento)
+          .trim()
+          .toUpperCase();
+      requiereConductorDesdeConfiguracion.value =
+          valor == 'TRUE' || valor == '1' || valor == 'SI' || valor == 'SÍ';
+    }
+    if (esModuloOperativosPreventivos)
+      requiereConductorDesdeConfiguracion.value = true;
     final String nombreOperativoArgumento = ParseModel.parseToString(
       arguments['nombreOperativo'],
     ).trim();
@@ -341,6 +617,14 @@ class OpServicioUrbanoController extends GetxController {
     if (datoPendiente is Pendiente) {
       operativoPendiente.value = datoPendiente;
       nombreOperativoActual.value = datoPendiente.descripcion.trim();
+      if (nombreModuloActual.value.isEmpty) {
+        final String moduloPendiente = _leerNombreModuloDesdeObjeto(
+          datoPendiente,
+        );
+        if (moduloPendiente.isNotEmpty) {
+          nombreModuloActual.value = moduloPendiente;
+        }
+      }
       puedeFinalizarOperativo.value = true;
       esOperativoPendiente.value = true;
       esOperativoAnexado.value = false;
@@ -365,6 +649,12 @@ class OpServicioUrbanoController extends GetxController {
     final dynamic datoAnexarse = arguments['anexarse'];
     if (datoAnexarse is Anexarse) {
       operativoAnexado.value = datoAnexarse;
+      if (nombreModuloActual.value.isEmpty) {
+        final String moduloAnexado = _leerNombreModuloDesdeObjeto(datoAnexarse);
+        if (moduloAnexado.isNotEmpty) {
+          nombreModuloActual.value = moduloAnexado;
+        }
+      }
       puedeFinalizarOperativo.value = false;
       esOperativoAnexado.value = true;
       esOperativoPendiente.value = false;
@@ -440,6 +730,14 @@ class OpServicioUrbanoController extends GetxController {
     debugPrint('ID HDR EVENTO: ${idHdrEventoActual.value}');
     debugPrint('ID OPERATIVO VARIABLES: ${idOperativoVariablesActual.value}');
     debugPrint('ID GEO: ${idGenGeoSenpladesActual.value}');
+    debugPrint('MÓDULO: ${nombreModuloActual.value}');
+    debugPrint('PREVENTIVO POR NOMBRE: $esModuloOperativosPreventivos');
+    debugPrint(
+      'PREVENTIVO POR CONFIGURACIÓN: ${requiereConductorDesdeConfiguracion.value}',
+    );
+    debugPrint(
+      'CONDUCTOR OBLIGATORIO: ${requiereConductorObligatorio ? 'SI' : 'NO'}',
+    );
     debugPrint('PENDIENTE: ${esOperativoPendiente.value}');
     debugPrint('ANEXADO: ${esOperativoAnexado.value}');
     debugPrint('==========================================');
@@ -468,40 +766,52 @@ class OpServicioUrbanoController extends GetxController {
     if (idOperativo <= 0) {
       variablesResultado.clear();
       variableResultadoSeleccionada.value = null;
+      variableResultadoPersonaSeleccionada.value = null;
+      variableResultadoVehiculoSeleccionada.value = null;
+      variableResultadoPersonaVehiculoSeleccionada.value = null;
       variablesResultadoCargadas.value = false;
       errorCargaVariables.value = true;
       mensajeErrorVariables =
-          'No se recibió el identificador de configuración del operativo.';
+      'No se recibió el identificador de configuración del operativo.';
       return false;
     }
     cargandoVariablesResultado.value = true;
     try {
       final List<VariablesResultado> resultado = await siipneMovilUseCase
           .consultarVariblesResultado(
-            request: GetVariablesResultadosRequest(idOperativo: idOperativo),
-          );
+        request: GetVariablesResultadosRequest(idOperativo: idOperativo),
+      );
       variablesResultado.assignAll(resultado);
-      final List<VariablesResultado> variablesDisponibles =
-          variablesResultadoConsultaActual;
-      /*
-       * Se mantiene internamente la primera variable
-       * para poder realizar la inserción inicial.
-       *
-       * YA NO se muestra en pantalla antes de consultar.
-       */
-      variableResultadoSeleccionada.value = variablesDisponibles.isNotEmpty
-          ? variablesDisponibles.first
-          : null;
+      final VariablesResultado? defaultPersona = variableDefaultPersona;
+      final VariablesResultado? defaultVehiculo = variableDefaultVehiculo;
+      variableResultadoPersonaSeleccionada.value = defaultPersona;
+      variableResultadoVehiculoSeleccionada.value = defaultVehiculo;
+      variableResultadoPersonaVehiculoSeleccionada.value = defaultPersona;
+      if (selectPerson.value) {
+        variableResultadoSeleccionada.value = defaultPersona;
+      } else if (selectVehiculo.value) {
+        variableResultadoSeleccionada.value = defaultVehiculo;
+      } else {
+        variableResultadoSeleccionada.value = null;
+      }
       variablesResultadoCargadas.value = true;
       errorCargaVariables.value = false;
       debugPrint('==========================================');
       debugPrint('VARIABLES RESULTADO CARGADAS');
       debugPrint('CANTIDAD: ${variablesResultado.length}');
+      debugPrint(
+        'DEFAULT PERSONA: ${defaultPersona?.idVariable} | '
+            '${defaultPersona?.desHdrTipoResum}',
+      );
+      debugPrint(
+        'DEFAULT VEHÍCULO: ${defaultVehiculo?.idVariable} | '
+            '${defaultVehiculo?.desHdrTipoResum}',
+      );
       for (final VariablesResultado variable in variablesResultado) {
         debugPrint(
           '${variable.idVariable} | '
-          '${variable.desHdrTipoResum} | '
-          '${variable.tipoConsulta}',
+              '${variable.desHdrTipoResum} | '
+              '${variable.tipoConsulta}',
         );
       }
       debugPrint('==========================================');
@@ -509,6 +819,9 @@ class OpServicioUrbanoController extends GetxController {
     } catch (e, stackTrace) {
       variablesResultado.clear();
       variableResultadoSeleccionada.value = null;
+      variableResultadoPersonaSeleccionada.value = null;
+      variableResultadoVehiculoSeleccionada.value = null;
+      variableResultadoPersonaVehiculoSeleccionada.value = null;
       variablesResultadoCargadas.value = false;
       errorCargaVariables.value = true;
       mensajeErrorVariables = 'No fue posible obtener las variables configuradas para el operativo.';
@@ -526,6 +839,31 @@ class OpServicioUrbanoController extends GetxController {
 
   void seleccionarVariableResultado(VariablesResultado? variable) {
     variableResultadoSeleccionada.value = variable;
+    if (selectPerson.value) {
+      variableResultadoPersonaSeleccionada.value = variable;
+      debugPrint(
+        'VARIABLE PERSONA SELECCIONADA: '
+            '${variable?.idVariable} | ${variable?.desHdrTipoResum}',
+      );
+      return;
+    }
+    if (selectVehiculo.value) {
+      variableResultadoVehiculoSeleccionada.value = variable;
+      debugPrint(
+        'VARIABLE VEHÍCULO SELECCIONADA: '
+            '${variable?.idVariable} | ${variable?.desHdrTipoResum}',
+      );
+    }
+  }
+
+  void seleccionarVariableResultadoPersonaVehiculo(
+      VariablesResultado? variable,
+      ) {
+    variableResultadoPersonaVehiculoSeleccionada.value = variable;
+    debugPrint(
+      'VARIABLE PERSONA VEHÍCULO SELECCIONADA: '
+          '${variable?.idVariable} | ${variable?.desHdrTipoResum}',
+    );
   }
 
   void limpiarVariableResultado() {
@@ -538,6 +876,7 @@ class OpServicioUrbanoController extends GetxController {
   Future<bool> actualizarResultadoRegistro({
     required int idHdrEventoResum,
     required int idVariableOriginal,
+    VariablesResultado? variableSeleccionada,
   }) async {
     if (actualizandoResultado.value || peticionServerState.value) {
       return false;
@@ -545,52 +884,40 @@ class OpServicioUrbanoController extends GetxController {
     mensajeErrorActualizaResultado = '';
     if (idHdrEventoResum <= 0) {
       mensajeErrorActualizaResultado =
-          'No existe un registro válido para actualizar.';
+      'No existe un registro válido para actualizar.';
       return false;
     }
-    final VariablesResultado? variable = variableResultadoSeleccionada.value;
+    final VariablesResultado? variable =
+        variableSeleccionada ?? variableResultadoSeleccionada.value;
     if (variable == null || variable.idVariable <= 0) {
       mensajeErrorActualizaResultado = 'Seleccione un resultado preliminar.';
       return false;
     }
     final int idVariableNueva = variable.idVariable;
-    /*
-     * Si el resultado elegido es exactamente el mismo
-     * con el cual se insertó originalmente el registro,
-     * no necesitamos ejecutar el PUT.
-     */
+    debugPrint('==========================================');
+    debugPrint('VERIFICANDO ACTUALIZACIÓN RESULTADO');
+    debugPrint('ID HDR EVENTO RESUM: $idHdrEventoResum');
+    debugPrint('VARIABLE ORIGINAL: $idVariableOriginal');
+    debugPrint('VARIABLE NUEVA: $idVariableNueva');
+    debugPrint('DESCRIPCIÓN: ${variable.desHdrTipoResum}');
+    debugPrint('==========================================');
     if (idVariableOriginal > 0 && idVariableNueva == idVariableOriginal) {
-      debugPrint('==========================================');
-      debugPrint('RESULTADO SIN CAMBIOS');
-      debugPrint('ID HDR EVENTO RESUM: $idHdrEventoResum');
-      debugPrint('VARIABLE: $idVariableNueva');
-      debugPrint('NO ES NECESARIO EJECUTAR PUT');
-      debugPrint('==========================================');
+      debugPrint('RESULTADO SIN CAMBIOS - NO SE EJECUTA PUT');
       return true;
     }
     actualizandoResultado.value = true;
-    /*
-     * También activamos el loading general
-     * para evitar dobles pulsaciones.
-     */
     peticionServerState.value = true;
     try {
-      debugPrint('==========================================');
-      debugPrint('ACTUALIZANDO RESULTADO');
-      debugPrint('ID HDR EVENTO RESUM: $idHdrEventoResum');
-      debugPrint('VARIABLE ORIGINAL: $idVariableOriginal');
-      debugPrint('VARIABLE NUEVA: $idVariableNueva');
-      debugPrint('==========================================');
       final ActualizaResultado resultado = await siipneMovilUseCase
           .actualizaResultado(
-            request: ActualizarResultadoRequest(
-              idHdrEventoResum: idHdrEventoResum,
-              idHdrTipoResum: idVariableNueva,
-            ),
-          );
+        request: ActualizarResultadoRequest(
+          idHdrEventoResum: idHdrEventoResum,
+          idHdrTipoResum: idVariableNueva,
+        ),
+      );
       if (resultado.idHdrEventoResum <= 0) {
         mensajeErrorActualizaResultado =
-            'El servidor no confirmó la actualización del resultado.';
+        'El servidor no confirmó la actualización del resultado.';
         return false;
       }
       if (resultado.idHdrEventoResum != idHdrEventoResum) {
@@ -601,11 +928,12 @@ class OpServicioUrbanoController extends GetxController {
       debugPrint('RESULTADO ACTUALIZADO CORRECTAMENTE');
       debugPrint('ID HDR EVENTO RESUM: ${resultado.idHdrEventoResum}');
       debugPrint('ID VARIABLE: $idVariableNueva');
+      debugPrint('DESCRIPCIÓN: ${variable.desHdrTipoResum}');
       debugPrint('==========================================');
       return true;
     } catch (e, stackTrace) {
       mensajeErrorActualizaResultado =
-          'No fue posible actualizar el resultado de la consulta.';
+      'No fue posible actualizar el resultado de la consulta.';
       debugPrint('==========================================');
       debugPrint('ERROR ACTUALIZANDO RESULTADO');
       debugPrint('$e');
@@ -631,6 +959,16 @@ class OpServicioUrbanoController extends GetxController {
       return false;
     }
     return documentosPersonasVehiculoRegistradas.contains(valor);
+  }
+
+  bool _documentoConsultadoEnOperativo(String documento) {
+    final String valor = normalizarDocumentoPersonaVehiculo(documento);
+    return valor.isNotEmpty && _documentosConsultadosOperativo.contains(valor);
+  }
+
+  void _registrarDocumentoConsultadoOperativo(String documento) {
+    final String valor = normalizarDocumentoPersonaVehiculo(documento);
+    if (valor.isNotEmpty) _documentosConsultadosOperativo.add(valor);
   }
 
   // ============================================================
@@ -664,17 +1002,17 @@ class OpServicioUrbanoController extends GetxController {
     required GlobalKey<FormState> key,
     String nacionalidad = 'ECU',
   }) async {
-    if (peticionServerState.value) {
+    if (peticionServerState.value || isClosed) {
       return false;
     }
     mensajeErrorConsulta = '';
+    mensajeErrorActualizaResultado = '';
     consultaRepetida = false;
-    final nacionalidadNormalizada = nacionalidad.trim().toUpperCase();
+    final String nacionalidadNormalizada = nacionalidad.trim().toUpperCase();
     if (!RegExp(r'^[A-Z]{3}$').hasMatch(nacionalidadNormalizada)) {
       mensajeErrorConsulta = 'Seleccione una nacionalidad válida.';
       return false;
     }
-    mensajeErrorActualizaResultado = '';
     final bool isValid = key.currentState?.validate() ?? false;
     if (!isValid) {
       debugPrint('CONSULTA PERSONA -> FORMULARIO INVÁLIDO');
@@ -682,7 +1020,7 @@ class OpServicioUrbanoController extends GetxController {
     }
     if (idHdrEventoActual.value <= 0) {
       mensajeErrorConsulta =
-          'No existe un operativo válido para realizar la consulta.';
+      'No existe un operativo válido para realizar la consulta.';
       return false;
     }
     final String cedula = controllerCedula.text.trim();
@@ -690,36 +1028,53 @@ class OpServicioUrbanoController extends GetxController {
       mensajeErrorConsulta = 'Ingrese un documento válido.';
       return false;
     }
-    /*
-     * IMPORTANTE:
-     *
-     * La primera variable compatible se utiliza
-     * SOLAMENTE para mantener intacta la inserción
-     * actual de la consulta.
-     */
-    final List<VariablesResultado> variablesDisponibles =
-        variablesResultadoPersona;
-    final int idVariable = variablesDisponibles.isNotEmpty
-        ? variablesDisponibles.first.idVariable
-        : 0;
+    if (_documentoConsultadoEnOperativo(cedula)) {
+      consultaRepetida = true;
+      controllerCedula.clear();
+      mensajeErrorConsulta = 'La persona ya fue consultada dentro de este operativo. Realice la consulta con otro documento.';
+      debugPrint('==========================================');
+      debugPrint('CONSULTA PERSONA BLOQUEADA LOCALMENTE');
+      debugPrint('DOCUMENTO: ${normalizarDocumentoPersonaVehiculo(cedula)}');
+      debugPrint('OPERATIVO: ${idHdrEventoActual.value}');
+      debugPrint('NO SE ENVÍA NUEVO REQUEST AL SERVIDOR');
+      debugPrint('==========================================');
+      return false;
+    }
+    final VariablesResultado? variableDefault = variableDefaultPersona;
+    final int idVariable = variableDefault?.idVariable ?? 0;
     if (idVariable <= 0) {
       mensajeErrorConsulta =
-          'No existen variables configuradas para la consulta de persona.';
+      'No existen variables configuradas para la consulta de persona.';
       return false;
     }
     peticionServerState.value = true;
-    final push = OperativoPushService.instance;
-    final consultaPush = push.consultasPersona.iniciar(
-      idOperativo: idHdrEventoActual.value,
-      documento: cedula,
-    );
-    try {
-      final LocationBloc locationBloc = BlocProvider.of<LocationBloc>(
-        Get.context!,
+    OperativoPushService? push;
+    dynamic consultaPush;
+    bool pushFinalizado = false;
+    if (_pushOperativoActivado && internetPublicoDisponible.value) {
+      push = OperativoPushService.instance;
+      consultaPush = push.consultasPersona.iniciar(
+        idOperativo: idHdrEventoActual.value,
+        documento: cedula,
       );
+    }
+    try {
+      final BuildContext? context = Get.context;
+      if (context == null) {
+        mensajeErrorConsulta =
+        'No existe contexto disponible para realizar la consulta.';
+        return false;
+      }
+      final LocationBloc locationBloc = BlocProvider.of<LocationBloc>(context);
       final LatLng pos = await locationBloc.getCurrentPosition();
+      if (isClosed) {
+        return false;
+      }
       final String ip = await DeviceInfoApp.getIp;
-      String consultadoPor = "${user.nombres}";
+      if (isClosed) {
+        return false;
+      }
+      final String consultadoPor = user.nombres;
       final ConsultarPersonaRequest request = ConsultarPersonaRequest(
         consultadoPor: consultadoPor,
         idOperativo: idHdrEventoActual.value,
@@ -732,65 +1087,132 @@ class OpServicioUrbanoController extends GetxController {
         idVariableResultado: idVariable,
         idGenPersona: user.idGenPersona,
       );
-
+      debugPrint('==========================================');
+      debugPrint('INICIANDO CONSULTA PERSONA');
+      debugPrint('OPERATIVO: ${idHdrEventoActual.value}');
+      debugPrint('DOCUMENTO: $cedula');
+      debugPrint('VARIABLE: $idVariable');
+      debugPrint('==========================================');
+      /*
+     * Limpiamos únicamente la visualización actual.
+     *
+     * NO limpiamos:
+     *
+     * _documentosConOrdenCapturaConfirmada
+     *
+     * porque sirve para proteger las consultas repetidas.
+     */
       dataPersona.clear();
       tieneOrdenCaptura.value = false;
       idHdrEventoResumPersona = 0;
       idVariableInsertadaPersona = 0;
-      await _activarNotificacionesOperativo();
-      if (isClosed) return false;
-      final DataConsultaPersona data = await siipneMovilUseCase
-          .consultarPersona(request: request);
-      push.consultasPersona.finalizar(
-        consultaPush,
-        consultaRepetida: data.consultaRepetida,
-        idHdrEventoResum: data.idHdrEventoResum,
+      /*
+     * No activar Firebase aquí.
+     *
+     * Las consultas SIIPNE deben funcionar
+     * independientemente de las notificaciones.
+     */
+      if (isClosed) {
+        return false;
+      }
+      /*
+     * Consulta principal con recuperación
+     * automática en timeout.
+     */
+      final DataConsultaPersona data = await _consultarPersonaServidor(
+        request: request,
       );
+      if (isClosed) {
+        return false;
+      }
+      final bool consultaRecuperadaPorTimeout =
+          _ultimaConsultaPersonaRecuperadaPorTimeout;
       consultaRepetida = data.consultaRepetida;
-      if (consultaRepetida) {
-        mensajeErrorConsulta =
-            'La persona ya fue consultada durante este operativo.';
+      final bool consultaRepetidaReal =
+          data.consultaRepetida && !consultaRecuperadaPorTimeout;
+      /*
+     * Finalizamos control interno PUSH.
+     */
+      if (push != null && consultaPush != null) {
+        push.consultasPersona.finalizar(
+          consultaPush,
+          consultaRepetida: data.consultaRepetida,
+          idHdrEventoResum: data.idHdrEventoResum,
+        );
+        pushFinalizado = true;
+      }
+      debugPrint('==========================================');
+      debugPrint('RESPUESTA CONSULTA PERSONA');
+      debugPrint('DOCUMENTO: $cedula');
+      debugPrint('CONSULTA REPETIDA SERVIDOR: ${data.consultaRepetida}');
+      debugPrint('RECUPERADA POR TIMEOUT: $consultaRecuperadaPorTimeout');
+      debugPrint('CONSULTA REPETIDA REAL: $consultaRepetidaReal');
+      debugPrint('ID HDR EVENTO RESUM: ${data.idHdrEventoResum}');
+      debugPrint('ORDEN CAPTURA SERVIDOR: ${data.ordenCaptura.success}');
+      debugPrint('==========================================');
+      if (data.idHdrEventoResum <= 0) {
+        dataPersona.clear();
+        mensajeErrorConsulta = 'El servidor respondió la consulta, pero no devolvió el identificador del registro realizado.';
         ocultarBtnBuscarPersona.value = false;
         return false;
       }
+      if (consultaRepetidaReal) {
+        debugPrint('==========================================');
+        debugPrint('CONSULTA PERSONA REPETIDA - BLOQUEADA');
+        debugPrint('DOCUMENTO: $cedula');
+        debugPrint('OPERATIVO: ${idHdrEventoActual.value}');
+        debugPrint('ID HDR EVENTO RESUM: ${data.idHdrEventoResum}');
+        debugPrint('SE DEBE CONSULTAR OTRO DOCUMENTO');
+        debugPrint('==========================================');
+        dataPersona.clear();
+        tieneOrdenCaptura.value = false;
+        idHdrEventoResumPersona = 0;
+        idVariableInsertadaPersona = 0;
+        ocultarBtnBuscarPersona.value = false;
+        controllerCedula.clear();
+        _registrarDocumentoConsultadoOperativo(cedula);
+        mensajeErrorConsulta = 'La persona ya fue consultada dentro de este operativo. Realice la consulta con otro documento.';
+        return false;
+      }
+      if (data.consultaRepetida && consultaRecuperadaPorTimeout) {
+        debugPrint('CONSULTA PERSONA RECUPERADA POR TIMEOUT - NO SE BLOQUEA');
+      }
+      _registrarDocumentoConsultadoOperativo(cedula);
       dataPersona.assignAll(<DataConsultaPersona>[data]);
-      if (dataPersona.isEmpty) {
-        mensajeErrorConsulta =
-            'No se obtuvieron datos para la consulta realizada.';
-        ocultarBtnBuscarPersona.value = false;
-        return false;
-      }
-      /*
-       * ID REAL DEL REGISTRO INSERTADO.
-       */
       idHdrEventoResumPersona = data.idHdrEventoResum;
-      /*
-       * Guardamos la variable con la cual fue
-       * insertado inicialmente.
-       */
       idVariableInsertadaPersona = idVariable;
+      variableResultadoPersonaSeleccionada.value = variableDefault;
+      variableResultadoSeleccionada.value = variableDefault;
       /*
-       * Después de consultar recién queda disponible
-       * para selección visible en la Page.
-       */
-      variableResultadoSeleccionada.value = variablesDisponibles.first;
-      if (data.ordenCaptura.success) {
-        tieneOrdenCaptura.value = true;
-        try {
-          await UtilidadesUtil.playAudio(
-            nameAudio: AppSiipneMovilImages.audio_Alerta,
-          );
-        } catch (e) {
-          debugPrint('No fue posible reproducir el audio de alerta: $e');
-        }
-      }
+     * ============================================================
+     * ORDEN DE CAPTURA
+     * ============================================================
+     *
+     * Esta función:
+     *
+     * - verifica respuesta actual;
+     * - verifica consulta repetida;
+     * - recupera una alerta confirmada durante esta sesión;
+     * - reproduce audio.
+     */
+      final bool tieneBoleta = await _procesarOrdenCapturaPersona(
+        persona: data,
+        documento: cedula,
+        actualizarConsultaPrincipal: true,
+        origen: consultaRepetida
+            ? 'PERSONA - CONSULTA REPETIDA'
+            : 'PERSONA - CONSULTA NUEVA',
+      );
+      debugPrint('==========================================');
+      debugPrint('ESTADO FINAL PERSONA');
+      debugPrint('DOCUMENTO: $cedula');
+      debugPrint('TIENE ORDEN CAPTURA: $tieneBoleta');
+      debugPrint('RX tieneOrdenCaptura: ${tieneOrdenCaptura.value}');
+      debugPrint('CONSULTA REPETIDA: $consultaRepetida');
+      debugPrint('==========================================');
       ocultarBtnBuscarPersona.value = true;
       controllerCedula.clear();
-      debugPrint('==========================================');
-      debugPrint('CONSULTA PERSONA CORRECTA');
-      debugPrint('ID HDR EVENTO RESUM: $idHdrEventoResumPersona');
-      debugPrint('VARIABLE INSERCIÓN: $idVariableInsertadaPersona');
-      debugPrint('==========================================');
+      mensajeErrorConsulta = '';
       return true;
     } catch (e, stackTrace) {
       mensajeErrorConsulta = UrlApiProviderAppCenso.mensajeException(
@@ -798,11 +1220,16 @@ class OpServicioUrbanoController extends GetxController {
         fallback: 'No fue posible realizar la consulta de la persona.',
       );
       ocultarBtnBuscarPersona.value = false;
-      debugPrint('ERROR CONSULTA PERSONA: $mensajeErrorConsulta');
+      debugPrint('==========================================');
+      debugPrint('ERROR CONSULTA PERSONA');
+      debugPrint(mensajeErrorConsulta);
+      debugPrint('$e');
       debugPrint('$stackTrace');
+      debugPrint('==========================================');
       return false;
     } finally {
-      push.consultasPersona.finalizar(consultaPush);
+      if (!pushFinalizado && push != null && consultaPush != null)
+        push.consultasPersona.finalizar(consultaPush);
       peticionServerState.value = false;
     }
   }
@@ -811,27 +1238,21 @@ class OpServicioUrbanoController extends GetxController {
   // NUEVA CONSULTA PERSONA
   // ============================================================
   Future<bool> nuevaConsultaPersona() async {
-    if (peticionServerState.value || actualizandoResultado.value) {
+    if (peticionServerState.value || actualizandoResultado.value || isClosed) {
       return false;
     }
     mensajeErrorActualizaResultado = '';
     FocusManager.instance.primaryFocus?.unfocus();
     /*
-     * Antes de borrar los datos actualizamos el
-     * resultado seleccionado.
-     */
+   * Guardar resultado actual antes de limpiar.
+   */
     if (dataPersona.isNotEmpty && idHdrEventoResumPersona > 0) {
       final bool actualizado = await actualizarResultadoRegistro(
         idHdrEventoResum: idHdrEventoResumPersona,
         idVariableOriginal: idVariableInsertadaPersona,
+        variableSeleccionada: variableResultadoPersonaSeleccionada.value,
       );
       if (!actualizado) {
-        /*
-         * MUY IMPORTANTE:
-         *
-         * Si falla el PUT NO limpiamos la consulta.
-         * Así el usuario no pierde el resultado.
-         */
         return false;
       }
     }
@@ -839,8 +1260,16 @@ class OpServicioUrbanoController extends GetxController {
     dataPersona.clear();
     idHdrEventoResumPersona = 0;
     idVariableInsertadaPersona = 0;
+    /*
+   * Limpiamos únicamente la pantalla.
+   *
+   * NO limpiamos:
+   *
+   * _documentosConOrdenCapturaConfirmada
+   */
     tieneOrdenCaptura.value = false;
     ocultarBtnBuscarPersona.value = false;
+    variableResultadoPersonaSeleccionada.value = variableDefaultPersona;
     limpiarSeleccionConsulta();
     return true;
   }
@@ -851,7 +1280,9 @@ class OpServicioUrbanoController extends GetxController {
   Future<bool> consultarVehiculoPorPlaca({
     required GlobalKey<FormState> key,
   }) async {
-    if (peticionServerState.value || isClosed) return false;
+    if (peticionServerState.value || isClosed) {
+      return false;
+    }
     mensajeErrorConsulta = '';
     mensajeErrorActualizaResultado = '';
     final bool isValid = key.currentState?.validate() ?? false;
@@ -861,7 +1292,7 @@ class OpServicioUrbanoController extends GetxController {
     }
     if (idHdrEventoActual.value <= 0) {
       mensajeErrorConsulta =
-          'No existe un operativo válido para realizar la consulta.';
+      'No existe un operativo válido para realizar la consulta.';
       return false;
     }
     final String placa = controllerPlaca.text.trim().toUpperCase();
@@ -869,14 +1300,11 @@ class OpServicioUrbanoController extends GetxController {
       mensajeErrorConsulta = 'Ingrese una placa válida.';
       return false;
     }
-    final List<VariablesResultado> variablesDisponibles =
-        variablesResultadoVehiculo;
-    final int idVariable = variablesDisponibles.isNotEmpty
-        ? variablesDisponibles.first.idVariable
-        : 0;
+    final VariablesResultado? variableDefault = variableDefaultVehiculo;
+    final int idVariable = variableDefault?.idVariable ?? 0;
     if (idVariable <= 0) {
       mensajeErrorConsulta =
-          'No existen variables configuradas para la consulta de vehículo.';
+      'No existen variables configuradas para la consulta de vehículo.';
       return false;
     }
     DataVehiculo? vehiculoParaAdvertencia;
@@ -886,16 +1314,19 @@ class OpServicioUrbanoController extends GetxController {
       final BuildContext? context = Get.context;
       if (context == null || !context.mounted) {
         mensajeErrorConsulta =
-            'No fue posible acceder a la pantalla del operativo.';
+        'No fue posible acceder a la pantalla del operativo.';
         return false;
       }
       final LocationBloc locationBloc = BlocProvider.of<LocationBloc>(context);
       final LatLng pos = await locationBloc.getCurrentPosition();
-      if (isClosed) return false;
+      if (isClosed) {
+        return false;
+      }
       final String ip = await DeviceInfoApp.getIp;
-      if (isClosed) return false;
-
-      String consultadoPor = "${user.nombres}";
+      if (isClosed) {
+        return false;
+      }
+      final String consultadoPor = user.nombres;
       final ConsultarVehiculoRequest request = ConsultarVehiculoRequest(
         consultadoPor: consultadoPor,
         idOperativo: idHdrEventoActual.value,
@@ -913,31 +1344,101 @@ class OpServicioUrbanoController extends GetxController {
       debugPrint('PLACA: $placa');
       debugPrint('ID VARIABLE INSERCIÓN: $idVariable');
       debugPrint('==========================================');
+      /*
+     * Limpiar resultado anterior.
+     */
       dataVehiculo.clear();
       vehiculoRobado.value = false;
       idVariableInsertadaVehiculo = 0;
       _limpiarPersonasVehiculo();
-      await _activarNotificacionesOperativo();
-      if (isClosed) return false;
-      final DataVehiculo data = await siipneMovilUseCase.consultarVehiculo(
+      // await _activarNotificacionesOperativo();
+      if (isClosed) {
+        return false;
+      }
+      /*
+     * ============================================================
+     * CONSULTA CON RECUPERACIÓN
+     * ============================================================
+     *
+     * Si ocurre timeout, vuelve a consultar UNA sola vez.
+     *
+     * Si el primer request sí persistió en servidor,
+     * el segundo debe devolver el registro existente.
+     */
+      final DataVehiculo data = await _consultarVehiculoServidor(
         request: request,
       );
-
-      if (isClosed) return false;
+      if (isClosed) {
+        return false;
+      }
+      /*
+     * El vehículo debe contener datos.
+     *
+     * IMPORTANTE:
+     * que haya sido consultado anteriormente NO constituye
+     * un error si el servidor devuelve la información.
+     */
       if (!data.datosVehiculo.success) {
-        mensajeErrorConsulta =
-            'No se obtuvieron datos válidos para el vehículo consultado.';
+        mensajeErrorConsulta = 'El servidor respondió, pero no devolvió los datos del vehículo consultado.';
         ocultarBtnBuscarVehiculo.value = false;
         return false;
       }
+      /*
+     * Validar que exista el registro persistido.
+     */
+      if (data.idHdrEventoResum <= 0) {
+        mensajeErrorConsulta =
+        'El servidor devolvió los datos del vehículo, '
+            'pero no confirmó el registro de la consulta.';
+        ocultarBtnBuscarVehiculo.value = false;
+        return false;
+      }
+      /*
+     * ============================================================
+     * SIEMPRE MOSTRAR EL VEHÍCULO
+     * ============================================================
+     */
       dataVehiculo.assignAll(<DataVehiculo>[data]);
       idVariableInsertadaVehiculo = idVariable;
-      variableResultadoSeleccionada.value = variablesDisponibles.first;
+      variableResultadoVehiculoSeleccionada.value = variableDefault;
+      variableResultadoSeleccionada.value = variableDefault;
       placaConsultadaAnterior = placaConsultada;
       placaConsultada = placa;
       vehiculoRobado.value = data.restriccionPj.data.robado;
       ocultarBtnBuscarVehiculo.value = true;
       controllerPlaca.clear();
+      /*
+     * La duplicidad del vehículo es una ADVERTENCIA.
+     * Nunca debe impedir visualizar los datos.
+     */
+      final DatosConsultaDuplicadoOperativo duplicado =
+          data.datosConsultaDuplicadoOperativo;
+      final bool vehiculoConsultadoAnteriormente = duplicado.idHdrEvento > 0;
+      if (vehiculoConsultadoAnteriormente) {
+        debugPrint('==========================================');
+        debugPrint('VEHÍCULO CONSULTADO ANTERIORMENTE');
+        debugPrint('PLACA: $placa');
+        debugPrint('OPERATIVO ANTERIOR: ${duplicado.idHdrEvento}');
+        debugPrint('SE MOSTRARÁ LA INFORMACIÓN NORMALMENTE');
+        debugPrint('==========================================');
+      }
+      if (requiereConductorObligatorio) {
+        final bool conductorExistente =
+        await _sincronizarConductorVehiculoServidor(placa: placa);
+        if (isClosed) return false;
+        debugPrint('==========================================');
+        debugPrint('SINCRONIZACIÓN CONDUCTOR AL CONSULTAR VEHÍCULO');
+        debugPrint('OPERATIVO: ${idHdrEventoActual.value}');
+        debugPrint('PLACA: $placa');
+        debugPrint(
+          'VEHÍCULO CONSULTADO ANTERIORMENTE: $vehiculoConsultadoAnteriormente',
+        );
+        debugPrint('CONDUCTOR EXISTENTE: ${conductorExistente ? 'SI' : 'NO'}');
+        debugPrint('==========================================');
+      }
+      /*
+     * ALERTA VEHÍCULO ROBADO.
+     */
       if (vehiculoRobado.value) {
         try {
           await UtilidadesUtil.playAudio(
@@ -947,13 +1448,20 @@ class OpServicioUrbanoController extends GetxController {
           debugPrint('No fue posible reproducir el audio de alerta: $e');
         }
       }
-      if (isClosed) return false;
+      if (isClosed) {
+        return false;
+      }
+      mensajeErrorConsulta = '';
       debugPrint('==========================================');
       debugPrint('CONSULTA VEHÍCULO CORRECTA');
-      debugPrint('ID HDR EVENTO RESUM: $idHdrEventoResumVehiculo');
+      debugPrint('ID HDR EVENTO RESUM: ${data.idHdrEventoResum}');
       debugPrint('VARIABLE INSERCIÓN: $idVariableInsertadaVehiculo');
+      debugPrint('DUPLICADO/ANTERIOR: $vehiculoConsultadoAnteriormente');
       debugPrint('==========================================');
-      // La advertencia se muestra después de retirar la carga.
+      /*
+     * Después de retirar loading se mostrará
+     * la advertencia de duplicidad/matrícula.
+     */
       vehiculoParaAdvertencia = data;
       return true;
     } catch (e, stackTrace) {
@@ -963,9 +1471,13 @@ class OpServicioUrbanoController extends GetxController {
           fallback: 'No fue posible realizar la consulta del vehículo.',
         );
         ocultarBtnBuscarVehiculo.value = false;
-        debugPrint('ERROR CONSULTA VEHÍCULO: $mensajeErrorConsulta');
+        debugPrint('==========================================');
+        debugPrint('ERROR CONSULTA VEHÍCULO');
+        debugPrint(mensajeErrorConsulta);
+        debugPrint('$e');
+        debugPrint('$stackTrace');
+        debugPrint('==========================================');
       }
-      debugPrint('$stackTrace');
       return false;
     } finally {
       if (!isClosed) {
@@ -1011,12 +1523,14 @@ class OpServicioUrbanoController extends GetxController {
     required GlobalKey<FormState> key,
     String nacionalidad = 'ECU',
   }) async {
-    if (consultandoPersonaVehiculo.value) {
+    if (consultandoPersonaVehiculo.value ||
+        peticionServerState.value ||
+        isClosed) {
       return false;
     }
     mensajeErrorConsulta = '';
     consultaRepetida = false;
-    final nacionalidadNormalizada = nacionalidad.trim().toUpperCase();
+    final String nacionalidadNormalizada = nacionalidad.trim().toUpperCase();
     if (!RegExp(r'^[A-Z]{3}$').hasMatch(nacionalidadNormalizada)) {
       mensajeErrorConsulta = 'Seleccione una nacionalidad válida.';
       return false;
@@ -1047,24 +1561,42 @@ class OpServicioUrbanoController extends GetxController {
       mensajeErrorConsulta = 'Ingrese un documento válido.';
       return false;
     }
-    // ==========================================================
-    // EVITAR DUPLICADOS
-    // ==========================================================
-    if (documentosPersonasVehiculoRegistradas.contains(documentoNormalizado)) {
-      mensajeErrorConsulta =
-          'La persona con documento $cedula ya se encuentra registrada en este vehículo.';
+    final bool esConductor = tipoPersonaVehiculo.value == 'CONDUCTOR';
+    if (_documentoConsultadoEnOperativo(documentoNormalizado)) {
+      consultaRepetida = true;
+      controllerCedulaVehiculo.clear();
+      mensajeErrorConsulta = esConductor
+          ? 'La persona ya fue consultada dentro de este operativo. Realice la consulta del conductor con otro documento.'
+          : 'La persona ya fue consultada dentro de este operativo. Realice la consulta del ocupante con otro documento.';
       debugPrint('==========================================');
-      debugPrint('PERSONA DUPLICADA');
-      debugPrint('DOCUMENTO: $cedula');
-      debugPrint('NORMALIZADO: $documentoNormalizado');
-      debugPrint(
-        'DOCUMENTOS REGISTRADOS: '
-        '$documentosPersonasVehiculoRegistradas',
-      );
+      debugPrint('${esConductor ? 'CONDUCTOR' : 'OCUPANTE'} BLOQUEADO LOCALMENTE');
+      debugPrint('DOCUMENTO: $documentoNormalizado');
+      debugPrint('OPERATIVO: ${idHdrEventoActual.value}');
+      debugPrint('NO SE ENVÍA NUEVO REQUEST AL SERVIDOR');
+      debugPrint('SE CONSERVA EL REGISTRO Y LA ALERTA EXISTENTE');
       debugPrint('==========================================');
       return false;
     }
-    final bool esConductor = tipoPersonaVehiculo.value == 'CONDUCTOR';
+    /*
+   * ============================================================
+   * DUPLICADO LOCAL
+   * ============================================================
+   *
+   * Este bloqueo únicamente evita agregar DOS VECES
+   * la misma persona que YA se encuentra visible en el front.
+   *
+   * No tiene relación con consultaRepetida del servidor.
+   */
+    if (documentosPersonasVehiculoRegistradas.contains(documentoNormalizado)) {
+      mensajeErrorConsulta =
+      'La persona con documento $cedula ya se encuentra registrada en este vehículo.';
+      debugPrint('==========================================');
+      debugPrint('PERSONA YA VISIBLE EN EL VEHÍCULO');
+      debugPrint('DOCUMENTO: $cedula');
+      debugPrint('OPERATIVO: ${idHdrEventoActual.value}');
+      debugPrint('==========================================');
+      return false;
+    }
     if (esConductor && dataPersona_conductor.isNotEmpty) {
       mensajeErrorConsulta = 'Este vehículo ya tiene un conductor registrado.';
       return false;
@@ -1072,26 +1604,40 @@ class OpServicioUrbanoController extends GetxController {
     final List<VariablesResultado> variablesDisponibles =
         variablesResultadoPersona;
     final VariablesResultado? seleccionada =
-        variableResultadoSeleccionada.value;
+        variableResultadoPersonaVehiculoSeleccionada.value;
     final bool seleccionCompatible =
         seleccionada != null &&
-        variablesDisponibles.any(
-          (VariablesResultado item) =>
+            variablesDisponibles.any(
+                  (VariablesResultado item) =>
               item.idVariable == seleccionada.idVariable,
-        );
-    final int idVariable = seleccionCompatible
-        ? seleccionada.idVariable
-        : variablesDisponibles.isNotEmpty
-        ? variablesDisponibles.first.idVariable
-        : 0;
+            );
+    final VariablesResultado? variableUsar = seleccionCompatible
+        ? seleccionada
+        : variableDefaultPersona;
+    final int idVariable = variableUsar?.idVariable ?? 0;
+    if (idVariable <= 0) {
+      mensajeErrorConsulta =
+      'No existen variables configuradas para registrar la persona.';
+      return false;
+    }
+    /*
+   * Bloquear resto de operaciones mientras
+   * se registra conductor/ocupante.
+   */
     consultandoPersonaVehiculo.value = true;
+    peticionServerState.value = true;
     paginaPersonasVehiculoLoading.value = true;
-    final push = OperativoPushService.instance;
-    final consultaPush = push.consultasPersona.iniciar(
-      idOperativo: idHdrEventoActual.value,
-      documento: cedula,
-      relacionadaVehiculo: true,
-    );
+    OperativoPushService? push;
+    dynamic consultaPush;
+    bool pushFinalizado = false;
+    if (_pushOperativoActivado && internetPublicoDisponible.value) {
+      push = OperativoPushService.instance;
+      consultaPush = push.consultasPersona.iniciar(
+        idOperativo: idHdrEventoActual.value,
+        documento: cedula,
+        relacionadaVehiculo: true,
+      );
+    }
     try {
       debugPrint('==========================================');
       debugPrint('CONSULTANDO PERSONA RELACIONADA');
@@ -1104,13 +1650,19 @@ class OpServicioUrbanoController extends GetxController {
       final BuildContext? context = Get.context;
       if (context == null) {
         mensajeErrorConsulta =
-            'No existe contexto disponible para realizar la consulta.';
+        'No existe contexto disponible para realizar la consulta.';
         return false;
       }
       final LocationBloc locationBloc = BlocProvider.of<LocationBloc>(context);
       final LatLng pos = await locationBloc.getCurrentPosition();
+      if (isClosed) {
+        return false;
+      }
       final String ip = await DeviceInfoApp.getIp;
-      String consultadoPor = "${user.nombres}";
+      if (isClosed) {
+        return false;
+      }
+      final String consultadoPor = user.nombres;
       final ConsultarPersonaRequest request = ConsultarPersonaRequest(
         consultadoPor: consultadoPor,
         idOperativo: idHdrEventoActual.value,
@@ -1125,23 +1677,92 @@ class OpServicioUrbanoController extends GetxController {
         tipoRelacion: esConductor ? 'CONDUCTOR' : 'OCUPANTE',
         idGenPersona: user.idGenPersona,
       );
-      await _activarNotificacionesOperativo();
-      if (isClosed) return false;
-      final DataConsultaPersona persona = await siipneMovilUseCase
-          .consultarPersona(request: request);
-      push.consultasPersona.finalizar(
-        consultaPush,
-        consultaRepetida: persona.consultaRepetida,
-        idHdrEventoResum: persona.idHdrEventoResum,
+      //await _activarNotificacionesOperativo();
+      if (isClosed) {
+        return false;
+      }
+      /*
+     * ============================================================
+     * CONSULTA CON RECUPERACIÓN AUTOMÁTICA
+     * ============================================================
+     *
+     * Utiliza EL MISMO helper de personas.
+     *
+     * Si el primer POST llegó al servidor pero
+     * la respuesta sufrió timeout:
+     *
+     *   1. esperamos 900 ms;
+     *   2. consultamos nuevamente;
+     *   3. servidor puede devolver consultaRepetida=true;
+     *   4. si fue recuperación técnica por timeout, NO se bloquea.
+     */
+      final DataConsultaPersona persona = await _consultarPersonaServidor(
+        request: request,
       );
+      if (isClosed) {
+        return false;
+      }
+      final bool consultaRecuperadaPorTimeout =
+          _ultimaConsultaPersonaRecuperadaPorTimeout;
+      consultaRepetida = persona.consultaRepetida;
+      final bool consultaRepetidaReal =
+          persona.consultaRepetida && !consultaRecuperadaPorTimeout;
+      if (push != null && consultaPush != null) {
+        push.consultasPersona.finalizar(
+          consultaPush,
+          consultaRepetida: persona.consultaRepetida,
+          idHdrEventoResum: persona.idHdrEventoResum,
+        );
+        pushFinalizado = true;
+      }
       FocusManager.instance.primaryFocus?.unfocus();
+      /*
+     * Debemos tener el registro persistido.
+     */
+      if (persona.idHdrEventoResum <= 0) {
+        mensajeErrorConsulta =
+        'El servidor respondió la consulta, pero no devolvió '
+            'el identificador del registro realizado.';
+        return false;
+      }
+      if (consultaRepetidaReal) {
+        final String rol = esConductor ? 'CONDUCTOR' : 'OCUPANTE';
+        debugPrint('==========================================');
+        debugPrint('$rol YA CONSULTADO - BLOQUEADO');
+        debugPrint('DOCUMENTO: $documentoNormalizado');
+        debugPrint('OPERATIVO: ${idHdrEventoActual.value}');
+        debugPrint('ID HDR EVENTO RESUM: ${persona.idHdrEventoResum}');
+        debugPrint('SE DEBE CONSULTAR OTRO DOCUMENTO');
+        debugPrint('==========================================');
+        controllerCedulaVehiculo.clear();
+        _registrarDocumentoConsultadoOperativo(documentoNormalizado);
+        mensajeErrorConsulta = esConductor
+            ? 'La persona ya fue consultada dentro de este operativo. Realice la consulta del conductor con otro documento.'
+            : 'La persona ya fue consultada dentro de este operativo. Realice la consulta del ocupante con otro documento.';
+        return false;
+      }
+      if (persona.consultaRepetida && consultaRecuperadaPorTimeout) {
+        debugPrint(
+          '${esConductor ? 'CONDUCTOR' : 'OCUPANTE'} RECUPERADO POR TIMEOUT - NO SE BLOQUEA',
+        );
+      }
+      /*
+     * Validación local nuevamente por seguridad.
+     *
+     * Esto protege contra dos respuestas concurrentes
+     * después de aplicar la validación restrictiva del servidor.
+     */
       if (documentosPersonasVehiculoRegistradas.contains(
         documentoNormalizado,
       )) {
-        mensajeErrorConsulta =
-            'La persona con documento $cedula ya se encuentra registrada en este vehículo.';
-        return false;
+        debugPrint('PERSONA YA INCORPORADA LOCALMENTE DURANTE LA CONSULTA');
+        return true;
       }
+      /*
+     * ============================================================
+     * MOSTRAR SIEMPRE LOS DATOS
+     * ============================================================
+     */
       if (esConductor) {
         dataPersona_conductor.assignAll(<DataConsultaPersona>[persona]);
         documentoConductorVehiculo = documentoNormalizado;
@@ -1150,55 +1771,77 @@ class OpServicioUrbanoController extends GetxController {
         documentosOcupantesVehiculo.add(documentoNormalizado);
       }
       documentosPersonasVehiculoRegistradas.add(documentoNormalizado);
+      _registrarDocumentoConsultadoOperativo(documentoNormalizado);
       idHdrEventoResumPersona = persona.idHdrEventoResum;
       controllerCedulaVehiculo.clear();
+      /*
+     * Una vez registrado conductor,
+     * pasar automáticamente a ocupante.
+     */
       if (esConductor) {
         tipoPersonaVehiculo.value = 'OCUPANTE';
       }
-      if (persona.ordenCaptura.success) {
-        try {
-          await UtilidadesUtil.playAudio(
-            nameAudio: AppSiipneMovilImages.audio_Alerta,
-          );
-        } catch (e) {
-          debugPrint('No fue posible reproducir audio: $e');
-        }
-
+      /*
+     * ORDEN DE CAPTURA
+     *
+     * Se procesa únicamente cuando la consulta puede continuar.
+     * Una repetición real de conductor/ocupante se bloquea antes.
+     */
+      final bool tieneBoleta = await _procesarOrdenCapturaPersona(
+        persona: persona,
+        documento: cedula,
+        actualizarConsultaPrincipal: false,
+        origen: esConductor ? 'CONDUCTOR' : 'OCUPANTE',
+      );
+      if (tieneBoleta) {
         debugPrint('==========================================');
         debugPrint('ALERTA PERSONA RELACIONADA AL VEHÍCULO');
         debugPrint('OPERATIVO: ${idHdrEventoActual.value}');
-        debugPrint('VEHÍCULO: ${dataVehiculo.first.datosVehiculo.data.placa}');
+        debugPrint(
+          'VEHÍCULO: '
+              '${dataVehiculo.first.datosVehiculo.data.placa}',
+        );
         debugPrint('DOCUMENTO: $cedula');
         debugPrint('TIPO: ${esConductor ? 'CONDUCTOR' : 'OCUPANTE'}');
+        debugPrint('CONSULTA REPETIDA: ${persona.consultaRepetida}');
         debugPrint('ORDEN CAPTURA: SI');
-        debugPrint('PUSH: GENERADO POR SERVIDOR');
         debugPrint('==========================================');
       }
+      variableResultadoPersonaVehiculoSeleccionada.value =
+          variableDefaultPersona;
+      mensajeErrorConsulta = '';
       debugPrint('==========================================');
-      debugPrint('PERSONA AGREGADA CORRECTAMENTE');
+      if (persona.consultaRepetida) {
+        debugPrint('PERSONA RELACIONADA RECUPERADA CORRECTAMENTE');
+      } else {
+        debugPrint('PERSONA RELACIONADA REGISTRADA CORRECTAMENTE');
+      }
       debugPrint('DOCUMENTO: $documentoNormalizado');
+      debugPrint('ID HDR EVENTO RESUM: ${persona.idHdrEventoResum}');
       debugPrint('CONDUCTOR: ${dataPersona_conductor.length}');
       debugPrint('OCUPANTES: ${dataPersona_ocupantes.length}');
-      debugPrint(
-        'DOCUMENTOS REGISTRADOS: '
-        '$documentosPersonasVehiculoRegistradas',
-      );
+      debugPrint('CONSULTA REPETIDA: ${persona.consultaRepetida}');
       debugPrint('==========================================');
       return true;
     } catch (e, stackTrace) {
       mensajeErrorConsulta = UrlApiProviderAppCenso.mensajeException(
         e,
         fallback:
-            'No fue posible consultar o relacionar la persona con el vehículo.',
+        'No fue posible consultar o relacionar la persona con el vehículo.',
       );
       debugPrint('==========================================');
       debugPrint('ERROR PERSONA VEHÍCULO');
       debugPrint(mensajeErrorConsulta);
+      debugPrint('$e');
       debugPrint('$stackTrace');
       debugPrint('==========================================');
       return false;
     } finally {
-      push.consultasPersona.finalizar(consultaPush);
+      /*
+     * Evitamos finalizar dos veces el control PUSH.
+     */
+      if (!pushFinalizado && push != null && consultaPush != null)
+        push.consultasPersona.finalizar(consultaPush);
       consultandoPersonaVehiculo.value = false;
       peticionServerState.value = false;
       paginaPersonasVehiculoLoading.value = false;
@@ -1252,6 +1895,7 @@ class OpServicioUrbanoController extends GetxController {
     conductorDesdeBase.value = null;
     tipoPersonaVehiculo.value = 'CONDUCTOR';
     idHdrEventoResumPersona = 0;
+    variableResultadoPersonaVehiculoSeleccionada.value = variableDefaultPersona;
   }
 
   // ============================================================
@@ -1270,12 +1914,74 @@ class OpServicioUrbanoController extends GetxController {
     controllerCedulaVehiculo.clear();
   }
 
+  Future<bool> _sincronizarConductorVehiculoServidor({
+    required String placa,
+    bool registrarError = false,
+  }) async {
+    final String placaNormalizada = placa.trim().toUpperCase();
+    if (placaNormalizada.isEmpty || idHdrEventoActual.value <= 0) {
+      conductorRegistradoEnBaseDeDatos.value = false;
+      conductorDesdeBase.value = null;
+      tipoPersonaVehiculo.value = 'CONDUCTOR';
+      if (registrarError)
+        mensajeErrorConsulta = placaNormalizada.isEmpty
+            ? 'No fue posible determinar la placa del vehículo.'
+            : 'No existe un operativo válido para verificar el conductor.';
+      return false;
+    }
+    try {
+      final ConductorVehiculo? resultado = await siipneMovilUseCase
+          .getDatosConductorVehiculo(
+        request: ConductorVehiculoRequest(
+          idHdrEvento: idHdrEventoActual.value,
+          placa: placaNormalizada,
+        ),
+      );
+      if (isClosed) return false;
+      if (resultado == null ||
+          resultado.cedula.trim().isEmpty ||
+          resultado.cedula.trim() == '0') {
+        conductorRegistradoEnBaseDeDatos.value = false;
+        conductorDesdeBase.value = null;
+        tipoPersonaVehiculo.value = 'CONDUCTOR';
+        debugPrint('CONDUCTOR SERVIDOR [$placaNormalizada]: NO REGISTRADO');
+        return false;
+      }
+      conductorRegistradoEnBaseDeDatos.value = true;
+      conductorDesdeBase.value = resultado;
+      tipoPersonaVehiculo.value = 'OCUPANTE';
+      final String documento = normalizarDocumentoPersonaVehiculo(
+        resultado.cedula,
+      );
+      if (documento.isNotEmpty) {
+        documentoConductorVehiculo = documento;
+        documentosPersonasVehiculoRegistradas.add(documento);
+        _registrarDocumentoConsultadoOperativo(documento);
+      }
+      debugPrint('==========================================');
+      debugPrint('CONDUCTOR RECUPERADO DESDE SERVIDOR');
+      debugPrint('OPERATIVO: ${idHdrEventoActual.value}');
+      debugPrint('PLACA: $placaNormalizada');
+      debugPrint('DOCUMENTO: ${resultado.cedula}');
+      debugPrint('CONDUCTOR: ${resultado.conductor}');
+      debugPrint('==========================================');
+      return true;
+    } catch (e, stackTrace) {
+      conductorRegistradoEnBaseDeDatos.value = false;
+      conductorDesdeBase.value = null;
+      tipoPersonaVehiculo.value = 'CONDUCTOR';
+      if (registrarError) mensajeErrorConsulta = 'No fue posible verificar el conductor del vehículo. Intente nuevamente.';
+      debugPrint('ERROR CONSULTANDO CONDUCTOR [$placaNormalizada]: $e');
+      debugPrint('$stackTrace');
+      return false;
+    }
+  }
+
   Future<bool> consultarExistenciaConductor() async {
     if (dataVehiculo.isEmpty) {
       mensajeErrorConsulta = 'No existe un vehículo consultado.';
       return false;
     }
-
     final String placa = dataVehiculo.first.datosVehiculo.data.placa
         .trim()
         .toUpperCase();
@@ -1283,47 +1989,14 @@ class OpServicioUrbanoController extends GetxController {
       mensajeErrorConsulta = 'No fue posible determinar la placa del vehículo.';
       return false;
     }
-
     peticionServerState.value = true;
     paginaPersonasVehiculoLoading.value = true;
     mensajeErrorConsulta = '';
-
     try {
-      conductorRegistradoEnBaseDeDatos.value = false;
-      conductorDesdeBase.value = null;
-
-      final ConductorVehiculo? resultado = await siipneMovilUseCase
-          .getDatosConductorVehiculo(
-            request: ConductorVehiculoRequest(
-              idHdrEvento: idHdrEventoActual.value,
-              placa: placa,
-            ),
-          );
-
-      if (resultado == null ||
-          resultado.cedula.trim().isEmpty ||
-          resultado.cedula.trim() == '0') {
-        tipoPersonaVehiculo.value = 'CONDUCTOR';
-        debugPrint('CONDUCTOR SERVIDOR [$placa]: NO REGISTRADO');
-        return false;
-      }
-
-      conductorRegistradoEnBaseDeDatos.value = true;
-      conductorDesdeBase.value = resultado;
-      tipoPersonaVehiculo.value = 'OCUPANTE';
-
-      debugPrint(
-        'CONDUCTOR SERVIDOR [$placa]: ${resultado.cedula} - ${resultado.conductor}',
+      return await _sincronizarConductorVehiculoServidor(
+        placa: placa,
+        registrarError: true,
       );
-      return true;
-    } catch (e, stackTrace) {
-      conductorRegistradoEnBaseDeDatos.value = false;
-      conductorDesdeBase.value = null;
-      tipoPersonaVehiculo.value = 'CONDUCTOR';
-      mensajeErrorConsulta = 'No fue posible verificar el conductor del vehículo. Intente nuevamente.';
-      debugPrint('ERROR CONSULTANDO CONDUCTOR [$placa]: $e');
-      debugPrint('$stackTrace');
-      return false;
     } finally {
       peticionServerState.value = false;
       paginaPersonasVehiculoLoading.value = false;
@@ -1384,7 +2057,7 @@ class OpServicioUrbanoController extends GetxController {
       );
       if (resultado.idHdrEvento <= 0) {
         mensajeErrorFinalizar =
-            'El servidor no confirmó la finalización del operativo.';
+        'El servidor no confirmó la finalización del operativo.';
         return false;
       }
       if (resultado.idHdrEvento != idEvento) {
@@ -1392,11 +2065,14 @@ class OpServicioUrbanoController extends GetxController {
         return false;
       }
       // No convertir un fallo push en fallo de finalización ya confirmada.
-      OperativoPushService.instance.salirOperativo();
+      if (_pushOperativoActivado) {
+        OperativoPushService.instance.salirOperativo();
+        _pushOperativoActivado = false;
+      }
       return true;
     } catch (e, stackTrace) {
       mensajeErrorFinalizar =
-          'No fue posible finalizar el operativo. Intente nuevamente.';
+      'No fue posible finalizar el operativo. Intente nuevamente.';
       debugPrint('ERROR FINALIZANDO: $e');
       debugPrint('$stackTrace');
       return false;
@@ -1422,10 +2098,12 @@ class OpServicioUrbanoController extends GetxController {
   void prepararPantallaPersonasVehiculo() {
     controllerCedulaVehiculo.clear();
     paginaPersonasVehiculoLoading.value = false;
-
     tipoPersonaVehiculo.value = conductorRegistradoEnBaseDeDatos.value
         ? 'OCUPANTE'
         : 'CONDUCTOR';
+    // La pantalla de conductor/ocupantes maneja su propia variable y nunca
+    // debe modificar la selección pendiente del vehículo principal.
+    variableResultadoPersonaVehiculoSeleccionada.value = variableDefaultPersona;
   }
 
   // ============================================================
@@ -1442,7 +2120,10 @@ class OpServicioUrbanoController extends GetxController {
     debugPrint('ANEXADO: ${esOperativoAnexado.value}');
     debugPrint('PUEDE FINALIZAR: ${puedeFinalizarOperativo.value}');
     debugPrint('==========================================');
-    await OperativoPushService.instance.salirOperativo();
+    if (_pushOperativoActivado) {
+      await OperativoPushService.instance.salirOperativo();
+      _pushOperativoActivado = false;
+    }
     if (!isClosed) Get.offAllNamed(AppRoutes.SPLASH_APP);
   }
 
@@ -1457,7 +2138,7 @@ class OpServicioUrbanoController extends GetxController {
     final int idEvento = idHdrEventoActual.value;
     if (idEvento <= 0) {
       mensajeErrorPersonalOperativo =
-          'No existe un operativo válido para consultar el personal.';
+      'No existe un operativo válido para consultar el personal.';
       return false;
     }
     peticionServerState.value = true;
@@ -1468,20 +2149,20 @@ class OpServicioUrbanoController extends GetxController {
       debugPrint('==========================================');
       final List<Integrante> resultado = await siipneMovilUseCase
           .consultarPersonalOperativo(
-            request: GetDatosPoliciasOperativoRequest(idHdrEvento: idEvento),
-          );
+        request: GetDatosPoliciasOperativoRequest(idHdrEvento: idEvento),
+      );
       personalOperativo.assignAll(resultado);
       debugPrint('PERSONAL RECIBIDO: ${personalOperativo.length}');
       if (personalOperativo.isEmpty) {
         mensajeErrorPersonalOperativo =
-            'No existen servidores policiales registrados en este operativo.';
+        'No existen servidores policiales registrados en este operativo.';
         return false;
       }
       return true;
     } catch (e, stackTrace) {
       personalOperativo.clear();
       mensajeErrorPersonalOperativo =
-          'No fue posible consultar el personal del operativo.';
+      'No fue posible consultar el personal del operativo.';
       debugPrint('==========================================');
       debugPrint('ERROR CONSULTANDO PERSONAL');
       debugPrint('$e');
@@ -1510,6 +2191,7 @@ class OpServicioUrbanoController extends GetxController {
       return await actualizarResultadoRegistro(
         idHdrEventoResum: idHdrEventoResumPersona,
         idVariableOriginal: idVariableInsertadaPersona,
+        variableSeleccionada: variableResultadoPersonaSeleccionada.value,
       );
     }
     /*
@@ -1521,6 +2203,7 @@ class OpServicioUrbanoController extends GetxController {
       return await actualizarResultadoRegistro(
         idHdrEventoResum: idHdrEventoResumVehiculo,
         idVariableOriginal: idVariableInsertadaVehiculo,
+        variableSeleccionada: variableResultadoVehiculoSeleccionada.value,
       );
     }
     /*
@@ -1551,10 +2234,10 @@ class OpServicioUrbanoController extends GetxController {
       final String placa = data.datosVehiculo.data.placa.trim();
       alertas.add(
         "VEHÍCULO CONSULTADO\n"
-        "El vehículo${placa.isNotEmpty ? ' con placa $placa' : ''} "
-        "ya fue consultado en otro operativo."
-        "${ubicacion.isNotEmpty ? '\n\nUbicación registrada:\n${ubicacion.join(' · ')}' : ''}"
-        "${duplicado.fecha.trim().isNotEmpty ? '\n\nFecha de consulta:\n${duplicado.fecha.trim()}' : ''}",
+            "El vehículo${placa.isNotEmpty ? ' con placa $placa' : ''} "
+            "ya fue consultado en otro operativo."
+            "${ubicacion.isNotEmpty ? '\n\nUbicación registrada:\n${ubicacion.join(' · ')}' : ''}"
+            "${duplicado.fecha.trim().isNotEmpty ? '\n\nFecha de consulta:\n${duplicado.fecha.trim()}' : ''}",
       );
     }
     // --------------------------------------------------
@@ -1563,7 +2246,7 @@ class OpServicioUrbanoController extends GetxController {
     if (alertaMatricula) {
       alertas.add(
         "ADVERTENCIA DE MATRÍCULA\n"
-        "${data.datospropietario.data.mensajeMatricula}",
+            "${data.datospropietario.data.mensajeMatricula}",
       );
     }
     // --------------------------------------------------
@@ -1586,7 +2269,7 @@ class OpServicioUrbanoController extends GetxController {
     final int idEvento = idHdrEventoActual.value;
     if (idEvento <= 0) {
       mensajeErrorResultadosOperativo =
-          'No existe un operativo válido para consultar el resumen.';
+      'No existe un operativo válido para consultar el resumen.';
       return false;
     }
     cargandoResultadosOperativo.value = true;
@@ -1598,17 +2281,17 @@ class OpServicioUrbanoController extends GetxController {
       debugPrint('==========================================');
       final ResultadosOperativo resultado = await siipneMovilUseCase
           .getDatosResultadosOperativo(
-            request: ResultadosOperativoRequest(idHdrEvento: idEvento),
-          );
+        request: ResultadosOperativoRequest(idHdrEvento: idEvento),
+      );
       if (resultado.idHdrEvento <= 0) {
         mensajeErrorResultadosOperativo =
-            'El servidor no devolvió información válida del operativo.';
+        'El servidor no devolvió información válida del operativo.';
         resultadosOperativo.value = null;
         return false;
       }
       if (resultado.idHdrEvento != idEvento) {
         mensajeErrorResultadosOperativo =
-            'La información recibida no corresponde al operativo actual.';
+        'La información recibida no corresponde al operativo actual.';
         resultadosOperativo.value = null;
         return false;
       }
@@ -1668,7 +2351,7 @@ class OpServicioUrbanoController extends GetxController {
     if (persona == null) {
       if (dataPersona.isEmpty) {
         mensajeErrorAntecedentesPersona =
-            'Primero debe realizar la consulta de una persona.';
+        'Primero debe realizar la consulta de una persona.';
         return false;
       }
       persona = dataPersona.first;
@@ -1695,7 +2378,7 @@ class OpServicioUrbanoController extends GetxController {
     }
     if (documento.isEmpty) {
       mensajeErrorAntecedentesPersona =
-          'No fue posible determinar el documento de la persona consultada.';
+      'No fue posible determinar el documento de la persona consultada.';
       return false;
     }
     consultandoAntecedentesPersona.value = true;
@@ -1711,8 +2394,8 @@ class OpServicioUrbanoController extends GetxController {
       debugPrint('==========================================');
       final DataAntecedentes resultado = await siipneMovilUseCase
           .getDatosAntecedentes(
-            request: AntecedentesRequest(documento: documento),
-          );
+        request: AntecedentesRequest(documento: documento),
+      );
       datosAntecedentesPersona.value = resultado;
       debugPrint('==========================================');
       debugPrint('ANTECEDENTES CONSULTADOS');
@@ -1743,25 +2426,24 @@ class OpServicioUrbanoController extends GetxController {
   // ============================================================
   @override
   void onClose() {
-    final OperativoPushService push = OperativoPushService.instance;
-
-    push.estado.removeListener(_estadoPushActualizado);
-    push.alertaCritica.removeListener(_alertaPushActualizada);
-    push.aperturaPendiente.removeListener(_alertaPushActualizada);
-
+    if (_pushOperativoActivado) {
+      final OperativoPushService push = OperativoPushService.instance;
+      push.estado.removeListener(_estadoPushActualizado);
+      push.alertaCritica.removeListener(_alertaPushActualizada);
+      push.aperturaPendiente.removeListener(_alertaPushActualizada);
+    }
     scrollController.removeListener(_onScroll);
     scrollController.dispose();
     controllerCedula.dispose();
     controllerPlaca.dispose();
     controllerCedulaVehiculo.dispose();
     controllerClaveFinalizar.dispose();
-
     super.onClose();
   }
+
   // ============================================================
   // BIOMETRÍA
   // ============================================================
-
   Future<bool> biometriaConfiguradaEnApp() async {
     try {
       return await loginController.biometriaConfiguradaEnApp();
@@ -1773,47 +2455,36 @@ class OpServicioUrbanoController extends GetxController {
 
   Future<bool> autenticarBiometriaFinalizar() async {
     if (autenticandoBiometria.value) return false;
-
     // 1. La biometría debe estar habilitada DENTRO de SIIPNE Móvil.
     final bool configuradaApp = await biometriaConfiguradaEnApp();
-
     if (!configuradaApp) {
       debugPrint(
         '[CIERRE BIOMETRIA] No habilitada en preferencias de SIIPNE Móvil',
       );
       return false;
     }
-
     autenticandoBiometria.value = true;
-
     try {
       final LocalAuthentication auth = LocalAuthentication();
-
       // 2. Validar soporte del dispositivo.
       final bool soportado = await auth.isDeviceSupported();
-
       if (!soportado) {
         debugPrint('[CIERRE BIOMETRIA] Dispositivo sin soporte biométrico');
         return false;
       }
-
       // 3. Validar disponibilidad biométrica.
       final bool disponible = await auth.canCheckBiometrics;
-
       if (!disponible) {
         debugPrint('[CIERRE BIOMETRIA] Biometría no disponible');
         return false;
       }
-
       // 4. Verificar que exista biometría registrada.
       final List<BiometricType> biometricos = await auth
           .getAvailableBiometrics();
-
       if (biometricos.isEmpty) {
         debugPrint('[CIERRE BIOMETRIA] No existen biométricos registrados');
         return false;
       }
-
       debugPrint('==========================================');
       debugPrint('AUTENTICACIÓN BIOMÉTRICA PARA CIERRE');
       debugPrint('CONFIGURADA EN APP: SI');
@@ -1821,22 +2492,18 @@ class OpServicioUrbanoController extends GetxController {
       debugPrint('BIOMÉTRICOS: $biometricos');
       debugPrint('OPERATIVO: ${idHdrEventoActual.value}');
       debugPrint('==========================================');
-
       final bool autenticado = await auth.authenticate(
         localizedReason:
-            'Confirme su identidad para finalizar el operativo '
+        'Confirme su identidad para finalizar el operativo '
             '${idHdrEventoActual.value}',
         biometricOnly: true,
         persistAcrossBackgrounding: true,
       );
-
       if (!autenticado) {
         debugPrint('[CIERRE BIOMETRIA] Autenticación no completada');
         return false;
       }
-
       debugPrint('[CIERRE BIOMETRIA] Identidad confirmada correctamente');
-
       return true;
     } on LocalAuthException catch (e) {
       // Cancelar el diálogo biométrico NO es un error del sistema.
@@ -1844,17 +2511,14 @@ class OpServicioUrbanoController extends GetxController {
         debugPrint('[CIERRE BIOMETRIA] Autenticación cancelada por el usuario');
         return false;
       }
-
       debugPrint(
         '[CIERRE BIOMETRIA] LocalAuthException: '
-        '${e.code} - ${e.description}',
+            '${e.code} - ${e.description}',
       );
-
       return false;
     } catch (e, stackTrace) {
       debugPrint('[CIERRE BIOMETRIA] Error inesperado: $e');
       debugPrint('$stackTrace');
-
       return false;
     } finally {
       autenticandoBiometria.value = false;
@@ -1863,54 +2527,42 @@ class OpServicioUrbanoController extends GetxController {
 
   void _alertaPushActualizada() {
     if (isClosed) return;
-
     final OperativoPushService push = OperativoPushService.instance;
     final Map<String, dynamic>? data =
         push.alertaCritica.value ?? push.aperturaPendiente.value;
-
     if (data == null || data.isEmpty) return;
-
     final int idEvento =
         int.tryParse(data['idHdrEvento']?.toString() ?? '') ?? 0;
     if (idEvento <= 0 || idEvento != idHdrEventoActual.value) return;
-
     final String tipo = data['tipo']?.toString().trim().toUpperCase() ?? '';
     if (tipo != 'BOLETA' && tipo != 'VEHICULO_ROBADO') return;
-
     final String alertaId =
         data['_pushId']?.toString().trim() ??
-        data['alertaId']?.toString().trim() ??
-        '${idEvento}_${data['idHdrEventoResum']}_${tipo}';
-
+            data['alertaId']?.toString().trim() ??
+            '${idEvento}_${data['idHdrEventoResum']}_${tipo}';
     if (alertaId.isEmpty || _alertasPushMostradas.contains(alertaId)) {
       return;
     }
-
     _alertasPushMostradas.add(alertaId);
-
     if (_alertasPushMostradas.length > 100) {
       _alertasPushMostradas.remove(_alertasPushMostradas.first);
     }
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (isClosed) return;
-
       _colaDialogosPush = _colaDialogosPush
           .then((_) async {
-            if (!await push.consultasPersona.permitirAlerta(data)) return;
-            if (isClosed) return;
-            await _mostrarDialogoAlertaPush(data);
-          })
+        if (!await push.consultasPersona.permitirAlerta(data)) return;
+        if (isClosed) return;
+        await _mostrarDialogoAlertaPush(data);
+      })
           .catchError((Object error, StackTrace stackTrace) {
-            _alertasPushMostradas.remove(alertaId);
-            debugPrint('[PUSH] Error mostrando diálogo: $error');
-            debugPrintStack(stackTrace: stackTrace);
-          });
-
+        _alertasPushMostradas.remove(alertaId);
+        debugPrint('[PUSH] Error mostrando diálogo: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      });
       if (identical(push.alertaCritica.value, data)) {
         push.limpiarAlertaCritica();
       }
-
       if (identical(push.aperturaPendiente.value, data)) {
         push.limpiarAperturaPendiente();
       }
@@ -1922,13 +2574,11 @@ class OpServicioUrbanoController extends GetxController {
     final String tipo = data['tipo']?.toString().trim().toUpperCase() ?? '';
     final bool esVehiculo = tipo == 'VEHICULO_ROBADO';
     String valor(String key) => data[key]?.toString().trim() ?? '';
-
     final String mensaje = valor('_mensaje').isNotEmpty
         ? valor('_mensaje')
         : esVehiculo
         ? 'Se ha detectado un vehículo con alerta durante el operativo.'
         : 'Se ha detectado una persona con alerta durante el operativo.';
-
     final String placa = valor('placa').toUpperCase();
     final String cedula = valor('cedula');
     final String identificacion = esVehiculo ? placa : cedula;
@@ -1936,9 +2586,7 @@ class OpServicioUrbanoController extends GetxController {
         ? valor('consultadoPor')
         : valor('usuario');
     final String hora = valor('hora');
-
     final String titulo = esVehiculo ? 'VEHÍCULO ROBADO' : 'ORDEN DE CAPTURA';
-
     await Get.dialog(
       Dialog(
         elevation: 0,
@@ -2022,7 +2670,6 @@ class OpServicioUrbanoController extends GetxController {
                       ),
                     ),
                   ),
-
                   // ============================================================
                   // CABECERA
                   // ============================================================
@@ -2128,7 +2775,6 @@ class OpServicioUrbanoController extends GetxController {
                       ],
                     ),
                   ),
-
                   // Línea tipo escáner
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 18),
@@ -2143,7 +2789,6 @@ class OpServicioUrbanoController extends GetxController {
                       ),
                     ),
                   ),
-
                   // ============================================================
                   // MENSAJE PRINCIPAL
                   // ============================================================
@@ -2260,7 +2905,6 @@ class OpServicioUrbanoController extends GetxController {
                       ),
                     ),
                   ),
-
                   // ============================================================
                   // PIE / ACCIÓN
                   // ============================================================
@@ -2436,7 +3080,6 @@ class OpServicioUrbanoController extends GetxController {
         isClosed)
       return;
     FocusManager.instance.primaryFocus?.unfocus();
-
     // ==========================================================
     // YA ESTAMOS EN PERSONA -> NUEVA CONSULTA PERSONA
     // ==========================================================
@@ -2447,13 +3090,11 @@ class OpServicioUrbanoController extends GetxController {
         return;
       }
     }
-
     // ==========================================================
     // VENIMOS DE VEHÍCULO -> VALIDAR VEHÍCULO ANTES DE CAMBIAR
     // ==========================================================
     if (selectVehiculo.value && dataVehiculo.isNotEmpty) {
       final bool continuar = await nuevaConsultaVehiculo();
-
       // nuevaConsultaVehiculo() valida conductor contra servidor.
       // Si NO existe conductor, NO se permite cambiar a PERSONA.
       if (!continuar || isClosed) {
@@ -2461,16 +3102,13 @@ class OpServicioUrbanoController extends GetxController {
         return;
       }
     }
-
     if (isClosed) return;
-
     selectPerson.value = true;
     selectVehiculo.value = false;
-
-    final List<VariablesResultado> variables = variablesResultadoPersona;
-    variableResultadoSeleccionada.value = variables.isNotEmpty
-        ? variables.first
-        : null;
+    final VariablesResultado? variable =
+        variableResultadoPersonaSeleccionada.value ?? variableDefaultPersona;
+    variableResultadoPersonaSeleccionada.value = variable;
+    variableResultadoSeleccionada.value = variable;
   }
 
   // ============================================================
@@ -2483,7 +3121,6 @@ class OpServicioUrbanoController extends GetxController {
         isClosed)
       return;
     FocusManager.instance.primaryFocus?.unfocus();
-
     // ==========================================================
     // VENIMOS DE PERSONA -> GUARDAR RESULTADO ANTES DE CAMBIAR
     // ==========================================================
@@ -2494,29 +3131,24 @@ class OpServicioUrbanoController extends GetxController {
         return;
       }
     }
-
     // ==========================================================
     // YA ESTAMOS EN VEHÍCULO -> NUEVA CONSULTA VEHÍCULO
     // ==========================================================
     if (selectVehiculo.value && dataVehiculo.isNotEmpty) {
       final bool continuar = await nuevaConsultaVehiculo();
-
       // También valida conductor antes de permitir otro vehículo.
       if (!continuar || isClosed) {
         _mostrarErrorCambioConsulta();
         return;
       }
     }
-
     if (isClosed) return;
-
     selectPerson.value = false;
     selectVehiculo.value = true;
-
-    final List<VariablesResultado> variables = variablesResultadoVehiculo;
-    variableResultadoSeleccionada.value = variables.isNotEmpty
-        ? variables.first
-        : null;
+    final VariablesResultado? variable =
+        variableResultadoVehiculoSeleccionada.value ?? variableDefaultVehiculo;
+    variableResultadoVehiculoSeleccionada.value = variable;
+    variableResultadoSeleccionada.value = variable;
   }
 
   // ============================================================
@@ -2524,13 +3156,11 @@ class OpServicioUrbanoController extends GetxController {
   // ============================================================
   void _mostrarErrorCambioConsulta() {
     if (isClosed) return;
-
     final String mensaje = mensajeErrorConsulta.trim().isNotEmpty
         ? mensajeErrorConsulta.trim()
         : mensajeErrorActualizaResultado.trim().isNotEmpty
         ? mensajeErrorActualizaResultado.trim()
         : 'No fue posible continuar con la nueva consulta. Verifique la información registrada.';
-
     DialogosAwesome.getWarning(
       title: "NO ES POSIBLE CONTINUAR",
       descripcion: mensaje,
@@ -2538,50 +3168,53 @@ class OpServicioUrbanoController extends GetxController {
   }
 
   Future<bool> nuevaConsultaVehiculo() async {
-    if (peticionServerState.value || actualizandoResultado.value || isClosed)
+    if (peticionServerState.value || actualizandoResultado.value || isClosed) {
       return false;
-
+    }
     mensajeErrorConsulta = '';
     mensajeErrorActualizaResultado = '';
     FocusManager.instance.primaryFocus?.unfocus();
-
     if (dataVehiculo.isEmpty) {
       mensajeErrorConsulta = 'No existe un vehículo consultado.';
       return false;
     }
-
     final String placa = dataVehiculo.first.datosVehiculo.data.placa
         .trim()
         .toUpperCase();
-
     debugPrint('==========================================');
-    debugPrint('VALIDANDO VEHÍCULO ANTES DE NUEVA CONSULTA');
+    debugPrint('VALIDANDO VEHÍCULO ANTES DE CONTINUAR');
     debugPrint('PLACA: $placa');
-    debugPrint('DESTINO: NUEVA CONSULTA / CAMBIO DE TIPO');
+    debugPrint('MÓDULO: ${nombreModuloActual.value}');
+    debugPrint(
+      'CONDUCTOR OBLIGATORIO: ${requiereConductorObligatorio ? 'SI' : 'NO'}',
+    );
     debugPrint('==========================================');
-
     // ==========================================================
-    // VALIDACIÓN PERSISTENTE DEL CONDUCTOR EN SERVIDOR
+    // CONDUCTOR OBLIGATORIO SOLO EN OPERATIVOS PREVENTIVOS
     // ==========================================================
-    final bool tieneConductor = await consultarExistenciaConductor();
-
-    debugPrint('==========================================');
-    debugPrint('RESULTADO VALIDACIÓN CONDUCTOR');
-    debugPrint('PLACA: $placa');
-    debugPrint('TIENE CONDUCTOR: $tieneConductor');
-    debugPrint('==========================================');
-
-    if (!tieneConductor) {
-      if (mensajeErrorConsulta.trim().isEmpty) {
-        mensajeErrorConsulta = placa.isEmpty
-            ? 'Debe registrar un conductor antes de realizar una nueva consulta.'
-            : 'El vehículo $placa no tiene un conductor registrado. Debe registrar un conductor antes de realizar una nueva consulta.';
+    if (requiereConductorObligatorio) {
+      final bool tieneConductor = await consultarExistenciaConductor();
+      debugPrint('==========================================');
+      debugPrint('RESULTADO VALIDACIÓN CONDUCTOR');
+      debugPrint('PLACA: $placa');
+      debugPrint('TIENE CONDUCTOR: $tieneConductor');
+      debugPrint('==========================================');
+      if (!tieneConductor) {
+        if (mensajeErrorConsulta.trim().isEmpty) {
+          mensajeErrorConsulta = placa.isEmpty
+              ? 'Debe registrar un conductor antes de realizar una nueva consulta.'
+              : 'El vehículo $placa no tiene un conductor registrado. '
+              'Debe registrar un conductor antes de realizar una nueva consulta.';
+        }
+        debugPrint('CAMBIO BLOQUEADO: OPERATIVO PREVENTIVO SIN CONDUCTOR');
+        return false;
       }
-
-      debugPrint('CAMBIO DE CONSULTA BLOQUEADO: VEHÍCULO SIN CONDUCTOR');
-      return false;
+    } else {
+      // Para Tránsito, Metro, Migración y cualquier otro módulo el conductor
+      // puede registrarse, pero NO constituye un requisito para continuar.
+      mensajeErrorConsulta = '';
+      debugPrint('VALIDACIÓN DE CONDUCTOR OMITIDA: MÓDULO NO PREVENTIVO');
     }
-
     // ==========================================================
     // GUARDAR RESULTADO PRELIMINAR DEL VEHÍCULO
     // ==========================================================
@@ -2589,17 +3222,16 @@ class OpServicioUrbanoController extends GetxController {
       final bool actualizado = await actualizarResultadoRegistro(
         idHdrEventoResum: idHdrEventoResumVehiculo,
         idVariableOriginal: idVariableInsertadaVehiculo,
+        variableSeleccionada: variableResultadoVehiculoSeleccionada.value,
       );
-
       if (!actualizado) {
         if (mensajeErrorActualizaResultado.trim().isEmpty) {
           mensajeErrorActualizaResultado =
-              'No fue posible guardar el resultado del vehículo consultado.';
+          'No fue posible guardar el resultado del vehículo consultado.';
         }
         return false;
       }
     }
-
     // ==========================================================
     // LIMPIAR VEHÍCULO ACTUAL
     // ==========================================================
@@ -2610,20 +3242,17 @@ class OpServicioUrbanoController extends GetxController {
     ocultarBtnBuscarVehiculo.value = false;
     placaConsultadaAnterior = placaConsultada;
     placaConsultada = '';
-
     _limpiarPersonasVehiculo();
-
     conductorRegistradoEnBaseDeDatos.value = false;
     conductorDesdeBase.value = null;
-
+    variableResultadoVehiculoSeleccionada.value = variableDefaultVehiculo;
+    variableResultadoPersonaVehiculoSeleccionada.value = variableDefaultPersona;
     limpiarSeleccionConsulta();
-
     return true;
   }
 
   Future<void> consultarLicencia(DataConsultaPersona data) async {
     peticionServerState(true);
-
     try {
       await ExceptionDialogos.manejarErroresShowDialogo(
         showMsjNodata: false,
@@ -2631,18 +3260,301 @@ class OpServicioUrbanoController extends GetxController {
           final GetLicenciaRequest request = GetLicenciaRequest(
             documento: data.dataSiipne.datosSiipne.documento,
           );
-
-
-          final DatosAnt respuesta =
-          await siipneMovilUseCase.getLicencia(
+          final DatosAnt respuesta = await siipneMovilUseCase.getLicencia(
             request: request,
           );
-
           data.datosAnt = respuesta;
         },
       );
     } finally {
       peticionServerState(false);
     }
+  }
+
+  bool _esTimeoutConsulta(Object error) {
+    final String mensaje = error.toString().toLowerCase();
+    return mensaje.contains('timeout') ||
+        mensaje.contains('timed out') ||
+        mensaje.contains('timeoutexception') ||
+        mensaje.contains('connection timeout') ||
+        mensaje.contains('receive timeout') ||
+        mensaje.contains('send timeout') ||
+        mensaje.contains('connectiontimeout') ||
+        mensaje.contains('receivetimeout') ||
+        mensaje.contains('sendtimeout') ||
+        mensaje.contains('tiempo de respuesta') ||
+        mensaje.contains('tiempo agotado');
+  }
+
+  Future<DataConsultaPersona> _consultarPersonaServidor({
+    required ConsultarPersonaRequest request,
+  }) async {
+    _ultimaConsultaPersonaRecuperadaPorTimeout = false;
+    try {
+      return await siipneMovilUseCase.consultarPersona(request: request);
+    } catch (e, stackTrace) {
+      if (!_esTimeoutConsulta(e)) {
+        debugPrint('==========================================');
+        debugPrint('ERROR CONSULTA PERSONA - NO ES TIMEOUT');
+        debugPrint('$e');
+        debugPrint('$stackTrace');
+        debugPrint('==========================================');
+        rethrow;
+      }
+      debugPrint('==========================================');
+      debugPrint('TIMEOUT CONSULTA PERSONA');
+      debugPrint(
+        'La petición pudo haberse procesado correctamente en el servidor.',
+      );
+      debugPrint('Se realizará UNA recuperación automática.');
+      debugPrint('==========================================');
+      await Future.delayed(const Duration(milliseconds: 900));
+      if (isClosed) {
+        throw Exception('El controlador fue cerrado durante la recuperación.');
+      }
+      _ultimaConsultaPersonaRecuperadaPorTimeout = true;
+      final DataConsultaPersona recuperada = await siipneMovilUseCase
+          .consultarPersona(request: request);
+      debugPrint('==========================================');
+      debugPrint('CONSULTA PERSONA RECUPERADA');
+      debugPrint('CONSULTA REPETIDA: ${recuperada.consultaRepetida}');
+      debugPrint('RECUPERACIÓN TÉCNICA POR TIMEOUT: SI');
+      debugPrint('ID HDR EVENTO RESUM: ${recuperada.idHdrEventoResum}');
+      debugPrint('==========================================');
+      return recuperada;
+    }
+  }
+
+  Future<DataVehiculo> _consultarVehiculoServidor({
+    required ConsultarVehiculoRequest request,
+  }) async {
+    try {
+      return await siipneMovilUseCase.consultarVehiculo(request: request);
+    } catch (e, stackTrace) {
+      if (!_esTimeoutConsulta(e)) {
+        debugPrint('==========================================');
+        debugPrint('ERROR CONSULTA VEHÍCULO - NO ES TIMEOUT');
+        debugPrint('$e');
+        debugPrint('$stackTrace');
+        debugPrint('==========================================');
+        rethrow;
+      }
+      debugPrint('==========================================');
+      debugPrint('TIMEOUT CONSULTA VEHÍCULO');
+      debugPrint(
+        'La petición pudo haberse procesado correctamente en el servidor.',
+      );
+      debugPrint('Se realizará UNA recuperación automática.');
+      debugPrint('==========================================');
+      await Future.delayed(const Duration(milliseconds: 900));
+      if (isClosed) {
+        throw Exception('El controlador fue cerrado durante la recuperación.');
+      }
+      final DataVehiculo recuperado = await siipneMovilUseCase
+          .consultarVehiculo(request: request);
+      debugPrint('==========================================');
+      debugPrint('CONSULTA VEHÍCULO RECUPERADA');
+      debugPrint('ID HDR EVENTO RESUM: ${recuperado.idHdrEventoResum}');
+      debugPrint('DATOS VEHÍCULO: ${recuperado.datosVehiculo.success}');
+      debugPrint('==========================================');
+      return recuperado;
+    }
+  }
+
+  Future<bool> _hayInternetPublico() async {
+    if (_verificandoInternetPublico) {
+      return internetPublicoDisponible.value;
+    }
+    _verificandoInternetPublico = true;
+    try {
+      debugPrint('==========================================');
+      debugPrint('[INTERNET] VERIFICANDO INTERNET PÚBLICO');
+      debugPrint('==========================================');
+      final bool disponible = await InternetConnection().hasInternetAccess
+          .timeout(const Duration(seconds: 3), onTimeout: () => false);
+      internetPublicoDisponible.value = disponible;
+      debugPrint('[INTERNET] INTERNET PÚBLICO: ${disponible ? 'SI' : 'NO'}');
+      if (!disponible) {
+        debugPrint(
+          '[INTERNET] Puede existir acceso únicamente '
+              'a los endpoints institucionales autorizados.',
+        );
+      }
+      debugPrint('==========================================');
+      return disponible;
+    } catch (e, stackTrace) {
+      internetPublicoDisponible.value = false;
+      debugPrint('==========================================');
+      debugPrint('[INTERNET] SIN ACCESO A INTERNET PÚBLICO');
+      debugPrint('[INTERNET] $e');
+      debugPrint('$stackTrace');
+      debugPrint('==========================================');
+      return false;
+    } finally {
+      _verificandoInternetPublico = false;
+    }
+  }
+
+  void _mostrarAlertaConsultaRepetida({
+    required String documento,
+    required int idHdrEventoResum,
+    String origen = 'PERSONA',
+    bool restrictiva = false,
+  }) {
+    if (isClosed) return;
+    final String documentoNormalizado = documento.trim().toUpperCase();
+    final String tipo = origen.trim().toUpperCase();
+    final String descripcionOrigen = tipo == 'CONDUCTOR'
+        ? ' como conductor'
+        : tipo == 'OCUPANTE'
+        ? ' como ocupante'
+        : '';
+    debugPrint('==========================================');
+    debugPrint(
+      restrictiva
+          ? 'ALERTA RESTRICTIVA - CONSULTA REPETIDA'
+          : 'ALERTA CONSULTA REPETIDA',
+    );
+    debugPrint('DOCUMENTO: $documentoNormalizado');
+    debugPrint('OPERATIVO: ${idHdrEventoActual.value}');
+    debugPrint('ID HDR RESUM: $idHdrEventoResum');
+    debugPrint('ORIGEN: $tipo');
+    debugPrint('==========================================');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (isClosed) return;
+      final String descripcion = restrictiva
+          ? 'La persona con documento $documentoNormalizado$descripcionOrigen ya fue consultada anteriormente dentro de este mismo operativo.\n\nEsta consulta no puede continuar. Realice la consulta con otro documento.'
+          : 'La persona con documento $documentoNormalizado$descripcionOrigen ya fue consultada anteriormente dentro de este mismo operativo. La vinculación continuará.';
+      if (restrictiva) {
+        DialogosAwesome.getError(
+          title: 'PERSONA YA CONSULTADA',
+          descripcion: descripcion,
+        );
+      } else {
+        DialogosAwesome.getWarning(
+          title: 'PERSONA CONSULTADA PREVIAMENTE',
+          descripcion: descripcion,
+        );
+      }
+    });
+  }
+
+  String _normalizarDocumentoAlerta(String documento) {
+    return documento.trim().toUpperCase().replaceAll(RegExp(r'[^A-Z0-9]'), '');
+  }
+
+  bool _resolverOrdenCapturaPersona({
+    required DataConsultaPersona persona,
+    required String documento,
+  }) {
+    final String documentoNormalizado = _normalizarDocumentoAlerta(documento);
+    /*
+   * ============================================================
+   * RESPUESTA ACTUAL DEL SERVIDOR
+   * ============================================================
+   */
+    final bool ordenServidor = persona.ordenCaptura.success;
+    if (ordenServidor) {
+      if (documentoNormalizado.isNotEmpty) {
+        _documentosConOrdenCapturaConfirmada.add(documentoNormalizado);
+      }
+      debugPrint('==========================================');
+      debugPrint('ORDEN DE CAPTURA CONFIRMADA POR SERVIDOR');
+      debugPrint('DOCUMENTO: $documentoNormalizado');
+      debugPrint('CONSULTA REPETIDA: ${persona.consultaRepetida}');
+      debugPrint('ID HDR RESUM: ${persona.idHdrEventoResum}');
+      debugPrint('==========================================');
+      return true;
+    }
+    /*
+   * ============================================================
+   * PROTECCIÓN PARA CONSULTA REPETIDA
+   * ============================================================
+   *
+   * Caso:
+   *
+   * 1. primera consulta:
+   *    ordenCaptura.success = true
+   *
+   * 2. segunda consulta:
+   *    consultaRepetida = true
+   *    ordenCaptura.success = false
+   *
+   * Si durante ESTA sesión ya confirmamos que ese documento
+   * tenía boleta, conservamos la alerta.
+   */
+    final bool alertaConfirmadaAnteriormente =
+        documentoNormalizado.isNotEmpty &&
+            _documentosConOrdenCapturaConfirmada.contains(documentoNormalizado);
+    if (persona.consultaRepetida && alertaConfirmadaAnteriormente) {
+      debugPrint('==========================================');
+      debugPrint('ORDEN DE CAPTURA RECUPERADA LOCALMENTE');
+      debugPrint('DOCUMENTO: $documentoNormalizado');
+      debugPrint('CONSULTA REPETIDA: SI');
+      debugPrint(
+        'El servidor no devolvió ordenCaptura.success=true, '
+            'pero este documento ya fue confirmado con boleta '
+            'durante esta sesión.',
+      );
+      debugPrint('==========================================');
+      return true;
+    }
+    debugPrint('==========================================');
+    debugPrint('PERSONA SIN ORDEN DE CAPTURA');
+    debugPrint('DOCUMENTO: $documentoNormalizado');
+    debugPrint('CONSULTA REPETIDA: ${persona.consultaRepetida}');
+    debugPrint('==========================================');
+    return false;
+  }
+
+  Future<bool> _procesarOrdenCapturaPersona({
+    required DataConsultaPersona persona,
+    required String documento,
+    bool actualizarConsultaPrincipal = true,
+    String origen = 'PERSONA',
+  }) async {
+    final bool tieneBoleta = _resolverOrdenCapturaPersona(
+      persona: persona,
+      documento: documento,
+    );
+    /*
+   * La variable tieneOrdenCaptura pertenece a la consulta
+   * principal de persona.
+   *
+   * Para conductor/ocupante solamente reproducimos
+   * la alerta sin alterar la consulta principal.
+   */
+    if (actualizarConsultaPrincipal) {
+      tieneOrdenCaptura.value = tieneBoleta;
+    }
+    debugPrint('==========================================');
+    debugPrint('RESULTADO VALIDACIÓN ALERTA');
+    debugPrint('ORIGEN: $origen');
+    debugPrint('DOCUMENTO: $documento');
+    debugPrint('CONSULTA REPETIDA: ${persona.consultaRepetida}');
+    debugPrint('ORDEN SERVIDOR: ${persona.ordenCaptura.success}');
+    debugPrint('ORDEN EFECTIVA: $tieneBoleta');
+    debugPrint('==========================================');
+    if (!tieneBoleta) {
+      return false;
+    }
+    /*
+   * Reproducir alerta siempre:
+   *
+   * - consulta nueva
+   * - consulta repetida
+   * - recuperación después de timeout
+   * - conductor
+   * - ocupante
+   */
+    try {
+      await UtilidadesUtil.playAudio(
+        nameAudio: AppSiipneMovilImages.audio_Alerta,
+      );
+    } catch (e, stackTrace) {
+      debugPrint('No fue posible reproducir audio de alerta: $e');
+      debugPrint('$stackTrace');
+    }
+    return true;
   }
 }
