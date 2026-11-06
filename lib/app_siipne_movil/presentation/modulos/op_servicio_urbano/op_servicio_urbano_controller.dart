@@ -223,6 +223,7 @@ class OpServicioUrbanoController extends GetxController {
   }
 
   Future<void> _activarNotificacionesOperativo() async {
+
     final int idEvento = idHdrEventoActual.value;
 
     if (isClosed) return;
