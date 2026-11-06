@@ -576,7 +576,7 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
       final List<VariablesResultado> variables =
           controller.variablesResultadoPersona;
       final VariablesResultado? seleccionada =
-          controller.variableResultadoSeleccionada.value;
+          controller.variableResultadoPersonaVehiculoSeleccionada.value;
 
       if (cargando) {
         return Container(
@@ -749,8 +749,10 @@ class _OpVehiculoPersonasPageState extends State<OpVehiculoPersonasPage> {
                 onChanged: controller.consultandoPersonaVehiculo.value
                     ? null
                     : (VariablesResultado? value) {
-                        controller.seleccionarVariableResultado(value);
-                      },
+                  controller.seleccionarVariableResultadoPersonaVehiculo(
+                    value,
+                  );
+                },
               ),
             ),
           ),

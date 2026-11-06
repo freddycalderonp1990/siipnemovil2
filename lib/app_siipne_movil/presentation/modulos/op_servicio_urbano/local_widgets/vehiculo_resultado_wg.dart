@@ -55,9 +55,12 @@ mixin VehiculoResultadoViewMixin on OpServicioUrbanoPageBase {
 
     if (controller.mensajeErrorConsulta.trim().isNotEmpty) {
       DialogosAwesome.getWarning(
-        title: "CONDUCTOR REQUERIDO",
+        title: controller.requiereConductorObligatorio
+            ? "CONDUCTOR REQUERIDO"
+            : "NO ES POSIBLE CONTINUAR",
         descripcion: controller.mensajeErrorConsulta,
       );
+
       return;
     }
 

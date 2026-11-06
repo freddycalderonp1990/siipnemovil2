@@ -37,9 +37,11 @@ packages:
   app_mi_upc:
     dependency: "direct main"
     description:
-      path: "/Users/policianacional/AndroidStudioProjects/app_mi_upc"
-      relative: false
-    source: path
+      path: "."
+      ref: "6.0.1"
+      resolved-ref: a83894ce2ced37a04a732c51d22bb39858a8cf9c
+      url: "https://github.com/freddycalderonp1990/app_mi_upc.git"
+    source: git
     version: "0.0.1"
   archive:
     dependency: transitive
@@ -973,6 +975,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.2"
+  internet_connection_checker_plus:
+    dependency: "direct main"
+    description:
+      name: internet_connection_checker_plus
+      sha256: "43edc904d8b8a9f5a2f871e9317a352ca005641b2f158a8b22732447c9f3994e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.2"
   intl:
     dependency: transitive
     description:

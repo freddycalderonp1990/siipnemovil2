@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.2+7
+version: 1.0.2+10
 
 environment:
   sdk: ^3.13.4
@@ -36,7 +36,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.9
-
+  internet_connection_checker_plus: ^3.1.2 #verificar si existe internet
   flutter_dotenv: ^6.0.1 #leer .env
   image_picker: ^1.2.3 #Obtener img de la camara o galeria
   flutter_pdfview: ^1.4.5 #Visaulizar PDF
@@ -95,8 +95,9 @@ dependencies:
       url: https://github.com/freddycalderonp1990/paquete_api_provider.git
       ref: 1.0.6
   app_mi_upc:
-    path: /Users/policianacional/AndroidStudioProjects/app_mi_upc
-
+    git:
+      url: https://github.com/freddycalderonp1990/app_mi_upc.git
+      ref: 6.0.1
   #app_mi_upc:
    # git:
     #  url: https://github.com/freddycalderonp1990/app_mi_upc.git
